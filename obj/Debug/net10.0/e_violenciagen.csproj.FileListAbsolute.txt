@@ -186,3 +186,4 @@ C:\Users\enguema\source\repos\e-violenciagen\obj\Debug\net10.0\refint\e_violenci
 C:\Users\enguema\source\repos\e-violenciagen\obj\Debug\net10.0\e_violenciagen.pdb
 C:\Users\enguema\source\repos\e-violenciagen\obj\Debug\net10.0\e_violenciagen.genruntimeconfig.cache
 C:\Users\enguema\source\repos\e-violenciagen\obj\Debug\net10.0\ref\e_violenciagen.dll
+C:\Users\enguema\source\repos\e-violenciagen\obj\Debug\net10.0\e_violenciagen.sourcelink.json

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("e_violenciagen")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1c2da121144632ed15f3cf9ec4a36e90a6117e74")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+349ab33a31c2fc1d0a48f5c162ff7b1e7bc388c5")]
 [assembly: System.Reflection.AssemblyProductAttribute("e_violenciagen")]
 [assembly: System.Reflection.AssemblyTitleAttribute("e_violenciagen")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
