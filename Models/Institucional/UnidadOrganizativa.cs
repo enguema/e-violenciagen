@@ -15,7 +15,7 @@ namespace e_violenciagen.Models;
 /// - Juzgado
 /// etc.
 /// </summary>
-public class UnidadOrganizativa: BaseEntity
+public class UnidadOrganizativa : BaseEntity
 {
     public string Codigo { get; set; } = string.Empty;
     public string? Descripcion { get; set; }
@@ -44,4 +44,10 @@ public class UnidadOrganizativa: BaseEntity
     /// </summary>
     public ICollection<UnidadOrganizativa> UnidadesHijas { get; set; }
         = new List<UnidadOrganizativa>();
+
+    /// <summary>
+    /// Personas vinculadas profesionalmente a esta institución.
+    /// </summary>
+    public ICollection<PersonaInstitucion> PersonasVinculadas { get; set; }
+        = new List<PersonaInstitucion>();
 }

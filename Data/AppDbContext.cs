@@ -24,11 +24,9 @@ public class AppDbContext : DbContext
     // MODELO INSTITUCIONAL
     // =========================================================
 
-    public DbSet<TipoInstitucion> TiposInstitucion =>
-        Set<TipoInstitucion>();
+    public DbSet<TipoInstitucion> TiposInstitucion => Set<TipoInstitucion>();
 
-    public DbSet<Institucion> Instituciones =>
-        Set<Institucion>();
+    public DbSet<Institucion> Instituciones => Set<Institucion>();
 
     public DbSet<UnidadOrganizativa> UnidadesOrganizativas =>
         Set<UnidadOrganizativa>();
@@ -38,31 +36,37 @@ public class AppDbContext : DbContext
     // TERRITORIO
     // =========================================================
 
-    public DbSet<Provincia> Provincias =>
-        Set<Provincia>();
+    public DbSet<Provincia> Provincias => Set<Provincia>();
 
-    public DbSet<Distrito> Distritos =>
-        Set<Distrito>();
+    public DbSet<Distrito> Distritos => Set<Distrito>();
 
-    public DbSet<Barrio> Barrios =>
-        Set<Barrio>();
+    public DbSet<Barrio> Barrios => Set<Barrio>();
 
 
     // =========================================================
     // CATÁLOGOS
     // =========================================================
 
-    public DbSet<TipoViolencia> TiposViolencia =>
-        Set<TipoViolencia>();
+    public DbSet<TipoViolencia> TiposViolencia => Set<TipoViolencia>();
 
-    public DbSet<EstadoCaso> EstadosCaso =>
-        Set<EstadoCaso>();
+    public DbSet<EstadoCaso> EstadosCaso => Set<EstadoCaso>();
 
-    public DbSet<TipoActuacion> TiposActuacion =>
-        Set<TipoActuacion>();
+    public DbSet<TipoActuacion> TiposActuacion => Set<TipoActuacion>();
 
-    public DbSet<TipoDocumentoExpediente> TiposDocumentoExpediente =>
-        Set<TipoDocumentoExpediente>();
+    public DbSet<TipoDocumentoExpediente> TiposDocumentoExpediente => Set<TipoDocumentoExpediente>();
+
+    // =========================================================
+    // PERSONAS Y ACTORES
+    // =========================================================
+
+    public DbSet<TipoDocumentoIdentidad> TiposDocumentoIdentidad =>
+        Set<TipoDocumentoIdentidad>();
+
+    public DbSet<Persona> Personas =>
+        Set<Persona>();
+
+    public DbSet<PersonaInstitucion> PersonasInstituciones =>
+        Set<PersonaInstitucion>();
 
     /// <summary>
     /// Aquí configuraremos progresivamente las entidades
