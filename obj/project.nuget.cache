@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "qqYG9saxsWI=",
+  "dgSpecHash": "NgkDUhcVZWE=",
   "success": true,
-  "projectFilePath": "C:\\Users\\enguema\\source\\repos\\e-violenciagen\\e_violenciagen.csproj",
+  "projectFilePath": "C:\\Users\\enguema\\Repos\\e-violenciagen\\e_violenciagen.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\enguema\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\enguema\\.nuget\\packages\\microsoft.build.framework\\18.0.2\\microsoft.build.framework.18.0.2.nupkg.sha512",
