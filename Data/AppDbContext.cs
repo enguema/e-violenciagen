@@ -59,14 +59,18 @@ public class AppDbContext : DbContext
     // PERSONAS Y ACTORES
     // =========================================================
 
-    public DbSet<TipoDocumentoIdentidad> TiposDocumentoIdentidad =>
-        Set<TipoDocumentoIdentidad>();
+    public DbSet<TipoDocumentoIdentidad> TiposDocumentoIdentidad => Set<TipoDocumentoIdentidad>();
 
-    public DbSet<Persona> Personas =>
-        Set<Persona>();
+    public DbSet<Persona> Personas => Set<Persona>();
 
-    public DbSet<PersonaInstitucion> PersonasInstituciones =>
-        Set<PersonaInstitucion>();
+    public DbSet<PersonaInstitucion> PersonasInstituciones => Set<PersonaInstitucion>();
+
+    // =========================================================
+    // CASOS
+    // =========================================================
+
+    public DbSet<Caso> Casos => Set<Caso>();
+    public DbSet<CasoTipoViolencia> CasosTiposViolencia => Set<CasoTipoViolencia>();
 
     /// <summary>
     /// Aquí configuraremos progresivamente las entidades
@@ -85,5 +89,6 @@ public class AppDbContext : DbContext
          * modelBuilder.ApplyConfigurationsFromAssembly(
          *     typeof(AppDbContext).Assembly);
          */
+         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 }

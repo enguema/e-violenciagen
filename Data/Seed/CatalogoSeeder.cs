@@ -18,6 +18,18 @@ public static class CatalogoSeeder
         {
             await CrearTiposDocumentoIdentidadAsync(dbContext, cancellationToken);
         }
+
+        if (!await dbContext.EstadosCaso.AnyAsync(cancellationToken))
+        {
+            await CrearEstadosCasoAsync(
+                dbContext,
+                cancellationToken);
+        }
+
+        if (!await dbContext.TiposViolencia.AnyAsync(cancellationToken))
+        {
+            await CrearTiposViolenciaAsync(dbContext, cancellationToken);
+        }
     }
 
     private static async Task CrearTiposInstitucionAsync(AppDbContext dbContext, CancellationToken cancellationToken)
@@ -96,4 +108,93 @@ public static class CatalogoSeeder
 
         await dbContext.SaveChangesAsync(cancellationToken);
     }
+
+    private static async Task CrearEstadosCasoAsync(AppDbContext dbContext, CancellationToken cancellationToken)
+    {
+        /*
+         * Estos son estados iniciales de trabajo.
+         *
+         * No deben considerarse todavía una definición
+         * jurídica definitiva del ciclo de vida de un caso.
+         * Podremos modificarlos cuando se validen los
+         * procedimientos institucionales.
+         */
+        var estados = new[]
+        {
+        new EstadoCaso
+        {
+            Codigo = "REGISTRADO",
+            Nombre = "Registrado",
+            Descripcion = "Caso registrado inicialmente en SIGEVIG.",
+            Orden = 1
+        },
+
+        new EstadoCaso
+        {
+            Codigo = "EN_SEGUIMIENTO",
+            Nombre = "En seguimiento",
+            Descripcion = "Caso actualmente atendido o en seguimiento.",
+            Orden = 2
+        },
+
+        new EstadoCaso
+        {
+            Codigo = "CERRADO",
+            Nombre = "Cerrado",
+            Descripcion = "Caso cuyo seguimiento ha finalizado.",
+            Orden = 3
+        }
+    };
+
+        await dbContext.EstadosCaso.AddRangeAsync(
+            estados,
+            cancellationToken);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private static async Task CrearTiposViolenciaAsync(AppDbContext dbContext, CancellationToken cancellationToken)
+    {
+        /*
+         * CATÁLOGO PROVISIONAL.
+         *
+         * Estos valores permiten desarrollar y probar el sistema.
+         * Deben validarse posteriormente contra la normativa y
+         * protocolos oficiales aplicables en Guinea Ecuatorial.
+         */
+        var tipos = new[]
+        {
+        new TipoViolencia
+        {
+            Codigo = "FISICA",
+            Nombre = "Violencia física"
+        },
+
+        new TipoViolencia
+        {
+            Codigo = "PSICOLOGICA",
+            Nombre = "Violencia psicológica"
+        },
+
+        new TipoViolencia
+        {
+            Codigo = "SEXUAL",
+            Nombre = "Violencia sexual"
+        },
+
+        new TipoViolencia
+        {
+            Codigo = "ECONOMICA",
+            Nombre = "Violencia económica"
+        }
+    };
+
+        await dbContext.TiposViolencia.AddRangeAsync(
+            tipos,
+            cancellationToken);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    
 }

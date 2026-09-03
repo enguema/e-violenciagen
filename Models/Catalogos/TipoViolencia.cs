@@ -10,4 +10,11 @@ public class TipoViolencia : BaseEntity
     public string Codigo { get; set; } = string.Empty;
     public string Nombre { get; set; } = string.Empty;
     public string? Descripcion { get; set; }
+
+    /// <summary>
+    /// Casos que han sido clasificados con este tipo
+    /// de violencia.
+    /// </summary>
+    public ICollection<CasoTipoViolencia> Casos { get; set; }
+        = new List<CasoTipoViolencia>();
 }

@@ -7,7 +7,7 @@ namespace e_violenciagen.Models;
 /// cuando analicemos los procedimientos reales.
 /// </summary>
 public class EstadoCaso : BaseEntity
-{    
+{
     public string Codigo { get; set; } = string.Empty;
     public string Nombre { get; set; } = string.Empty;
     public string? Descripcion { get; set; }
@@ -17,4 +17,10 @@ public class EstadoCaso : BaseEntity
     /// aparecerán en interfaces y listados.
     /// </summary>
     public int Orden { get; set; }
+
+    /// <summary>
+    /// Casos cuyo estado actual corresponde a este valor.
+    /// </summary>
+    public ICollection<Caso> Casos { get; set; }
+        = new List<Caso>();
 }
