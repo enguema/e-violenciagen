@@ -97,5 +97,26 @@ public class Persona : BaseEntity
     /// con una o varias instituciones a lo largo del tiempo.
     /// </summary>
     public ICollection<PersonaInstitucion> VinculacionesInstitucionales
-        { get; set; } = new List<PersonaInstitucion>();
+    { get; set; } = new List<PersonaInstitucion>();
+
+    // =========================================================
+    // PARTICIPACIÓN EN CASOS
+    // =========================================================
+
+    /// <summary>
+    /// Casos en los que esta persona figura como víctima.
+    ///
+    /// Esto NO significa que Persona sea una "entidad víctima";
+    /// únicamente muestra las relaciones concretas existentes.
+    /// </summary>
+    public ICollection<CasoVictima> CasosComoVictima { get; set; }
+        = new List<CasoVictima>();
+
+
+    /// <summary>
+    /// Casos en los que esta persona figura como
+    /// presunto agresor.
+    /// </summary>
+    public ICollection<CasoPresuntoAgresor> CasosComoPresuntoAgresor
+    { get; set; } = new List<CasoPresuntoAgresor>();
 }

@@ -144,4 +144,18 @@ public class Caso : BaseEntity
     /// </summary>
     public ICollection<CasoTipoViolencia> TiposViolencia { get; set; }
         = new List<CasoTipoViolencia>();
+
+    /// <summary>
+    /// Personas que participan como víctimas dentro del caso.
+    /// </summary>
+    public ICollection<CasoVictima> Victimas { get; set; }
+        = new List<CasoVictima>();
+
+
+    /// <summary>
+    /// Personas identificadas dentro del expediente
+    /// como presuntos agresores.
+    /// </summary>
+    public ICollection<CasoPresuntoAgresor> PresuntosAgresores { get; set; }
+        = new List<CasoPresuntoAgresor>();
 }

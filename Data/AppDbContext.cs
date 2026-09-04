@@ -71,6 +71,8 @@ public class AppDbContext : DbContext
 
     public DbSet<Caso> Casos => Set<Caso>();
     public DbSet<CasoTipoViolencia> CasosTiposViolencia => Set<CasoTipoViolencia>();
+    public DbSet<CasoVictima> CasosVictimas => Set<CasoVictima>();
+    public DbSet<CasoPresuntoAgresor> CasosPresuntosAgresores => Set<CasoPresuntoAgresor>();
 
     /// <summary>
     /// Aquí configuraremos progresivamente las entidades
@@ -89,6 +91,6 @@ public class AppDbContext : DbContext
          * modelBuilder.ApplyConfigurationsFromAssembly(
          *     typeof(AppDbContext).Assembly);
          */
-         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 }
