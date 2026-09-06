@@ -1,0 +1,64 @@
+/* ==========================================================
+   EXPEDIENTE SIGEVIG
+   ========================================================== */
+
+.expediente-card {
+    border: 0;
+    border-radius: 0.9rem;
+}
+
+.expediente-section-title {
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.expediente-label {
+    color: var(--bs-secondary-color);
+    font-size: 0.85rem;
+    margin-bottom: 0.2rem;
+}
+
+.expediente-value {
+    font-weight: 500;
+}
+
+.timeline-item {
+    position: relative;
+}
+
+.timeline-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+/* Formularios del expediente */
+
+.form-control,
+.form-select {
+    min-height: 2.75rem;
+}
+
+textarea.form-control {
+    min-height: auto;
+}
+
+.card {
+    border-radius: 0.9rem;
+}
+
+.card-header {
+    border-top-left-radius: 0.9rem !important;
+    border-top-right-radius: 0.9rem !important;
+}
+
+.form-check.border {
+    transition:
+        border-color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out;
+}
+
+.form-check.border:has(.form-check-input:checked) {
+    border-color: var(--bs-primary) !important;
+    background-color: var(--bs-primary-bg-subtle);
+}

@@ -11,4 +11,10 @@ public class TipoDocumentoExpediente : BaseEntity
     public string Codigo { get; set; } = string.Empty;
     public string Nombre { get; set; } = string.Empty;
     public string? Descripcion { get; set; }
+
+    /// <summary>
+    /// Documentos clasificados con este tipo.
+    /// </summary>
+    public ICollection<DocumentoExpediente> Documentos { get; set; }
+        = new List<DocumentoExpediente>();
 }

@@ -158,4 +158,18 @@ public class Caso : BaseEntity
     /// </summary>
     public ICollection<CasoPresuntoAgresor> PresuntosAgresores { get; set; }
         = new List<CasoPresuntoAgresor>();
+
+    /// <summary>
+    /// Actuaciones realizadas por las diferentes instituciones
+    /// a lo largo del ciclo de vida del caso.
+    /// </summary>
+    public ICollection<Actuacion> Actuaciones { get; set; }
+        = new List<Actuacion>();
+
+    /// <summary>
+    /// Documentos que forman parte del expediente electrónico
+    /// del caso.
+    /// </summary>
+    public ICollection<DocumentoExpediente> Documentos { get; set; }
+        = new List<DocumentoExpediente>();
 }

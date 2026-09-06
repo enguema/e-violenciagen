@@ -1,0 +1,562 @@
+@model e_violenciagen.ViewModels.Casos.CasoCreateViewModel
+
+@{
+    ViewData["Title"] = "Registrar nuevo caso";
+}
+
+<div class="container-fluid py-4">
+
+    <!-- =====================================================
+         CABECERA
+         ===================================================== -->
+
+    <div class="d-flex flex-column flex-lg-row
+        justify-content-between
+        align-items-lg-center
+        gap-3 mb-4">
+
+        <div>
+            <div class="text-uppercase text-primary
+                small fw-semibold mb-1">
+                Expediente electrónico
+            </div>
+
+            <h1 class="h3 fw-bold mb-1">
+                Registrar nuevo caso
+            </h1>
+
+            <p class="text-muted mb-0">
+                Introduzca la información inicial disponible.
+                El expediente podrá completarse posteriormente.
+            </p>
+        </div>
+
+        <a asp-action="Index" class="btn btn-outline-secondary">
+
+            Volver a expedientes
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         ALERTAS AJAX
+         ===================================================== -->
+
+    <div id="formAlert" class="alert d-none" role="alert">
+    </div>
+
+
+    <form asp-controller="Caso" asp-action="Create" method="post" id="formCaso">
+
+        @Html.AntiForgeryToken()
+
+
+        <div class="row g-4">
+
+            <!-- =================================================
+                 COLUMNA PRINCIPAL
+                 ================================================= -->
+
+            <div class="col-xl-8">
+
+                <!-- DATOS DEL CASO -->
+                <div class="card border-0 shadow-sm mb-4">
+
+                    <div class="card-header bg-white border-0 py-3">
+
+                        <h5 class="fw-semibold mb-1">
+                            Información del caso
+                        </h5>
+
+                        <small class="text-muted">
+                            Datos iniciales del hecho comunicado.
+                        </small>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-4">
+
+                                <label asp-for="FechaHecho" class="form-label">
+                                </label>
+
+                                <input asp-for="FechaHecho" type="date" class="form-control" />
+
+                                <span asp-validation-for="FechaHecho" class="text-danger small">
+                                </span>
+
+                            </div>
+
+
+                            <div class="col-md-8">
+
+                                <label asp-for="Resumen" class="form-label">
+                                </label>
+
+                                <input asp-for="Resumen" class="form-control" placeholder="Resumen breve del caso" />
+
+                            </div>
+
+
+                            <div class="col-12">
+
+                                <label asp-for="RelatoInicial" class="form-label">
+                                </label>
+
+                                <textarea asp-for="RelatoInicial" class="form-control" rows="5"
+                                          placeholder="Describa los hechos conocidos inicialmente...">
+                                </textarea>
+
+                                <div class="form-text">
+                                    Las declaraciones formales y los informes
+                                    se incorporarán posteriormente como
+                                    actuaciones o documentos.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- VÍCTIMA -->
+                <div class="card border-0 shadow-sm mb-4">
+
+                    <div class="card-header bg-white border-0 py-3">
+
+                        <div class="d-flex align-items-center
+                            justify-content-between">
+
+                            <div>
+                                <h5 class="fw-semibold mb-1">
+                                    Víctima principal
+                                </h5>
+
+                                <small class="text-muted">
+                                    Identificación básica de la persona.
+                                </small>
+                            </div>
+
+                            <span class="badge bg-primary-subtle text-primary">
+                                Obligatoria
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label asp-for="Victima.Nombres" class="form-label">
+                                    Nombres
+                                </label>
+
+                                <input asp-for="Victima.Nombres" class="form-control" />
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <label asp-for="Victima.Apellidos" class="form-label">
+                                    Apellidos
+                                </label>
+
+                                <input asp-for="Victima.Apellidos" class="form-control" />
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Tipo de documento
+                                </label>
+
+                                <select asp-for="Victima.TipoDocumentoIdentidadId" class="form-select">
+
+                                    <option value="">
+                                        Sin documento / desconocido
+                                    </option>
+
+                                    @foreach (var tipo in Model.TiposDocumento)
+                                    {
+                                        <option value="@tipo.Id">
+                                            @tipo.Nombre
+                                        </option>
+                                    }
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label asp-for="Victima.NumeroDocumento" class="form-label">
+                                    Número de documento
+                                </label>
+
+                                <input asp-for="Victima.NumeroDocumento" class="form-control" />
+
+                            </div>
+
+
+                            <div class="col-md-4">
+
+                                <label asp-for="Victima.FechaNacimiento" class="form-label">
+                                    Fecha de nacimiento
+                                </label>
+
+                                <input asp-for="Victima.FechaNacimiento" type="date" class="form-control" />
+
+                            </div>
+
+
+                            <div class="col-md-4">
+
+                                <label asp-for="Victima.Telefono" class="form-label">
+                                    Teléfono
+                                </label>
+
+                                <input asp-for="Victima.Telefono" class="form-control" />
+
+                            </div>
+
+
+                            <div class="col-md-4">
+
+                                <label asp-for="Victima.Email" class="form-label">
+                                    Correo electrónico
+                                </label>
+
+                                <input asp-for="Victima.Email" class="form-control" />
+
+                            </div>
+
+
+                            <div class="col-12">
+
+                                <div class="form-check
+                                    border rounded-3 p-3 ps-5">
+
+                                    <input asp-for="VictimaRequiereProteccion" class="form-check-input" />
+
+                                    <label asp-for="VictimaRequiereProteccion" class="form-check-label fw-semibold">
+                                        La víctima requiere valoración o
+                                        medidas de protección
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-12">
+
+                                <label asp-for="ObservacionesVictima" class="form-label">
+                                    Observaciones
+                                </label>
+
+                                <textarea asp-for="ObservacionesVictima" class="form-control" rows="3">
+                                </textarea>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- PRESUNTO AGRESOR -->
+                <div class="card border-0 shadow-sm">
+
+                    <div class="card-header bg-white border-0 py-3">
+
+                        <div class="form-check form-switch">
+
+                            <input asp-for="IncluirPresuntoAgresor" class="form-check-input" id="incluirAgresor" />
+
+                            <label class="form-check-label fw-semibold" for="incluirAgresor">
+                                Presunto agresor identificado
+                            </label>
+
+                        </div>
+
+                        <small class="text-muted">
+                            Active esta opción solamente si existe
+                            una persona identificada.
+                        </small>
+
+                    </div>
+
+
+                    <div class="card-body d-none" id="agresorFields">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                <label asp-for="PresuntoAgresor.Nombres" class="form-label">
+                                    Nombres
+                                </label>
+
+                                <input asp-for="PresuntoAgresor.Nombres" class="form-control" />
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label asp-for="PresuntoAgresor.Apellidos" class="form-label">
+                                    Apellidos
+                                </label>
+
+                                <input asp-for="PresuntoAgresor.Apellidos" class="form-control" />
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Tipo de documento
+                                </label>
+
+                                <select asp-for="PresuntoAgresor.TipoDocumentoIdentidadId" class="form-select">
+
+                                    <option value="">
+                                        Sin documento / desconocido
+                                    </option>
+
+                                    @foreach (var tipo in Model.TiposDocumento)
+                                    {
+                                        <option value="@tipo.Id">
+                                            @tipo.Nombre
+                                        </option>
+                                    }
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label asp-for="PresuntoAgresor.NumeroDocumento" class="form-label">
+                                    Número de documento
+                                </label>
+
+                                <input asp-for="PresuntoAgresor.NumeroDocumento" class="form-control" />
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label asp-for="PresuntoAgresor.FechaNacimiento" class="form-label">
+                                    Fecha de nacimiento
+                                </label>
+
+                                <input asp-for="PresuntoAgresor.FechaNacimiento" type="date" class="form-control" />
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label asp-for="RelacionConVictima" class="form-label">
+                                    Relación con la víctima
+                                </label>
+
+                                <input asp-for="RelacionConVictima" class="form-control"
+                                       placeholder="Ej.: pareja, expareja..." />
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 COLUMNA LATERAL
+                 ================================================= -->
+
+            <div class="col-xl-4">
+
+                <!-- LOCALIZACIÓN -->
+                <div class="card border-0 shadow-sm mb-4">
+
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="fw-semibold mb-0">
+                            Localización del hecho
+                        </h5>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="mb-3">
+
+                            <label asp-for="ProvinciaId" class="form-label">
+                            </label>
+
+                            <select asp-for="ProvinciaId" class="form-select" id="provinciaSelect">
+
+                                <option value="">
+                                    Seleccione...
+                                </option>
+
+                                @foreach (var provincia in Model.Provincias)
+                                {
+                                    <option value="@provincia.Id">
+                                        @provincia.Nombre
+                                    </option>
+                                }
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label asp-for="DistritoId" class="form-label">
+                            </label>
+
+                            <select asp-for="DistritoId" class="form-select" id="distritoSelect" disabled>
+
+                                <option value="">
+                                    Seleccione provincia primero
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label asp-for="BarrioHechoId" class="form-label">
+                            </label>
+
+                            <select asp-for="BarrioHechoId" class="form-select" id="barrioSelect" disabled>
+
+                                <option value="">
+                                    Seleccione distrito primero
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div>
+
+                            <label asp-for="LugarDescripcion" class="form-label">
+                            </label>
+
+                            <textarea asp-for="LugarDescripcion" rows="3" class="form-control"
+                                      placeholder="Referencia adicional...">
+                            </textarea>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- TIPOS DE VIOLENCIA -->
+                <div class="card border-0 shadow-sm mb-4">
+
+                    <div class="card-header bg-white border-0 py-3">
+
+                        <h5 class="fw-semibold mb-1">
+                            Clasificación
+                        </h5>
+
+                        <small class="text-muted">
+                            Puede seleccionar varios tipos.
+                        </small>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        @foreach (var tipo in Model.TiposViolencia)
+                        {
+                            <div class="form-check
+                                border rounded-3
+                                p-3 ps-5 mb-2">
+
+                                <input class="form-check-input" type="checkbox" name="TiposViolenciaIds" value="@tipo.Id"
+                                       id="violencia_@tipo.Id" />
+
+                                <label class="form-check-label" for="violencia_@tipo.Id">
+                                    @tipo.Nombre
+                                </label>
+
+                            </div>
+                        }
+
+                    </div>
+                </div>
+
+
+                <!-- GUARDAR -->
+                <div class="card border-0 shadow-sm">
+
+                    <div class="card-body">
+
+                        <div class="d-grid gap-2">
+
+                            <button type="submit" id="btnGuardar" class="btn btn-primary btn-lg">
+
+                                Registrar expediente
+
+                            </button>
+
+                            <a asp-action="Index" class="btn btn-light">
+                                Cancelar
+                            </a>
+
+                        </div>
+
+                        <hr />
+
+                        <p class="small text-muted mb-0">
+                            El código oficial del expediente será
+                            generado automáticamente al guardar.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="~/js/casos/create.js" asp-append-version="true">
+    </script>
+}

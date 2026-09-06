@@ -1,0 +1,166 @@
+@model IReadOnlyList<e_violenciagen.ViewModels.Casos.CasoIndexItemViewModel>
+
+@{
+    ViewData["Title"] = "Expedientes";
+}
+
+<div class="container-fluid py-4">
+
+    <!-- =====================================================
+         CABECERA
+         ===================================================== -->
+    <div class="d-flex flex-column flex-lg-row
+        justify-content-between align-items-lg-center
+        gap-3 mb-4">
+
+        <div>
+            <h1 class="h3 fw-bold mb-1">
+                Expedientes
+            </h1>
+
+            <p class="text-muted mb-0">
+                Seguimiento integral de casos de violencia de género
+            </p>
+        </div>
+
+        <div>
+            @*<button class="btn btn-primary px-4">
+                <i class="bi bi-plus-lg me-2"></i>
+                Nuevo caso
+            </button>*@
+            <a asp-controller="Caso" asp-action="Create" class="btn btn-primary px-4">
+
+                Nuevo caso
+            </a>
+        </div>
+    </div>
+
+
+    <!-- =====================================================
+         RESUMEN
+         ===================================================== -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <div class="text-muted small">
+                        Expedientes registrados
+                    </div>
+
+                    <div class="display-6 fw-bold">
+                        @Model.Count
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TABLA
+         ===================================================== -->
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white border-0 py-3">
+            <h5 class="mb-0 fw-semibold">
+                Casos registrados
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>Expediente</th>
+                            <th>Registro</th>
+                            <th>Estado</th>
+                            <th class="text-center">Víctimas</th>
+                            <th class="text-center">Presuntos agresores</th>
+                            <th class="text-center">Actuaciones</th>
+                            <th class="text-center">Documentos</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var caso in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    <div class="fw-semibold">
+                                        @caso.CodigoCaso
+                                    </div>
+
+                                    @if (caso.FechaHecho.HasValue)
+                                    {
+                                        <small class="text-muted">
+                                            Hecho:
+                                            @caso.FechaHecho.Value.ToString("dd/MM/yyyy")
+                                        </small>
+                                    }
+                                </td>
+
+                                <td>
+                                    @caso.FechaRegistro.ToLocalTime()
+                                    .ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td>
+                                    <span class="badge rounded-pill
+                                        bg-primary-subtle
+                                        text-primary">
+                                        @caso.Estado
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark">
+                                        @caso.NumeroVictimas
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+                                    @caso.NumeroPresuntosAgresores
+                                </td>
+
+                                <td class="text-center">
+                                    @caso.NumeroActuaciones
+                                </td>
+
+                                <td class="text-center">
+                                    @caso.NumeroDocumentos
+                                </td>
+
+                                <td class="text-end">
+
+                                    <a asp-controller="Caso" asp-action="Details" asp-route-id="@caso.Id"
+                                       class="btn btn-sm btn-outline-primary">
+
+                                        Ver expediente
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>

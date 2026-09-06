@@ -74,6 +74,22 @@ public class AppDbContext : DbContext
     public DbSet<CasoVictima> CasosVictimas => Set<CasoVictima>();
     public DbSet<CasoPresuntoAgresor> CasosPresuntosAgresores => Set<CasoPresuntoAgresor>();
 
+    // =========================================================
+    // ACTUACIONES INSTITUCIONALES
+    // =========================================================
+    public DbSet<Actuacion> Actuaciones =>
+        Set<Actuacion>();
+
+    public DbSet<ActuacionParticipante> ActuacionesParticipantes =>
+        Set<ActuacionParticipante>();
+
+    // =========================================================
+    // EXPEDIENTE ELECTRÓNICO / DOCUMENTOS
+    // =========================================================
+
+    public DbSet<DocumentoExpediente> DocumentosExpediente =>
+        Set<DocumentoExpediente>();
+
     /// <summary>
     /// Aquí configuraremos progresivamente las entidades
     /// mediante Fluent API.
@@ -91,6 +107,27 @@ public class AppDbContext : DbContext
          * modelBuilder.ApplyConfigurationsFromAssembly(
          *     typeof(AppDbContext).Assembly);
          */
+
+        // =========================================================
+        // SECUENCIA PARA EL CÓDIGO ADMINISTRATIVO DEL CASO
+        // =========================================================
+
+        /*
+         * PostgreSQL será responsable de entregar números
+         * consecutivos de forma segura incluso si varios usuarios
+         * registran casos simultáneamente.
+         */
+        modelBuilder
+            .HasSequence<long>("CasoCodigoSequence")
+            .StartsAt(1)
+            .IncrementsBy(1);
+
+
+        // Aplicamos automáticamente las configuraciones
+        // IEntityTypeConfiguration<T>.
+        modelBuilder.ApplyConfigurationsFromAssembly(
+            typeof(AppDbContext).Assembly);
+
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 }

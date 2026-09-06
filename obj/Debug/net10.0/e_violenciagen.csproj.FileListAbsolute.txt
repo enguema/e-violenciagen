@@ -376,3 +376,6 @@ C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\refint\e_violenciagen.dl
 C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\e_violenciagen.pdb
 C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\e_violenciagen.genruntimeconfig.cache
 C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\ref\e_violenciagen.dll
+C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\compressed\jldk45qw57-{0}-hx3y94pu4c-hx3y94pu4c.gz
+C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\compressed\96y2bvl63w-{0}-4p8oy7ovmu-4p8oy7ovmu.gz
+C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\compressed\g3o7k5tagm-{0}-yixx2iiq2q-yixx2iiq2q.gz

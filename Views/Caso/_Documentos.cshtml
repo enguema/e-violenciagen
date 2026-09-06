@@ -1,0 +1,129 @@
+@model IReadOnlyList<e_violenciagen.ViewModels.Casos.CasoDocumentoViewModel>
+
+<div class="card border-0 shadow-sm">
+
+    <div class="card-header bg-white py-3
+                d-flex justify-content-between
+                align-items-center">
+
+        <h5 class="mb-0 fw-semibold">
+            Documentos del expediente
+        </h5>
+
+        <button type="button"
+                class="btn btn-primary btn-sm">
+            Añadir documento
+        </button>
+
+    </div>
+
+    <div class="card-body">
+
+        @if (!Model.Any())
+        {
+            <div class="text-center text-muted py-5">
+                El expediente todavía no contiene documentos.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+
+                <table class="table align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>Documento</th>
+                            <th>Tipo</th>
+                            <th>Fecha</th>
+                            <th>Actuación</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    @foreach (var documento in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                <div class="fw-semibold">
+                                    @(documento.Titulo
+                                      ?? documento.NombreOriginal)
+                                </div>
+
+                                <small class="text-muted">
+                                    @documento.NombreOriginal
+                                </small>
+                            </td>
+
+
+                            <td>
+                                @documento.TipoDocumento
+                            </td>
+
+
+                            <td>
+                                @(documento.FechaDocumento?
+                                    .ToString("dd/MM/yyyy")
+                                  ?? documento.FechaIncorporacion
+                                      .ToLocalTime()
+                                      .ToString("dd/MM/yyyy"))
+                            </td>
+
+
+                            <td>
+                                @(documento.ActuacionTitulo
+                                  ?? "Expediente general")
+                            </td>
+
+
+                            <td>
+
+                                @if (documento.EsConfidencial)
+                                {
+                                    <span class="badge
+                                                 bg-warning-subtle
+                                                 text-warning-emphasis">
+                                        Confidencial
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge
+                                                 bg-success-subtle
+                                                 text-success">
+                                        Normal
+                                    </span>
+                                }
+
+                            </td>
+
+
+                            <td class="text-end">
+
+                                <button class="btn
+                                               btn-outline-primary
+                                               btn-sm">
+                                    Ver
+                                </button>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+    </div>
+
+</div>

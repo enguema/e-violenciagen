@@ -22,4 +22,10 @@ public class Institucion : BaseEntity
     public ICollection<PersonaInstitucion> PersonasVinculadas { get; set; }
         = new List<PersonaInstitucion>();
 
+    /// <summary>
+    /// Actuaciones realizadas por esta institución.
+    /// </summary>
+    public ICollection<Actuacion> Actuaciones { get; set; }
+        = new List<Actuacion>();
+
 }

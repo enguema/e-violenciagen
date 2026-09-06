@@ -1,0 +1,241 @@
+@model e_violenciagen.ViewModels.Casos.CasoDetailsViewModel
+
+@{
+    ViewData["Title"] = $"Expediente {Model.CodigoCaso}";
+}
+
+<div class="container-fluid py-4">
+
+    <!-- =====================================================
+         CABECERA DEL EXPEDIENTE
+         ===================================================== -->
+    <div class="card border-0 shadow-sm mb-4 overflow-hidden">
+
+        <div class="card-body p-4">
+
+            <div class="d-flex flex-column flex-lg-row
+                justify-content-between
+                align-items-lg-start
+                gap-3">
+
+                <div>
+
+                    <div class="text-uppercase text-muted
+                        small fw-semibold mb-2">
+                        Expediente electrónico
+                    </div>
+
+                    <h1 class="h2 fw-bold mb-2">
+                        @Model.CodigoCaso
+                    </h1>
+
+                    <div class="d-flex flex-wrap gap-2">
+
+                        <span class="badge rounded-pill
+                            bg-primary-subtle
+                            text-primary px-3 py-2">
+                            @Model.Estado
+                        </span>
+
+                        <span class="badge rounded-pill
+                            bg-light text-dark
+                            px-3 py-2">
+
+                            Registrado:
+                            @Model.FechaRegistro
+                            .ToLocalTime()
+                            .ToString("dd/MM/yyyy")
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="d-flex gap-2">
+
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Volver
+                    </a>
+
+                    <button class="btn btn-primary">
+                        <i class="bi bi-pencil-square me-1"></i>
+                        Editar
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- =====================================================
+         INDICADORES
+         ===================================================== -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <div class="text-muted small mb-1">
+                        Víctimas
+                    </div>
+
+                    <div class="h2 fw-bold mb-0">
+                        @Model.Victimas.Count
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <div class="text-muted small mb-1">
+                        Presuntos agresores
+                    </div>
+
+                    <div class="h2 fw-bold mb-0">
+                        @Model.PresuntosAgresores.Count
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <div class="text-muted small mb-1">
+                        Actuaciones
+                    </div>
+
+                    <div class="h2 fw-bold mb-0">
+                        @Model.Actuaciones.Count
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <div class="text-muted small mb-1">
+                        Documentos
+                    </div>
+
+                    <div class="h2 fw-bold mb-0">
+                        @Model.Documentos.Count
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         NAVEGACIÓN DEL EXPEDIENTE
+         ===================================================== -->
+
+    <ul class="nav nav-pills mb-4 gap-2" id="expedienteTabs" role="tablist">
+
+        <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#resumen">
+                Resumen
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#personas">
+                Personas
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#actuaciones">
+                Actuaciones
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#documentos">
+                Documentos
+            </button>
+        </li>
+
+    </ul>
+
+
+    <!-- =====================================================
+         CONTENIDO
+         ===================================================== -->
+
+    <div class="tab-content">
+
+        <div class="tab-pane fade show active" id="resumen">
+
+            <partial name="_Resumen" model="Model" />
+
+        </div>
+
+
+        <div class="tab-pane fade" id="personas">
+
+            <partial name="_Personas" model="Model" />
+
+        </div>
+
+
+        <div class="tab-pane fade" id="actuaciones">
+
+            <div id="actuacionesContainer">
+
+                <partial name="_Actuaciones" model="Model.Actuaciones" />
+
+            </div>
+
+        </div>
+
+
+        <div class="tab-pane fade" id="documentos">
+
+            <div id="documentosContainer">
+
+                <partial name="_Documentos" model="Model.Documentos" />
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/casos.css" asp-append-version="true" />
+}
+
+@section Scripts {
+
+    <script>
+        window.sigevigCasoId = "@Model.Id";
+    </script>
+
+    <script src="~/js/casos/details.js" asp-append-version="true"></script>
+}

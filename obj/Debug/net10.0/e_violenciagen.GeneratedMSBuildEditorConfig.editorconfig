@@ -30,6 +30,34 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
+[C:/Users/enguema/Repos/e-violenciagen/Views/Caso/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2Fzb1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/enguema/Repos/e-violenciagen/Views/Caso/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2Fzb1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/enguema/Repos/e-violenciagen/Views/Caso/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2Fzb1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/enguema/Repos/e-violenciagen/Views/Caso/_Actuaciones.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2Fzb1xfQWN0dWFjaW9uZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/enguema/Repos/e-violenciagen/Views/Caso/_Documentos.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2Fzb1xfRG9jdW1lbnRvcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/enguema/Repos/e-violenciagen/Views/Caso/_Personas.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2Fzb1xfUGVyc29uYXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/enguema/Repos/e-violenciagen/Views/Caso/_Resumen.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2Fzb1xfUmVzdW1lbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/enguema/Repos/e-violenciagen/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

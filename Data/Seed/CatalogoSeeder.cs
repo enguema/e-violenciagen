@@ -30,6 +30,182 @@ public static class CatalogoSeeder
         {
             await CrearTiposViolenciaAsync(dbContext, cancellationToken);
         }
+
+        if (!await dbContext.TiposActuacion.AnyAsync(cancellationToken))
+        {
+            await CrearTiposActuacionAsync(
+                dbContext,
+                cancellationToken);
+        }
+
+        if (!await dbContext.TiposDocumentoExpediente
+        .AnyAsync(cancellationToken))
+        {
+            await CrearTiposDocumentoExpedienteAsync(
+                dbContext,
+                cancellationToken);
+        }
+    }
+
+    private static async Task CrearTiposDocumentoExpedienteAsync(AppDbContext dbContext, CancellationToken cancellationToken)
+    {
+        /*
+         * Catálogo inicial de desarrollo.
+         *
+         * Posteriormente deberá validarse con los procedimientos
+         * documentales de las instituciones participantes.
+         */
+        var tipos = new[]
+        {
+        new TipoDocumentoExpediente
+        {
+            Codigo = "DENUNCIA",
+            Nombre = "Denuncia"
+        },
+
+        new TipoDocumentoExpediente
+        {
+            Codigo = "INFORME_POLICIAL",
+            Nombre = "Informe policial"
+        },
+
+        new TipoDocumentoExpediente
+        {
+            Codigo = "INFORME_MEDICO",
+            Nombre = "Informe médico"
+        },
+
+        new TipoDocumentoExpediente
+        {
+            Codigo = "INFORME_PSICOLOGICO",
+            Nombre = "Informe psicológico"
+        },
+
+        new TipoDocumentoExpediente
+        {
+            Codigo = "INFORME_SOCIAL",
+            Nombre = "Informe social"
+        },
+
+        new TipoDocumentoExpediente
+        {
+            Codigo = "INFORME_FISCAL",
+            Nombre = "Documento fiscal"
+        },
+
+        new TipoDocumentoExpediente
+        {
+            Codigo = "RESOLUCION_JUDICIAL",
+            Nombre = "Resolución judicial"
+        },
+
+        new TipoDocumentoExpediente
+        {
+            Codigo = "DECLARACION",
+            Nombre = "Declaración"
+        },
+
+        new TipoDocumentoExpediente
+        {
+            Codigo = "EVIDENCIA",
+            Nombre = "Evidencia documental"
+        },
+
+        new TipoDocumentoExpediente
+        {
+            Codigo = "OTRO",
+            Nombre = "Otro documento"
+        }
+    };
+
+        await dbContext.TiposDocumentoExpediente.AddRangeAsync(
+            tipos,
+            cancellationToken);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private static async Task CrearTiposActuacionAsync(AppDbContext dbContext, CancellationToken cancellationToken)
+    {
+        /*
+         * Catálogo inicial de desarrollo.
+         *
+         * Deberá revisarse posteriormente con los procedimientos
+         * reales de Policía, Sanidad, Fiscalía, Juzgados y
+         * Ministerio.
+         */
+        var tipos = new[]
+        {
+        new TipoActuacion
+        {
+            Codigo = "DENUNCIA",
+            Nombre = "Recepción de denuncia",
+            Descripcion =
+                "Registro o recepción formal de una denuncia."
+        },
+
+        new TipoActuacion
+        {
+            Codigo = "ATENCION_MEDICA",
+            Nombre = "Atención médica",
+            Descripcion =
+                "Atención sanitaria relacionada con el caso."
+        },
+
+        new TipoActuacion
+        {
+            Codigo = "EVALUACION_PSICOLOGICA",
+            Nombre = "Evaluación psicológica"
+        },
+
+        new TipoActuacion
+        {
+            Codigo = "EVALUACION_SOCIAL",
+            Nombre = "Evaluación social"
+        },
+
+        new TipoActuacion
+        {
+            Codigo = "DILIGENCIA_POLICIAL",
+            Nombre = "Diligencia policial"
+        },
+
+        new TipoActuacion
+        {
+            Codigo = "REMISION",
+            Nombre = "Remisión de expediente"
+        },
+
+        new TipoActuacion
+        {
+            Codigo = "ACTUACION_FISCAL",
+            Nombre = "Actuación fiscal"
+        },
+
+        new TipoActuacion
+        {
+            Codigo = "ACTUACION_JUDICIAL",
+            Nombre = "Actuación judicial"
+        },
+
+        new TipoActuacion
+        {
+            Codigo = "SEGUIMIENTO_SOCIAL",
+            Nombre = "Seguimiento social"
+        },
+
+        new TipoActuacion
+        {
+            Codigo = "OTRA",
+            Nombre = "Otra actuación"
+        }
+    };
+
+        await dbContext.TiposActuacion.AddRangeAsync(
+            tipos,
+            cancellationToken);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 
     private static async Task CrearTiposInstitucionAsync(AppDbContext dbContext, CancellationToken cancellationToken)
@@ -196,5 +372,5 @@ public static class CatalogoSeeder
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    
+
 }

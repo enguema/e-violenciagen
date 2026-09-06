@@ -1,0 +1,151 @@
+@model e_violenciagen.ViewModels.Casos.CasoDetailsViewModel
+
+<div class="row g-4">
+
+    <div class="col-lg-7">
+
+        <div class="card border-0 shadow-sm h-100">
+
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-semibold">
+                    Información general
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-4">
+
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">
+                            Fecha del hecho
+                        </small>
+
+                        <div class="fw-semibold">
+                            @(Model.FechaHecho?.ToString("dd/MM/yyyy")
+                                ?? "No especificada")
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">
+                            Estado
+                        </small>
+
+                        <div class="fw-semibold">
+                            @Model.Estado
+                        </div>
+                    </div>
+
+
+                    <div class="col-12">
+                        <small class="text-muted d-block mb-2">
+                            Tipos de violencia
+                        </small>
+
+                        <div class="d-flex flex-wrap gap-2">
+
+                            @foreach (var tipo in Model.TiposViolencia)
+                            {
+                                <span class="badge
+                                             bg-danger-subtle
+                                             text-danger
+                                             px-3 py-2">
+                                    @tipo
+                                </span>
+                            }
+
+                        </div>
+                    </div>
+
+
+                    <div class="col-12">
+                        <small class="text-muted d-block mb-1">
+                            Resumen
+                        </small>
+
+                        <p class="mb-0">
+                            @(Model.Resumen ?? "Sin información.")
+                        </p>
+                    </div>
+
+
+                    <div class="col-12">
+                        <small class="text-muted d-block mb-1">
+                            Relato inicial
+                        </small>
+
+                        <p class="mb-0 text-break"
+                           style="white-space: pre-line;">
+                            @(Model.RelatoInicial ?? "Sin información.")
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-lg-5">
+
+        <div class="card border-0 shadow-sm h-100">
+
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-semibold">
+                    Localización
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <dl class="row mb-0">
+
+                    <dt class="col-sm-4 text-muted">
+                        Provincia
+                    </dt>
+
+                    <dd class="col-sm-8">
+                        @(Model.Provincia ?? "No especificada")
+                    </dd>
+
+
+                    <dt class="col-sm-4 text-muted">
+                        Distrito
+                    </dt>
+
+                    <dd class="col-sm-8">
+                        @(Model.Distrito ?? "No especificado")
+                    </dd>
+
+
+                    <dt class="col-sm-4 text-muted">
+                        Barrio
+                    </dt>
+
+                    <dd class="col-sm-8">
+                        @(Model.Barrio ?? "No especificado")
+                    </dd>
+
+
+                    <dt class="col-sm-4 text-muted">
+                        Referencia
+                    </dt>
+
+                    <dd class="col-sm-8">
+                        @(Model.LugarDescripcion ?? "No especificada")
+                    </dd>
+
+                </dl>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

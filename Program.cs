@@ -1,3 +1,4 @@
+using e_violenciagen.Aplication.Casos;
 using e_violenciagen.Data;
 using e_violenciagen.Models;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseNpgsql(ConnectionString);
 });
+
+//----------Registramos los servicios--------------
+
+builder.Services.AddScoped<ICasoService, CasoService>();
 
 var app = builder.Build();
 

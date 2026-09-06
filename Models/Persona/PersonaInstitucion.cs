@@ -88,4 +88,11 @@ public class PersonaInstitucion : BaseEntity
     /// ya terminó.
     /// </summary>
     public DateOnly? FechaFin { get; set; }
+
+    /// <summary>
+    /// Actuaciones en las que esta persona participó
+    /// dentro de su contexto institucional.
+    /// </summary>
+    public ICollection<ActuacionParticipante> ParticipacionesActuaciones
+    { get; set; } = new List<ActuacionParticipante>();
 }

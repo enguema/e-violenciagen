@@ -1,0 +1,145 @@
+@model e_violenciagen.ViewModels.Casos.CasoDetailsViewModel
+
+<div class="row g-4">
+
+    <!-- VÍCTIMAS -->
+    <div class="col-xl-6">
+
+        <div class="card border-0 shadow-sm h-100">
+
+            <div class="card-header bg-white py-3
+                        d-flex justify-content-between
+                        align-items-center">
+
+                <h5 class="mb-0 fw-semibold">
+                    Víctimas
+                </h5>
+
+                <span class="badge bg-light text-dark">
+                    @Model.Victimas.Count
+                </span>
+
+            </div>
+
+            <div class="card-body">
+
+                @if (!Model.Victimas.Any())
+                {
+                    <div class="text-center text-muted py-5">
+                        No existen víctimas vinculadas.
+                    </div>
+                }
+                else
+                {
+                    foreach (var persona in Model.Victimas)
+                    {
+                        <div class="border rounded-3 p-3 mb-3">
+
+                            <div class="d-flex
+                                        justify-content-between
+                                        gap-3">
+
+                                <div>
+
+                                    <h6 class="fw-bold mb-1">
+                                        @persona.NombreCompleto
+                                    </h6>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        persona.NumeroDocumento))
+                                    {
+                                        <div class="small text-muted">
+                                            @persona.TipoDocumento:
+                                            @persona.NumeroDocumento
+                                        </div>
+                                    }
+
+                                </div>
+
+                                <div class="text-end">
+
+                                    @if (persona.EsPrincipal)
+                                    {
+                                        <span class="badge bg-primary">
+                                            Principal
+                                        </span>
+                                    }
+
+                                    @if (persona.RequiereProteccion)
+                                    {
+                                        <span class="badge
+                                                     bg-warning-subtle
+                                                     text-warning-emphasis">
+                                            Requiere protección
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                }
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- PRESUNTOS AGRESORES -->
+    <div class="col-xl-6">
+
+        <div class="card border-0 shadow-sm h-100">
+
+            <div class="card-header bg-white py-3
+                        d-flex justify-content-between
+                        align-items-center">
+
+                <h5 class="mb-0 fw-semibold">
+                    Presuntos agresores
+                </h5>
+
+                <span class="badge bg-light text-dark">
+                    @Model.PresuntosAgresores.Count
+                </span>
+
+            </div>
+
+            <div class="card-body">
+
+                @if (!Model.PresuntosAgresores.Any())
+                {
+                    <div class="text-center text-muted py-5">
+                        No existe presunto agresor identificado.
+                    </div>
+                }
+                else
+                {
+                    foreach (var persona in Model.PresuntosAgresores)
+                    {
+                        <div class="border rounded-3 p-3 mb-3">
+
+                            <h6 class="fw-bold mb-1">
+                                @persona.NombreCompleto
+                            </h6>
+
+                            @if (!string.IsNullOrWhiteSpace(
+                                persona.RelacionConVictima))
+                            {
+                                <div class="small text-muted">
+                                    Relación:
+                                    @persona.RelacionConVictima
+                                </div>
+                            }
+
+                        </div>
+                    }
+                }
+
+            </div>
+
+        </div>
+    </div>
+
+</div>

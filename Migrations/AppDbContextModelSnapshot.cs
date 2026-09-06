@@ -22,11 +22,16 @@ namespace e_violenciagen.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.HasSequence("CasoCodigoSequence");
+
             modelBuilder.Entity("PersonaInstitucion", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Cargo")
                         .HasMaxLength(150)
@@ -53,9 +58,6 @@ namespace e_violenciagen.Migrations
 
                     b.Property<Guid?>("InstitucionId1")
                         .HasColumnType("uuid");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<Guid>("PersonaId")
                         .HasColumnType("uuid");
@@ -84,11 +86,94 @@ namespace e_violenciagen.Migrations
                     b.ToTable("PersonasInstituciones");
                 });
 
+            modelBuilder.Entity("e_violenciagen.Models.Actuacion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("CasoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
+
+                    b.Property<DateTime>("FechaActuacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("InstitucionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Resultado")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid>("TipoActuacionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Titulo")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<Guid?>("UnidadOrganizativaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstitucionId");
+
+                    b.HasIndex("TipoActuacionId");
+
+                    b.HasIndex("UnidadOrganizativaId");
+
+                    b.HasIndex("CasoId", "FechaActuacion");
+
+                    b.ToTable("Actuaciones");
+                });
+
+            modelBuilder.Entity("e_violenciagen.Models.ActuacionParticipante", b =>
+                {
+                    b.Property<Guid>("ActuacionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PersonaInstitucionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("EsResponsable")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("RolEnActuacion")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.HasKey("ActuacionId", "PersonaInstitucionId");
+
+                    b.HasIndex("PersonaInstitucionId");
+
+                    b.ToTable("ActuacionesParticipantes");
+                });
+
             modelBuilder.Entity("e_violenciagen.Models.Barrio", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Codigo")
                         .IsRequired()
@@ -102,9 +187,6 @@ namespace e_violenciagen.Migrations
 
                     b.Property<Guid>("DistritoId")
                         .HasColumnType("uuid");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -125,6 +207,9 @@ namespace e_violenciagen.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid?>("BarrioHechoId")
                         .HasColumnType("uuid");
@@ -147,9 +232,6 @@ namespace e_violenciagen.Migrations
 
                     b.Property<DateTime>("FechaRegistro")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("LugarDescripcion")
                         .HasMaxLength(500)
@@ -255,6 +337,9 @@ namespace e_violenciagen.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Codigo")
                         .IsRequired()
                         .HasColumnType("text");
@@ -264,9 +349,6 @@ namespace e_violenciagen.Migrations
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -285,11 +367,101 @@ namespace e_violenciagen.Migrations
                     b.ToTable("Distritos");
                 });
 
+            modelBuilder.Entity("e_violenciagen.Models.DocumentoExpediente", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("ActuacionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CasoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<bool>("EsConfidencial")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Extension")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateOnly?>("FechaDocumento")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("FechaIncorporacion")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("HashArchivo")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("NombreAlmacenado")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("NombreOriginal")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("RutaAlmacenamiento")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<long>("TamanoBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("TipoDocumentoExpedienteId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("TipoMime")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("Titulo")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<DateTime?>("UpdatedAd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActuacionId");
+
+                    b.HasIndex("CasoId");
+
+                    b.HasIndex("HashArchivo");
+
+                    b.HasIndex("RutaAlmacenamiento")
+                        .IsUnique();
+
+                    b.HasIndex("TipoDocumentoExpedienteId");
+
+                    b.ToTable("DocumentosExpediente");
+                });
+
             modelBuilder.Entity("e_violenciagen.Models.EstadoCaso", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Codigo")
                         .IsRequired()
@@ -303,9 +475,6 @@ namespace e_violenciagen.Migrations
 
                     b.Property<string>("Descripcion")
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -328,6 +497,9 @@ namespace e_violenciagen.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Codigo")
                         .IsRequired()
                         .HasColumnType("text");
@@ -340,9 +512,6 @@ namespace e_violenciagen.Migrations
 
                     b.Property<string>("Descripcion")
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -370,6 +539,9 @@ namespace e_violenciagen.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Apellidos")
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
@@ -391,9 +563,6 @@ namespace e_violenciagen.Migrations
 
                     b.Property<DateOnly?>("FechaNacimiento")
                         .HasColumnType("date");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Nombres")
                         .HasMaxLength(100)
@@ -430,6 +599,9 @@ namespace e_violenciagen.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Codigo")
                         .IsRequired()
                         .HasColumnType("text");
@@ -439,9 +611,6 @@ namespace e_violenciagen.Migrations
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -461,6 +630,9 @@ namespace e_violenciagen.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Codigo")
                         .IsRequired()
                         .HasColumnType("text");
@@ -473,9 +645,6 @@ namespace e_violenciagen.Migrations
 
                     b.Property<string>("Descripcion")
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -495,6 +664,9 @@ namespace e_violenciagen.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Codigo")
                         .IsRequired()
                         .HasColumnType("text");
@@ -507,9 +679,6 @@ namespace e_violenciagen.Migrations
 
                     b.Property<string>("Descripcion")
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -529,6 +698,9 @@ namespace e_violenciagen.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Codigo")
                         .IsRequired()
                         .HasColumnType("text");
@@ -541,9 +713,6 @@ namespace e_violenciagen.Migrations
 
                     b.Property<string>("Descripcion")
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -563,6 +732,9 @@ namespace e_violenciagen.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Codigo")
                         .IsRequired()
                         .HasColumnType("text");
@@ -575,9 +747,6 @@ namespace e_violenciagen.Migrations
 
                     b.Property<string>("Descripcion")
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -597,6 +766,9 @@ namespace e_violenciagen.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Codigo")
                         .IsRequired()
                         .HasColumnType("text");
@@ -609,9 +781,6 @@ namespace e_violenciagen.Migrations
 
                     b.Property<string>("Descripcion")
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -631,6 +800,9 @@ namespace e_violenciagen.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Activo")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Codigo")
                         .IsRequired()
                         .HasColumnType("text");
@@ -647,8 +819,8 @@ namespace e_violenciagen.Migrations
                     b.Property<Guid>("InstitucionId")
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                    b.Property<string>("Nombre")
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("UnidadPadreId")
                         .HasColumnType("uuid");
@@ -698,6 +870,59 @@ namespace e_violenciagen.Migrations
                     b.Navigation("Persona");
 
                     b.Navigation("UnidadOrganizativa");
+                });
+
+            modelBuilder.Entity("e_violenciagen.Models.Actuacion", b =>
+                {
+                    b.HasOne("e_violenciagen.Models.Caso", "Caso")
+                        .WithMany("Actuaciones")
+                        .HasForeignKey("CasoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("e_violenciagen.Models.Institucion", "Institucion")
+                        .WithMany("Actuaciones")
+                        .HasForeignKey("InstitucionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("e_violenciagen.Models.TipoActuacion", "TipoActuacion")
+                        .WithMany("Actuaciones")
+                        .HasForeignKey("TipoActuacionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("e_violenciagen.Models.UnidadOrganizativa", "UnidadOrganizativa")
+                        .WithMany("Actuaciones")
+                        .HasForeignKey("UnidadOrganizativaId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Caso");
+
+                    b.Navigation("Institucion");
+
+                    b.Navigation("TipoActuacion");
+
+                    b.Navigation("UnidadOrganizativa");
+                });
+
+            modelBuilder.Entity("e_violenciagen.Models.ActuacionParticipante", b =>
+                {
+                    b.HasOne("e_violenciagen.Models.Actuacion", "Actuacion")
+                        .WithMany("Participantes")
+                        .HasForeignKey("ActuacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PersonaInstitucion", "PersonaInstitucion")
+                        .WithMany("ParticipacionesActuaciones")
+                        .HasForeignKey("PersonaInstitucionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Actuacion");
+
+                    b.Navigation("PersonaInstitucion");
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.Barrio", b =>
@@ -797,6 +1022,32 @@ namespace e_violenciagen.Migrations
                     b.Navigation("Provincia");
                 });
 
+            modelBuilder.Entity("e_violenciagen.Models.DocumentoExpediente", b =>
+                {
+                    b.HasOne("e_violenciagen.Models.Actuacion", "Actuacion")
+                        .WithMany("Documentos")
+                        .HasForeignKey("ActuacionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("e_violenciagen.Models.Caso", "Caso")
+                        .WithMany("Documentos")
+                        .HasForeignKey("CasoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("e_violenciagen.Models.TipoDocumentoExpediente", "TipoDocumentoExpediente")
+                        .WithMany("Documentos")
+                        .HasForeignKey("TipoDocumentoExpedienteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Actuacion");
+
+                    b.Navigation("Caso");
+
+                    b.Navigation("TipoDocumentoExpediente");
+                });
+
             modelBuilder.Entity("e_violenciagen.Models.Institucion", b =>
                 {
                     b.HasOne("e_violenciagen.Models.TipoInstitucion", "TipoInstitucion")
@@ -842,8 +1093,24 @@ namespace e_violenciagen.Migrations
                     b.Navigation("UnidadPadre");
                 });
 
+            modelBuilder.Entity("PersonaInstitucion", b =>
+                {
+                    b.Navigation("ParticipacionesActuaciones");
+                });
+
+            modelBuilder.Entity("e_violenciagen.Models.Actuacion", b =>
+                {
+                    b.Navigation("Documentos");
+
+                    b.Navigation("Participantes");
+                });
+
             modelBuilder.Entity("e_violenciagen.Models.Caso", b =>
                 {
+                    b.Navigation("Actuaciones");
+
+                    b.Navigation("Documentos");
+
                     b.Navigation("PresuntosAgresores");
 
                     b.Navigation("TiposViolencia");
@@ -863,6 +1130,8 @@ namespace e_violenciagen.Migrations
 
             modelBuilder.Entity("e_violenciagen.Models.Institucion", b =>
                 {
+                    b.Navigation("Actuaciones");
+
                     b.Navigation("PersonasVinculadas");
                 });
 
@@ -878,6 +1147,16 @@ namespace e_violenciagen.Migrations
             modelBuilder.Entity("e_violenciagen.Models.Provincia", b =>
                 {
                     b.Navigation("Distritos");
+                });
+
+            modelBuilder.Entity("e_violenciagen.Models.TipoActuacion", b =>
+                {
+                    b.Navigation("Actuaciones");
+                });
+
+            modelBuilder.Entity("e_violenciagen.Models.TipoDocumentoExpediente", b =>
+                {
+                    b.Navigation("Documentos");
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.TipoDocumentoIdentidad", b =>
@@ -897,6 +1176,8 @@ namespace e_violenciagen.Migrations
 
             modelBuilder.Entity("e_violenciagen.Models.UnidadOrganizativa", b =>
                 {
+                    b.Navigation("Actuaciones");
+
                     b.Navigation("PersonasVinculadas");
 
                     b.Navigation("UnidadesHijas");
