@@ -45,6 +45,455 @@ public static class CatalogoSeeder
                 dbContext,
                 cancellationToken);
         }
+
+        if (!await dbContext.Provincias.AnyAsync(cancellationToken))
+        {
+            await CrearProvinciasAsync(
+                dbContext,
+                cancellationToken);
+        }
+
+        if (!await dbContext.Distritos.AnyAsync(cancellationToken))
+        {
+            await CrearDistritosAsync(
+                dbContext,
+                cancellationToken);
+        }
+
+        if (!await dbContext.Barrios.AnyAsync(cancellationToken))
+        {
+            await CrearBarriosAsync(
+                dbContext,
+                cancellationToken);
+        }
+    }
+
+
+
+    private static async Task CrearProvinciasAsync(AppDbContext dbContext, CancellationToken cancellationToken)
+    {
+        /*
+         * Provincias iniciales utilizadas por SIGEVIG.
+         *
+         * Los códigos son identificadores internos estables.
+         * El nombre es el texto que verá el usuario.
+         */
+        var provincias = new[]
+        {
+        new Provincia
+        {
+            Codigo = "BIOKO_NORTE",
+            Nombre = "Bioko Norte"
+        },
+
+        new Provincia
+        {
+            Codigo = "BIOKO_SUR",
+            Nombre = "Bioko Sur"
+        },
+
+        new Provincia
+        {
+            Codigo = "ANNOBON",
+            Nombre = "Annobón"
+        },
+
+        new Provincia
+        {
+            Codigo = "LITORAL",
+            Nombre = "Litoral"
+        },
+
+        new Provincia
+        {
+            Codigo = "CENTRO_SUR",
+            Nombre = "Centro Sur"
+        },
+
+        new Provincia
+        {
+            Codigo = "KIE_NTEM",
+            Nombre = "Kié-Ntem"
+        },
+
+        new Provincia
+        {
+            Codigo = "WELE_NZAS",
+            Nombre = "Wele-Nzas"
+        },
+
+        new Provincia
+        {
+            Codigo = "DJIBLOHO",
+            Nombre = "Djibloho"
+        }
+    };
+
+        await dbContext.Provincias.AddRangeAsync(
+            provincias,
+            cancellationToken);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private static async Task CrearDistritosAsync(AppDbContext dbContext, CancellationToken cancellationToken)
+    {
+        // =========================================================
+        // RECUPERAR PROVINCIAS
+        // =========================================================
+
+        /*
+         * Usamos Codigo y no Nombre porque Codigo es el
+         * identificador funcional estable del catálogo.
+         */
+
+        var provincias =
+            await dbContext.Provincias
+                .ToDictionaryAsync(
+                    x => x.Codigo,
+                    cancellationToken);
+
+
+        // =========================================================
+        // VALIDACIÓN BÁSICA
+        // =========================================================
+
+        /*
+         * Si falta una provincia esperada, preferimos detener
+         * el seeder antes que crear datos territoriales incoherentes.
+         */
+        string[] codigosRequeridos =
+        {
+        "BIOKO_NORTE",
+        "BIOKO_SUR",
+        "ANNOBON",
+        "LITORAL",
+        "CENTRO_SUR",
+        "KIE_NTEM",
+        "WELE_NZAS",
+        "DJIBLOHO"
+    };
+
+        foreach (string codigo in codigosRequeridos)
+        {
+            if (!provincias.ContainsKey(codigo))
+            {
+                throw new InvalidOperationException(
+                    $"No se encontró la provincia con código '{codigo}'.");
+            }
+        }
+
+
+        // =========================================================
+        // CREAR DISTRITOS
+        // =========================================================
+
+        var distritos = new[]
+        {
+        // -----------------------------------------------------
+        // BIOKO NORTE
+        // -----------------------------------------------------
+
+        new Distrito
+        {
+            Codigo = "MALABO",
+            Nombre = "Malabo",
+            ProvinciaId = provincias["BIOKO_NORTE"].Id
+        },
+
+        new Distrito
+        {
+            Codigo = "BANEY",
+            Nombre = "Baney",
+            ProvinciaId = provincias["BIOKO_NORTE"].Id
+        },
+
+
+        // -----------------------------------------------------
+        // BIOKO SUR
+        // -----------------------------------------------------
+
+        new Distrito
+        {
+            Codigo = "LUBA",
+            Nombre = "Luba",
+            ProvinciaId = provincias["BIOKO_SUR"].Id
+        },
+
+        new Distrito
+        {
+            Codigo = "RIABA",
+            Nombre = "Riaba",
+            ProvinciaId = provincias["BIOKO_SUR"].Id
+        },
+
+
+        // -----------------------------------------------------
+        // ANNOBÓN
+        // -----------------------------------------------------
+
+        new Distrito
+        {
+            Codigo = "SAN_ANTONIO_PALE",
+            Nombre = "San Antonio de Palé",
+            ProvinciaId = provincias["ANNOBON"].Id
+        },
+
+
+        // -----------------------------------------------------
+        // LITORAL
+        // -----------------------------------------------------
+
+        new Distrito
+        {
+            Codigo = "BATA",
+            Nombre = "Bata",
+            ProvinciaId = provincias["LITORAL"].Id
+        },
+
+        new Distrito
+        {
+            Codigo = "MBINI",
+            Nombre = "Mbini",
+            ProvinciaId = provincias["LITORAL"].Id
+        },
+
+        new Distrito
+        {
+            Codigo = "COGO",
+            Nombre = "Cogo",
+            ProvinciaId = provincias["LITORAL"].Id
+        },
+
+
+        // -----------------------------------------------------
+        // CENTRO SUR
+        // -----------------------------------------------------
+
+        new Distrito
+        {
+            Codigo = "EVINAYONG",
+            Nombre = "Evinayong",
+            ProvinciaId = provincias["CENTRO_SUR"].Id
+        },
+
+        new Distrito
+        {
+            Codigo = "NIEFANG",
+            Nombre = "Niefang",
+            ProvinciaId = provincias["CENTRO_SUR"].Id
+        },
+
+        new Distrito
+        {
+            Codigo = "AKURENAM",
+            Nombre = "Akurenam",
+            ProvinciaId = provincias["CENTRO_SUR"].Id
+        },
+
+
+        // -----------------------------------------------------
+        // KIÉ-NTEM
+        // -----------------------------------------------------
+
+        new Distrito
+        {
+            Codigo = "EBIBEYIN",
+            Nombre = "Ebibeyin",
+            ProvinciaId = provincias["KIE_NTEM"].Id
+        },
+
+        new Distrito
+        {
+            Codigo = "MICOMISENG",
+            Nombre = "Micomiseng",
+            ProvinciaId = provincias["KIE_NTEM"].Id
+        },
+
+        new Distrito
+        {
+            Codigo = "NSOK_NSOMO",
+            Nombre = "Nsok-Nsomo",
+            ProvinciaId = provincias["KIE_NTEM"].Id
+        },
+
+
+        // -----------------------------------------------------
+        // WELE-NZAS
+        // -----------------------------------------------------
+
+        new Distrito
+        {
+            Codigo = "MONGOMO",
+            Nombre = "Mongomo",
+            ProvinciaId = provincias["WELE_NZAS"].Id
+        },
+
+        new Distrito
+        {
+            Codigo = "ANISOK",
+            Nombre = "Añisok",
+            ProvinciaId = provincias["WELE_NZAS"].Id
+        },
+
+        new Distrito
+        {
+            Codigo = "NSORK",
+            Nombre = "Nsork",
+            ProvinciaId = provincias["WELE_NZAS"].Id
+        },
+
+        new Distrito
+        {
+            Codigo = "ACONIBE",
+            Nombre = "Aconibe",
+            ProvinciaId = provincias["WELE_NZAS"].Id
+        },
+
+
+        // -----------------------------------------------------
+        // DJIBLOHO
+        // -----------------------------------------------------
+
+        new Distrito
+        {
+            Codigo = "OYALA",
+            Nombre = "Oyala",
+            ProvinciaId = provincias["DJIBLOHO"].Id
+        }
+    };
+
+
+        await dbContext.Distritos.AddRangeAsync(
+            distritos,
+            cancellationToken);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private static async Task CrearBarriosAsync(AppDbContext dbContext, CancellationToken cancellationToken)
+    {
+        // =========================================================
+        // RECUPERAR DISTRITOS
+        // =========================================================
+
+        var distritos =
+            await dbContext.Distritos
+                .ToDictionaryAsync(
+                    x => x.Codigo,
+                    cancellationToken);
+
+
+        // =========================================================
+        // VALIDAR DISTRITOS NECESARIOS
+        // =========================================================
+
+        if (!distritos.ContainsKey("MALABO"))
+        {
+            throw new InvalidOperationException(
+                "No se encontró el distrito MALABO.");
+        }
+
+        if (!distritos.ContainsKey("BATA"))
+        {
+            throw new InvalidOperationException(
+                "No se encontró el distrito BATA.");
+        }
+
+
+        // =========================================================
+        // CREAR BARRIOS
+        // =========================================================
+
+        /*
+         * Por ahora cargamos barrios de desarrollo únicamente
+         * para algunos distritos.
+         *
+         * Posteriormente podremos ampliar este catálogo con
+         * información territorial oficial.
+         */
+
+        var barrios = new[]
+        {
+        // -----------------------------------------------------
+        // MALABO
+        // -----------------------------------------------------
+
+        new Barrio
+        {
+            Codigo = "MAL_SEMINARIO",
+            Nombre = "Seminario",
+            DistritoId = distritos["MALABO"].Id
+        },
+
+        new Barrio
+        {
+            Codigo = "MAL_CARACOLAS",
+            Nombre = "Caracolas",
+            DistritoId = distritos["MALABO"].Id
+        },
+
+        new Barrio
+        {
+            Codigo = "MAL_PARAISO",
+            Nombre = "Paraíso",
+            DistritoId = distritos["MALABO"].Id
+        },
+
+        new Barrio
+        {
+            Codigo = "MAL_NUEVO_CAMPO",
+            Nombre = "Nuevo Campo",
+            DistritoId = distritos["MALABO"].Id
+        },
+
+        new Barrio
+        {
+            Codigo = "MAL_ELA_NGUEMA",
+            Nombre = "Ela Nguema",
+            DistritoId = distritos["MALABO"].Id
+        },
+
+
+        // -----------------------------------------------------
+        // BATA
+        // -----------------------------------------------------
+
+        new Barrio
+        {
+            Codigo = "BAT_NKOLOMBONG",
+            Nombre = "Nkolombong",
+            DistritoId = distritos["BATA"].Id
+        },
+
+        new Barrio
+        {
+            Codigo = "BAT_BIKUY",
+            Nombre = "Bikuy",
+            DistritoId = distritos["BATA"].Id
+        },
+
+        new Barrio
+        {
+            Codigo = "BAT_NKOANTOMA",
+            Nombre = "Nkoantoma",
+            DistritoId = distritos["BATA"].Id
+        },
+
+        new Barrio
+        {
+            Codigo = "BAT_MONDONG",
+            Nombre = "Mondong",
+            DistritoId = distritos["BATA"].Id
+        }
+    };
+
+
+        await dbContext.Barrios.AddRangeAsync(
+            barrios,
+            cancellationToken);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 
     private static async Task CrearTiposDocumentoExpedienteAsync(AppDbContext dbContext, CancellationToken cancellationToken)
