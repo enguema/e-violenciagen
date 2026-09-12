@@ -1,4 +1,5 @@
 using e_violenciagen.Aplication.Casos;
+using e_violenciagen.Aplication.Personas;
 using e_violenciagen.Data;
 using e_violenciagen.Models;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ builder.Services.AddControllersWithViews();
 
 //Db 1.
 
-string ConnectionString = builder.Configuration.GetConnectionString("HomeConecction")
+string ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("No se ha configurado la cadena seleccionada");
 
 //Db 2. egistramos el contexto en el contenedor de inyeccion de dependencias de ASP.NET Core
@@ -22,6 +23,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 //----------Registramos los servicios--------------
 
 builder.Services.AddScoped<ICasoService, CasoService>();
+builder.Services.AddScoped<IPersonaService, PersonaService>();
 
 var app = builder.Build();
 

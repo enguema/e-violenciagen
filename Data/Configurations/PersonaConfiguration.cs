@@ -52,6 +52,13 @@ public class PersonaConfiguration
          *
          * Creamos por tanto un índice compuesto único.
          */
+        builder.HasIndex(p => p.Nombres);
+
+        builder.HasIndex(p => p.Apellidos);
+
+        builder.HasIndex(p => p.NumeroDocumento);
+
+        
         builder.HasIndex(x => new
         {
             x.TipoDocumentoIdentidadId,
