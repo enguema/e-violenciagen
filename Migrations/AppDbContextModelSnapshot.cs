@@ -571,6 +571,9 @@ namespace e_violenciagen.Migrations
                     b.Property<string>("NumeroDocumento")
                         .HasColumnType("text");
 
+                    b.Property<string>("RutaFoto")
+                        .HasColumnType("text");
+
                     b.Property<string>("Sexo")
                         .HasColumnType("text");
 
@@ -585,7 +588,13 @@ namespace e_violenciagen.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Apellidos");
+
                     b.HasIndex("BarrioId");
+
+                    b.HasIndex("Nombres");
+
+                    b.HasIndex("NumeroDocumento");
 
                     b.HasIndex("TipoDocumentoIdentidadId", "NumeroDocumento")
                         .IsUnique();

@@ -3,15 +3,17 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "bootstrap@5.3.3",
-      "destination": "wwwroot/lib/bootstrap"
+      "library": "jquery@3.7.1",
+      "destination": "wwwroot/lib/jquery"
     },
     {
-      "library": "datatables.net@2.3.4",
+      "provider": "unpkg",
+      "library": "datatables.net@2.3.3",
       "destination": "wwwroot/lib/datatables"
     },
     {
-      "library": "datatables.net-bs5@2.3.4",
+      "provider": "unpkg",
+      "library": "datatables.net-bs5@2.3.3",
       "destination": "wwwroot/lib/datatables-bs5"
     }
   ]

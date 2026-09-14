@@ -8,6 +8,7 @@ using e_violenciagen.Models;
 using e_violenciagen.ViewModels.Common;
 using e_violenciagen.ViewModels.Personas;
 using e_violenciagen.Data;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace e_violenciagen.Aplication.Personas;
 
@@ -878,7 +879,6 @@ public class PersonaService : IPersonaService
             }
         }
 
-
         if (model.BarrioId.HasValue)
         {
             bool existeBarrio =
@@ -1122,5 +1122,52 @@ public class PersonaService : IPersonaService
                 "No se pudo eliminar la fotografía física {RutaFoto}.",
                 route);
         }
+    }
+
+    // =========================================================
+    // PREPARAR FORMULARIO DE ALTA
+    // =========================================================
+
+    public async Task<PersonaCreateViewModel> GetCreateViewModelAsync(CancellationToken cancellationToken = default)
+    {
+        /*
+         * Solo recuperamos la información necesaria para
+         * construir los desplegables.
+         *
+         * AsNoTracking porque son consultas de solo lectura.
+         */
+
+        var tiposDocumento = await _dbContext
+            .Set<TipoDocumentoIdentidad>()
+            .AsNoTracking()
+            .OrderBy(x => x.Nombre)
+            .Select(x => new SelectListItem
+            {
+                Value = x.Id.ToString(),
+                Text = x.Nombre
+            })
+            .ToListAsync(cancellationToken);
+
+
+        var barrios = await _dbContext
+            .Set<Barrio>()
+            .AsNoTracking()
+            .OrderBy(x => x.Nombre)
+            .Select(x => new SelectListItem
+            {
+                Value = x.Id.ToString(),
+                Text = x.Nombre
+            })
+            .ToListAsync(cancellationToken);
+
+
+        return new PersonaCreateViewModel
+        {
+            Persona = new PersonaFormViewModel(),
+
+            TiposDocumento = tiposDocumento,
+
+            Barrios = barrios
+        };
     }
 }

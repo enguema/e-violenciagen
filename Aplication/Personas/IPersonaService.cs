@@ -15,6 +15,8 @@ namespace e_violenciagen.Aplication.Personas;
 /// </summary>
 public interface IPersonaService
 {
+    Task<PersonaCreateViewModel> GetCreateViewModelAsync(
+    CancellationToken cancellationToken = default);
     // =========================================================
     // CONSULTA PARA DATATABLE
     // =========================================================

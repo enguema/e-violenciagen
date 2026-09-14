@@ -2,6 +2,7 @@ using e_violenciagen.Aplication.Personas;
 using Microsoft.AspNetCore.Mvc;
 using e_violenciagen.ViewModels.Common;
 using e_violenciagen.ViewModels.Personas;
+using e_violenciagen.Dtos.Personas;
 
 namespace e_violenciagen.Controllers;
 
@@ -69,9 +70,7 @@ public class PersonaController : Controller
     /// posteriormente en PersonaService/PostgreSQL.
     /// </summary>
     [HttpPost]
-    public async Task<IActionResult> DataTable(
-        DataTableRequest request,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> DataTable(DataTableRequest request, CancellationToken cancellationToken)
     {
         try
         {
@@ -114,9 +113,7 @@ public class PersonaController : Controller
     /// Muestra la ficha detallada de una persona.
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Details(
-        Guid id,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken)
     {
         var persona = await _personaService.GetByIdAsync(
             id,
@@ -142,10 +139,10 @@ public class PersonaController : Controller
     /// los incorporaremos cuando construyamos la vista Create.
     /// </summary>
     [HttpGet]
-    public IActionResult Create()
+    public async Task<IActionResult> Create(CancellationToken cancellationToken)
     {
-        var model = new PersonaFormViewModel();
-
+        //var model = new PersonaFormViewModel();
+        var model = await _personaService.GetCreateViewModelAsync(cancellationToken);
         return View(model);
     }
 
@@ -162,56 +159,31 @@ public class PersonaController : Controller
     /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(
-        PersonaFormViewModel model,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(PersonaCreateViewModel model, CancellationToken cancellationToken)
     {
-        // =====================================================
-        // VALIDACIÓN DEL VIEWMODEL
-        // =====================================================
-
         if (!ModelState.IsValid)
         {
             return BadRequest(new
             {
                 success = false,
-
-                message =
-                    "Revise los datos introducidos.",
-
+                message = "Revise los datos introducidos.",
                 errors = GetModelStateErrors()
             });
         }
 
-
         try
         {
-            Guid personaId = await _personaService.CreateAsync(
-                model,
-                cancellationToken);
-
+            Guid personaId = await _personaService.CreateAsync(model.Persona, cancellationToken);
 
             return Json(new
             {
                 success = true,
-
-                message =
-                    "La persona se ha registrado correctamente.",
-
+                message = "La persona se ha registrado correctamente.",
                 id = personaId
             });
         }
         catch (InvalidOperationException ex)
         {
-            /*
-             * InvalidOperationException representa aquí
-             * una regla funcional conocida:
-             *
-             * - catálogo inexistente;
-             * - fotografía inválida;
-             * - otra validación de negocio.
-             */
-
             return UnprocessableEntity(new
             {
                 success = false,
@@ -220,23 +192,17 @@ public class PersonaController : Controller
         }
         catch (Exception ex)
         {
-            _logger.LogError(
-                ex,
-                "Error al registrar una nueva persona.");
+            _logger.LogError(ex,"Error al registrar una nueva persona.");
 
-            return StatusCode(
-                StatusCodes.Status500InternalServerError,
+            return StatusCode(StatusCodes.Status500InternalServerError,
                 new
                 {
                     success = false,
-
-                    message =
-                        "Ocurrió un error al registrar la persona."
+                    message = "Ocurrió un error al registrar la persona."
                 });
         }
     }
-
-
+    
     // =========================================================
     // EDIT - GET
     // =========================================================
