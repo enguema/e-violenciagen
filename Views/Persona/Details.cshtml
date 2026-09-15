@@ -1,0 +1,537 @@
+@model e_violenciagen.ViewModels.Personas.PersonaDetailViewModel
+
+@{
+    ViewData["Title"] = "Detalle de persona";
+}
+
+<div class="container-fluid py-4">
+
+    @* =========================================================
+       CABECERA
+       ========================================================= *@
+
+    <div class="d-flex flex-column flex-md-row
+                justify-content-between align-items-md-center
+                gap-3 mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Detalle de persona
+            </h2>
+
+            <p class="text-muted mb-0">
+                Información completa registrada en el sistema.
+            </p>
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <a asp-controller="Persona"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+
+                <i class="bi bi-arrow-left me-1"></i>
+                Volver
+
+            </a>
+
+            <a asp-controller="Persona"
+               asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="btn btn-primary">
+
+                <i class="bi bi-pencil me-1"></i>
+                Editar
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    @* =========================================================
+       FILA PRINCIPAL
+       ========================================================= *@
+
+    <div class="row g-4">
+
+        @* =====================================================
+           PERFIL
+           ===================================================== *@
+
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body text-center">
+
+                    @if (!string.IsNullOrWhiteSpace(Model.RutaFoto))
+                    {
+                        <img src="@Model.RutaFoto"
+                             alt="Fotografía de @Model.NombreCompleto"
+                             class="img-fluid rounded border mb-3"
+                             style="max-height: 280px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <div class="border rounded bg-light
+                                    text-muted py-5 mb-3">
+
+                            <i class="bi bi-person-circle
+                                      display-3 d-block mb-2">
+                            </i>
+
+                            Sin fotografía
+
+                        </div>
+                    }
+
+
+                    <h4 class="fw-bold mb-1">
+                        @Model.NombreCompleto
+                    </h4>
+
+
+                    @if (!string.IsNullOrWhiteSpace(Model.NumeroDocumento))
+                    {
+                        <p class="text-muted mb-0">
+
+                            @if (!string.IsNullOrWhiteSpace(Model.TipoDocumento))
+                            {
+                                <span>@Model.TipoDocumento:</span>
+                            }
+
+                            <strong>
+                                @Model.NumeroDocumento
+                            </strong>
+
+                        </p>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        @* =====================================================
+           INFORMACIÓN PRINCIPAL
+           ===================================================== *@
+
+        <div class="col-lg-8">
+
+            @* =================================================
+               IDENTIFICACIÓN
+               ================================================= *@
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header bg-white py-3">
+
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-vcard me-2"></i>
+                        Identificación
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Tipo de documento
+                            </small>
+
+                            <span class="fw-semibold">
+                                @(Model.TipoDocumento ?? "No indicado")
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Número de documento
+                            </small>
+
+                            <span class="fw-semibold">
+                                @(Model.NumeroDocumento ?? "No indicado")
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            @* =================================================
+               DATOS PERSONALES
+               ================================================= *@
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header bg-white py-3">
+
+                    <h5 class="mb-0">
+                        <i class="bi bi-person me-2"></i>
+                        Datos personales
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Nombres
+                            </small>
+
+                            <span class="fw-semibold">
+                                @Model.Nombres
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Apellidos
+                            </small>
+
+                            <span class="fw-semibold">
+                                @Model.Apellidos
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Fecha de nacimiento
+                            </small>
+
+                            <span class="fw-semibold">
+
+                                @if (Model.FechaNacimiento.HasValue)
+                                {
+                                    @Model.FechaNacimiento.Value
+                                }
+                                else
+                                {
+                                    <span>No indicada</span>
+                                }
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Sexo
+                            </small>
+
+                            <span class="fw-semibold">
+                                @(Model.Sexo ?? "No indicado")
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            @* =================================================
+               CONTACTO
+               ================================================= *@
+
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header bg-white py-3">
+
+                    <h5 class="mb-0">
+                        <i class="bi bi-telephone me-2"></i>
+                        Contacto
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Teléfono
+                            </small>
+
+                            @if (!string.IsNullOrWhiteSpace(Model.Telefono))
+                            {
+                                <a href="tel:@Model.Telefono"
+                                   class="text-decoration-none fw-semibold">
+
+                                    @Model.Telefono
+
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="fw-semibold">
+                                    No indicado
+                                </span>
+                            }
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Correo electrónico
+                            </small>
+
+                            @if (!string.IsNullOrWhiteSpace(Model.Email))
+                            {
+                                <a href="mailto:@Model.Email"
+                                   class="text-decoration-none fw-semibold">
+
+                                    @Model.Email
+
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="fw-semibold">
+                                    No indicado
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            @* =================================================
+               DIRECCIÓN
+               ================================================= *@
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-white py-3">
+
+                    <h5 class="mb-0">
+                        <i class="bi bi-geo-alt me-2"></i>
+                        Dirección
+                    </h5>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Provincia
+                            </small>
+
+                            <span class="fw-semibold">
+                                @(Model.Provincia ?? "No indicada")
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Distrito
+                            </small>
+
+                            <span class="fw-semibold">
+                                @(Model.Distrito ?? "No indicado")
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Barrio
+                            </small>
+
+                            <span class="fw-semibold">
+                                @(Model.Barrio ?? "No indicado")
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <small class="text-muted d-block">
+                                Dirección
+                            </small>
+
+                            <span class="fw-semibold">
+                                @(Model.Direccion ?? "No indicada")
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    @* =========================================================
+       RESUMEN DE PARTICIPACIÓN
+       ========================================================= *@
+
+    <div class="row g-4 mt-1">
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex
+                                justify-content-between
+                                align-items-center">
+
+                        <div>
+
+                            <small class="text-muted d-block mb-1">
+                                Casos como víctima
+                            </small>
+
+                            <span class="fs-3 fw-bold">
+                                @Model.NumeroCasosComoVictima
+                            </span>
+
+                        </div>
+
+
+                        <i class="bi bi-person-heart
+                                  fs-2 text-muted">
+                        </i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex
+                                justify-content-between
+                                align-items-center">
+
+                        <div>
+
+                            <small class="text-muted d-block mb-1">
+                                Casos como presunto agresor
+                            </small>
+
+                            <span class="fs-3 fw-bold">
+                                @Model.NumeroCasosComoPresuntoAgresor
+                            </span>
+
+                        </div>
+
+
+                        <i class="bi bi-person-exclamation
+                                  fs-2 text-muted">
+                        </i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex
+                                justify-content-between
+                                align-items-center">
+
+                        <div>
+
+                            <small class="text-muted d-block mb-1">
+                                Vinculaciones institucionales
+                            </small>
+
+                            <span class="fs-3 fw-bold">
+                                @Model.NumeroVinculacionesInstitucionales
+                            </span>
+
+                        </div>
+
+
+                        <i class="bi bi-building
+                                  fs-2 text-muted">
+                        </i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

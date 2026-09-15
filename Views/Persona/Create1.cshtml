@@ -1,0 +1,836 @@
+@model e_violenciagen.ViewModels.Personas.PersonaCreateViewModel
+
+@{
+    ViewData["Title"] = "Registrar persona";
+}
+
+
+<div class="container-fluid py-4">
+
+    @* =========================================================
+       CABECERA
+       ========================================================= *@
+
+    <div class="d-flex justify-content-between
+                align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Registrar persona
+            </h2>
+
+            <p class="text-muted mb-0">
+                Introduzca los datos personales y de contacto.
+            </p>
+        </div>
+
+        <a asp-controller="Persona"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+
+            <i class="bi bi-arrow-left me-1"></i>
+            Volver
+
+        </a>
+
+    </div>
+
+
+    @* =========================================================
+       MENSAJE GENERAL
+       ========================================================= *@
+
+    <div id="formAlert"
+         class="alert d-none"
+         role="alert">
+    </div>
+
+
+    <form id="personaForm"
+          asp-controller="Persona"
+          asp-action="Create"
+          method="post"
+          enctype="multipart/form-data">
+
+        @Html.AntiForgeryToken()
+
+
+        <div class="row g-4">
+
+            @* =================================================
+               COLUMNA PRINCIPAL
+               ================================================= *@
+
+            <div class="col-lg-8">
+
+
+                @* =============================================
+                   IDENTIFICACIÓN
+                   ============================================= *@
+
+                <div class="card border-0 shadow-sm mb-4">
+
+                    <div class="card-header bg-white py-3">
+
+                        <h5 class="mb-0">
+                            <i class="bi bi-person-vcard me-2"></i>
+                            Identificación
+                        </h5>
+
+                    </div>
+
+
+                    <div class="card-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                <label asp-for="Persona.TipoDocumentoIdentidadId"
+                                       class="form-label">
+                                </label>
+
+                                <select asp-for="Persona.TipoDocumentoIdentidadId"
+                                        asp-items="Model.TiposDocumento"
+                                        class="form-select">
+
+                                    <option value="">
+                                        Seleccione...
+                                    </option>
+
+                                </select>
+
+                                <span asp-validation-for="Persona.TipoDocumentoIdentidadId"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label asp-for="Persona.NumeroDocumento"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Persona.NumeroDocumento"
+                                       class="form-control"
+                                       autocomplete="off" />
+
+                                <span asp-validation-for="Persona.NumeroDocumento"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                @* =============================================
+                   DATOS PERSONALES
+                   ============================================= *@
+
+                <div class="card border-0 shadow-sm mb-4">
+
+                    <div class="card-header bg-white py-3">
+
+                        <h5 class="mb-0">
+                            <i class="bi bi-person me-2"></i>
+                            Datos personales
+                        </h5>
+
+                    </div>
+
+
+                    <div class="card-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                <label asp-for="Persona.Nombres"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Persona.Nombres"
+                                       class="form-control" />
+
+                                <span asp-validation-for="Persona.Nombres"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label asp-for="Persona.Apellidos"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Persona.Apellidos"
+                                       class="form-control" />
+
+                                <span asp-validation-for="Persona.Apellidos"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label asp-for="Persona.FechaNacimiento"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Persona.FechaNacimiento"
+                                       type="date"
+                                       class="form-control" />
+
+                                <span asp-validation-for="Persona.FechaNacimiento"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label asp-for="Persona.Sexo"
+                                       class="form-label">
+                                    Sexo
+                                </label>
+
+                                <select asp-for="Persona.Sexo"
+                                        class="form-select">
+
+                                    <option value="">
+                                        Seleccione...
+                                    </option>
+
+                                    <option value="Femenino">
+                                        Femenino
+                                    </option>
+
+                                    <option value="Masculino">
+                                        Masculino
+                                    </option>
+
+                                </select>
+
+                                <span asp-validation-for="Persona.Sexo"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                @* =============================================
+                   CONTACTO
+                   ============================================= *@
+
+                <div class="card border-0 shadow-sm mb-4">
+
+                    <div class="card-header bg-white py-3">
+
+                        <h5 class="mb-0">
+                            <i class="bi bi-telephone me-2"></i>
+                            Contacto
+                        </h5>
+
+                    </div>
+
+
+                    <div class="card-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                <label asp-for="Persona.Telefono"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Persona.Telefono"
+                                       class="form-control"
+                                       type="tel" />
+
+                                <span asp-validation-for="Persona.Telefono"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label asp-for="Persona.Email"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Persona.Email"
+                                       class="form-control"
+                                       type="email" />
+
+                                <span asp-validation-for="Persona.Email"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                @* =============================================
+                   DIRECCIÓN
+                   ============================================= *@
+
+                <div class="card border-0 shadow-sm">
+
+                    <div class="card-header bg-white py-3">
+
+                        <h5 class="mb-0">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            Dirección
+                        </h5>
+
+                    </div>
+
+
+                    <div class="card-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-5">
+
+                                <label asp-for="Persona.BarrioId"
+                                       class="form-label">
+                                </label>
+
+                                <select asp-for="Persona.BarrioId"
+                                        asp-items="Model.Barrios"
+                                        class="form-select">
+
+                                    <option value="">
+                                        Seleccione...
+                                    </option>
+
+                                </select>
+
+                                <span asp-validation-for="Persona.BarrioId"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+
+                            <div class="col-md-7">
+
+                                <label asp-for="Persona.Direccion"
+                                       class="form-label">
+                                </label>
+
+                                <input asp-for="Persona.Direccion"
+                                       class="form-control" />
+
+                                <span asp-validation-for="Persona.Direccion"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            @* =================================================
+               FOTOGRAFÍA
+               ================================================= *@
+
+            <div class="col-lg-4">
+
+                <div class="card border-0 shadow-sm">
+
+                    <div class="card-header bg-white py-3">
+
+                        <h5 class="mb-0">
+                            <i class="bi bi-camera me-2"></i>
+                            Fotografía
+                        </h5>
+
+                    </div>
+
+
+                    <div class="card-body">
+
+                        @* Vista previa *@
+
+                        <div class="text-center mb-3">
+
+                            <div id="photoPlaceholder"
+                                 class="border rounded bg-light
+                                        py-5 text-muted">
+
+                                <i class="bi bi-person-circle
+                                          fs-1 d-block mb-2">
+                                </i>
+
+                                Sin fotografía
+
+                            </div>
+
+
+                            <img id="photoPreview"
+                                 src=""
+                                 alt="Vista previa"
+                                 class="img-fluid rounded border d-none" />
+
+                        </div>
+
+
+                        <label asp-for="Persona.Foto"
+                               class="form-label">
+                            Seleccionar fotografía
+                        </label>
+
+                        <input asp-for="Persona.Foto"
+                               id="fotoInput"
+                               type="file"
+                               class="form-control"
+                               accept="image/jpeg,image/png,image/webp" />
+
+                        <span asp-validation-for="Persona.Foto"
+                              class="text-danger small">
+                        </span>
+
+
+                        <div class="form-text mt-2">
+
+                            Formatos permitidos:
+                            JPG, PNG y WEBP.
+
+                            Tamaño máximo: 5 MB.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        @* =====================================================
+           BOTONES
+           ===================================================== *@
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+
+            <a asp-controller="Persona"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+
+                Cancelar
+
+            </a>
+
+
+            <button type="submit"
+                    id="btnGuardar"
+                    class="btn btn-primary">
+
+                <span id="saveSpinner"
+                      class="spinner-border spinner-border-sm
+                             me-2 d-none"
+                      aria-hidden="true">
+                </span>
+
+                <i id="saveIcon"
+                   class="bi bi-check-lg me-1">
+                </i>
+
+                Guardar persona
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const form =
+                    document.getElementById("personaForm");
+
+                const fotoInput =
+                    document.getElementById("fotoInput");
+
+                const photoPreview =
+                    document.getElementById("photoPreview");
+
+                const photoPlaceholder =
+                    document.getElementById("photoPlaceholder");
+
+                const btnGuardar =
+                    document.getElementById("btnGuardar");
+
+                const saveSpinner =
+                    document.getElementById("saveSpinner");
+
+                const saveIcon =
+                    document.getElementById("saveIcon");
+
+                const formAlert =
+                    document.getElementById("formAlert");
+
+
+                // =============================================
+                // PREVISUALIZACIÓN DE FOTO
+                // =============================================
+
+                fotoInput.addEventListener(
+                    "change",
+                    function () {
+
+                        const file = this.files?.[0];
+
+                        if (!file) {
+
+                            photoPreview.src = "";
+
+                            photoPreview.classList.add("d-none");
+
+                            photoPlaceholder.classList.remove(
+                                "d-none"
+                            );
+
+                            return;
+                        }
+
+
+                        /*
+                         * Creamos una URL temporal para mostrar
+                         * la fotografía sin subirla todavía
+                         * al servidor.
+                         */
+                        const objectUrl =
+                            URL.createObjectURL(file);
+
+
+                        photoPreview.src = objectUrl;
+
+                        photoPreview.classList.remove("d-none");
+
+                        photoPlaceholder.classList.add("d-none");
+
+
+                        /*
+                         * Liberamos la URL temporal una vez
+                         * cargada la imagen.
+                         */
+                        photoPreview.onload = function () {
+                            URL.revokeObjectURL(objectUrl);
+                        };
+
+                    });
+
+
+                // =============================================
+                // ENVÍO AJAX
+                // =============================================
+
+                form.addEventListener(
+                    "submit",
+                    async function (event) {
+
+                        event.preventDefault();
+
+
+                        // =====================================
+                        // VALIDACIÓN CLIENTE
+                        // =====================================
+
+                        /*
+                         * Si jQuery Validate está instalado,
+                         * aprovechamos la validación generada
+                         * por ASP.NET Core.
+                         */
+                        if (
+                            typeof $ !== "undefined" &&
+                            $.validator &&
+                            !$(form).valid()
+                        ) {
+                            return;
+                        }
+
+
+                        setSavingState(true);
+
+                        hideAlert();
+
+
+                        try {
+
+                            /*
+                             * FormData incluye:
+                             *
+                             * - todos los campos del formulario
+                             * - la fotografía
+                             * - el AntiForgeryToken
+                             */
+                            const formData =
+                                new FormData(form);
+
+
+                            const response =
+                                await fetch(
+                                    form.action,
+                                    {
+                                        method: "POST",
+                                        body: formData
+                                    });
+
+
+                            const result =
+                                await response.json();
+
+
+                            // =================================
+                            // OPERACIÓN CORRECTA
+                            // =================================
+
+                            if (response.ok &&
+                                result.success) {
+
+                                showAlert(
+                                    result.message,
+                                    "success"
+                                );
+
+
+                                /*
+                                 * Después del registro enviamos
+                                 * al usuario a la ficha de la
+                                 * nueva persona.
+                                 */
+                                setTimeout(
+                                    function () {
+
+                                        window.location.href =
+                                            '@Url.Action(
+                                                "Details",
+                                                "Persona")'
+                                            + "/"
+                                            + result.id;
+
+                                    },
+                                    700
+                                );
+
+                                return;
+                            }
+
+
+                            // =================================
+                            // ERRORES DE VALIDACIÓN
+                            // =================================
+
+                            if (response.status === 400 &&
+                                result.errors) {
+
+                                showModelErrors(
+                                    result.errors
+                                );
+
+                                showAlert(
+                                    result.message ??
+                                    "Revise los datos introducidos.",
+                                    "warning"
+                                );
+
+                                return;
+                            }
+
+
+                            // =================================
+                            // ERROR DE NEGOCIO
+                            // =================================
+
+                            showAlert(
+                                result.message ??
+                                "No se pudo registrar la persona.",
+                                "danger"
+                            );
+
+                        }
+                        catch (error) {
+
+                            console.error(
+                                "Error registrando Persona:",
+                                error
+                            );
+
+                            showAlert(
+                                "No se pudo comunicar con el servidor.",
+                                "danger"
+                            );
+
+                        }
+                        finally {
+
+                            setSavingState(false);
+
+                        }
+
+                    });
+
+
+                // =============================================
+                // ESTADO DEL BOTÓN
+                // =============================================
+
+                function setSavingState(saving) {
+
+                    btnGuardar.disabled = saving;
+
+                    saveSpinner.classList.toggle(
+                        "d-none",
+                        !saving
+                    );
+
+                    saveIcon.classList.toggle(
+                        "d-none",
+                        saving
+                    );
+
+                }
+
+
+                // =============================================
+                // ALERTAS BOOTSTRAP
+                // =============================================
+
+                function showAlert(
+                    message,
+                    type
+                ) {
+
+                    formAlert.className =
+                        `alert alert-${type}`;
+
+                    formAlert.textContent = message;
+
+                    formAlert.classList.remove(
+                        "d-none"
+                    );
+
+
+                    window.scrollTo({
+                        top: 0,
+                        behavior: "smooth"
+                    });
+
+                }
+
+
+                function hideAlert() {
+
+                    formAlert.classList.add(
+                        "d-none"
+                    );
+
+                    formAlert.textContent = "";
+
+                }
+
+
+                // =============================================
+                // ERRORES DE MODELSTATE
+                // =============================================
+
+                function showModelErrors(errors) {
+
+                    /*
+                     * Los nombres del ModelState tendrán
+                     * formato:
+                     *
+                     * Persona.Nombres
+                     * Persona.Email
+                     * etc.
+                     */
+
+                    Object.entries(errors)
+                        .forEach(
+                            ([key, messages]) => {
+
+                                const input =
+                                    form.elements[key];
+
+                                if (!input) {
+                                    return;
+                                }
+
+
+                                input.classList.add(
+                                    "is-invalid"
+                                );
+
+
+                                /*
+                                 * Buscamos el span generado por:
+                                 *
+                                 * asp-validation-for
+                                 */
+                                const validationSpan =
+                                    form.querySelector(
+                                        `[data-valmsg-for="${key}"]`
+                                    );
+
+
+                                if (validationSpan) {
+
+                                    validationSpan.textContent =
+                                        messages[0] ?? "";
+
+                                }
+
+                            });
+
+                }
+
+            });
+
+    </script>
+}

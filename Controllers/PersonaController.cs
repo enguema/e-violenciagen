@@ -124,7 +124,41 @@ public class PersonaController : Controller
             return NotFound();
         }
 
-        return View(persona);
+        var model = new PersonaDetailViewModel
+        {
+            Id = persona.Id,
+
+            TipoDocumento = persona.TipoDocumento,
+            NumeroDocumento = persona.NumeroDocumento,
+
+            Nombres = persona.Nombres,
+            Apellidos = persona.Apellidos,
+            NombreCompleto = persona.NombreCompleto,
+
+            FechaNacimiento = persona.FechaNacimiento,
+            Sexo = persona.Sexo,
+
+            RutaFoto = persona.RutaFoto,
+
+            Telefono = persona.Telefono,
+            Email = persona.Email,
+
+            Direccion = persona.Direccion,
+            Barrio = persona.Barrio,
+            Distrito = persona.Distrito,
+            Provincia = persona.Provincia,
+
+            NumeroCasosComoVictima =
+                persona.NumeroCasosComoVictima,
+
+            NumeroCasosComoPresuntoAgresor =
+                persona.NumeroCasosComoPresuntoAgresor,
+
+            NumeroVinculacionesInstitucionales =
+                persona.NumeroVinculacionesInstitucionales
+        };
+
+        return View(model);
     }
 
 
@@ -141,9 +175,10 @@ public class PersonaController : Controller
     [HttpGet]
     public async Task<IActionResult> Create(CancellationToken cancellationToken)
     {
+        await GetFormCatalogsAsync(cancellationToken);
         //var model = new PersonaFormViewModel();
-        var model = await _personaService.GetCreateViewModelAsync(cancellationToken);
-        return View(model);
+        //var model = await _personaService.GetCreateViewModelAsync(cancellationToken);
+        return View(new PersonaFormViewModel());
     }
 
 
@@ -159,7 +194,7 @@ public class PersonaController : Controller
     /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(PersonaCreateViewModel model, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(PersonaFormViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -173,7 +208,7 @@ public class PersonaController : Controller
 
         try
         {
-            Guid personaId = await _personaService.CreateAsync(model.Persona, cancellationToken);
+            Guid personaId = await _personaService.CreateAsync(model, cancellationToken);
 
             return Json(new
             {
@@ -192,7 +227,7 @@ public class PersonaController : Controller
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex,"Error al registrar una nueva persona.");
+            _logger.LogError(ex, "Error al registrar una nueva persona.");
 
             return StatusCode(StatusCodes.Status500InternalServerError,
                 new
@@ -202,7 +237,7 @@ public class PersonaController : Controller
                 });
         }
     }
-    
+
     // =========================================================
     // EDIT - GET
     // =========================================================
@@ -212,20 +247,16 @@ public class PersonaController : Controller
     /// PersonaFormViewModel para mostrarlos en Edit.
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Edit(
-        Guid id,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
     {
         PersonaFormViewModel? model =
-            await _personaService.GetForEditAsync(
-                id,
-                cancellationToken);
+            await _personaService.GetForEditAsync(id, cancellationToken);
 
         if (model is null)
         {
             return NotFound();
         }
-
+        await GetFormCatalogsAsync(cancellationToken);
         return View(model);
     }
 
@@ -244,10 +275,7 @@ public class PersonaController : Controller
     /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(
-        Guid id,
-        PersonaFormViewModel model,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> Edit(Guid id, PersonaFormViewModel model, CancellationToken cancellationToken)
     {
         /*
          * El identificador de la URL es la fuente fiable.
@@ -343,9 +371,7 @@ public class PersonaController : Controller
     /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(
-        Guid id,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         try
         {
@@ -441,5 +467,17 @@ public class PersonaController : Controller
                             ? "Valor no válido."
                             : error.ErrorMessage)
                     .ToArray());
+    }
+
+    private async Task GetFormCatalogsAsync(CancellationToken cancellationToken)
+    {
+        var model = await _personaService
+            .GetCreateViewModelAsync(cancellationToken);
+
+        ViewBag.TiposDocumento =
+            model.TiposDocumento;
+
+        ViewBag.Barrios =
+            model.Barrios;
     }
 }

@@ -1,0 +1,294 @@
+@model e_violenciagen.ViewModels.Personas.PersonaFormViewModel
+
+@* =========================================================
+   IDENTIFICACIÓN
+   ========================================================= *@
+
+<div class="card border-0 shadow-sm mb-4">
+
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0">
+            <i class="bi bi-person-vcard me-2"></i>
+            Identificación
+        </h5>
+    </div>
+
+    <div class="card-body">
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+
+                <label asp-for="TipoDocumentoIdentidadId"
+                       class="form-label">
+                </label>
+
+                <select asp-for="TipoDocumentoIdentidadId"
+                        asp-items="ViewBag.TiposDocumento"
+                        class="form-select">
+
+                    <option value="">
+                        Seleccione...
+                    </option>
+
+                </select>
+
+                <span asp-validation-for="TipoDocumentoIdentidadId"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label asp-for="NumeroDocumento"
+                       class="form-label">
+                </label>
+
+                <input asp-for="NumeroDocumento"
+                       class="form-control"
+                       autocomplete="off" />
+
+                <span asp-validation-for="NumeroDocumento"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@* =========================================================
+   DATOS PERSONALES
+   ========================================================= *@
+
+<div class="card border-0 shadow-sm mb-4">
+
+    <div class="card-header bg-white py-3">
+
+        <h5 class="mb-0">
+            <i class="bi bi-person me-2"></i>
+            Datos personales
+        </h5>
+
+    </div>
+
+
+    <div class="card-body">
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+
+                <label asp-for="Nombres"
+                       class="form-label">
+                </label>
+
+                <input asp-for="Nombres"
+                       class="form-control" />
+
+                <span asp-validation-for="Nombres"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label asp-for="Apellidos"
+                       class="form-label">
+                </label>
+
+                <input asp-for="Apellidos"
+                       class="form-control" />
+
+                <span asp-validation-for="Apellidos"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label asp-for="FechaNacimiento"
+                       class="form-label">
+                </label>
+
+                <input asp-for="FechaNacimiento"
+                       type="date"
+                       class="form-control" />
+
+                <span asp-validation-for="FechaNacimiento"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label asp-for="Sexo"
+                       class="form-label">
+                    Sexo
+                </label>
+
+                <select asp-for="Sexo"
+                        class="form-select">
+
+                    <option value="">
+                        Seleccione...
+                    </option>
+
+                    <option value="Femenino">
+                        Femenino
+                    </option>
+
+                    <option value="Masculino">
+                        Masculino
+                    </option>
+
+                </select>
+
+                <span asp-validation-for="Sexo"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@* =========================================================
+   CONTACTO
+   ========================================================= *@
+
+<div class="card border-0 shadow-sm mb-4">
+
+    <div class="card-header bg-white py-3">
+
+        <h5 class="mb-0">
+            <i class="bi bi-telephone me-2"></i>
+            Contacto
+        </h5>
+
+    </div>
+
+
+    <div class="card-body">
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+
+                <label asp-for="Telefono"
+                       class="form-label">
+                </label>
+
+                <input asp-for="Telefono"
+                       type="tel"
+                       class="form-control" />
+
+                <span asp-validation-for="Telefono"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label asp-for="Email"
+                       class="form-label">
+                </label>
+
+                <input asp-for="Email"
+                       type="email"
+                       class="form-control" />
+
+                <span asp-validation-for="Email"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@* =========================================================
+   DIRECCIÓN
+   ========================================================= *@
+
+<div class="card border-0 shadow-sm">
+
+    <div class="card-header bg-white py-3">
+
+        <h5 class="mb-0">
+            <i class="bi bi-geo-alt me-2"></i>
+            Dirección
+        </h5>
+
+    </div>
+
+
+    <div class="card-body">
+
+        <div class="row g-3">
+
+            <div class="col-md-5">
+
+                <label asp-for="BarrioId"
+                       class="form-label">
+                </label>
+
+                <select asp-for="BarrioId"
+                        asp-items="ViewBag.Barrios"
+                        class="form-select">
+
+                    <option value="">
+                        Seleccione...
+                    </option>
+
+                </select>
+
+                <span asp-validation-for="BarrioId"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+
+            <div class="col-md-7">
+
+                <label asp-for="Direccion"
+                       class="form-label">
+                </label>
+
+                <input asp-for="Direccion"
+                       class="form-control" />
+
+                <span asp-validation-for="Direccion"
+                      class="text-danger small">
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
