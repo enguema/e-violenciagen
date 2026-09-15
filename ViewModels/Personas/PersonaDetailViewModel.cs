@@ -63,6 +63,8 @@ public class PersonaDetailViewModel
 
     public string? Provincia { get; set; }
 
+    public int? Edad { get; set; }
+
 
     // =========================================================
     // RESUMEN DE PARTICIPACIÓN

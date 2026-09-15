@@ -852,9 +852,7 @@ public class PersonaService : IPersonaService
     /// select HTML porque una petición HTTP puede modificarse
     /// manualmente.
     /// </summary>
-    private async Task ValidarReferenciasAsync( //-----BORRAR ESTE MÉTODO, NO TIENE SENTIDO, YA QUE NO SE USA EN NINGÚN LADO
-        PersonaFormViewModel model,
-        CancellationToken cancellationToken)
+    private async Task ValidarReferenciasAsync(PersonaFormViewModel model, CancellationToken cancellationToken)
     {
         if (model.TipoDocumentoIdentidadId.HasValue)
         {

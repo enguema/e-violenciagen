@@ -115,9 +115,7 @@ public class PersonaController : Controller
     [HttpGet]
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken)
     {
-        var persona = await _personaService.GetByIdAsync(
-            id,
-            cancellationToken);
+        var persona = await _personaService.GetByIdAsync(id, cancellationToken);
 
         if (persona is null)
         {

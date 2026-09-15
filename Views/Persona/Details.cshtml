@@ -11,7 +11,8 @@
        ========================================================= *@
 
     <div class="d-flex flex-column flex-md-row
-                justify-content-between align-items-md-center
+                justify-content-between
+                align-items-md-center
                 gap-3 mb-4">
 
         <div>
@@ -20,7 +21,7 @@
             </h2>
 
             <p class="text-muted mb-0">
-                Información completa registrada en el sistema.
+                Información registrada de la persona.
             </p>
         </div>
 
@@ -56,6 +57,7 @@
 
     <div class="row g-4">
 
+
         @* =====================================================
            PERFIL
            ===================================================== *@
@@ -71,12 +73,14 @@
                         <img src="@Model.RutaFoto"
                              alt="Fotografía de @Model.NombreCompleto"
                              class="img-fluid rounded border mb-3"
-                             style="max-height: 280px; object-fit: cover;" />
+                             style="max-height: 300px; object-fit: cover;" />
                     }
                     else
                     {
-                        <div class="border rounded bg-light
-                                    text-muted py-5 mb-3">
+                        <div class="border rounded
+                                    bg-light
+                                    text-muted
+                                    py-5 mb-3">
 
                             <i class="bi bi-person-circle
                                       display-3 d-block mb-2">
@@ -99,13 +103,21 @@
 
                             @if (!string.IsNullOrWhiteSpace(Model.TipoDocumento))
                             {
-                                <span>@Model.TipoDocumento:</span>
+                                <span>
+                                    @Model.TipoDocumento:
+                                </span>
                             }
 
                             <strong>
                                 @Model.NumeroDocumento
                             </strong>
 
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">
+                            Sin documento registrado
                         </p>
                     }
 
@@ -117,7 +129,7 @@
 
 
         @* =====================================================
-           INFORMACIÓN PRINCIPAL
+           DATOS GENERALES
            ===================================================== *@
 
         <div class="col-lg-8">
@@ -136,7 +148,6 @@
                     </h5>
 
                 </div>
-
 
                 <div class="card-body">
 
@@ -189,7 +200,6 @@
 
                 </div>
 
-
                 <div class="card-body">
 
                     <div class="row g-3">
@@ -230,7 +240,7 @@
 
                                 @if (Model.FechaNacimiento.HasValue)
                                 {
-                                    @Model.FechaNacimiento.Value
+                                    @Model.FechaNacimiento.Value 
                                 }
                                 else
                                 {
@@ -275,7 +285,6 @@
                     </h5>
 
                 </div>
-
 
                 <div class="card-body">
 
@@ -347,11 +356,10 @@
 
                     <h5 class="mb-0">
                         <i class="bi bi-geo-alt me-2"></i>
-                        Dirección
+                        Ubicación
                     </h5>
 
                 </div>
-
 
                 <div class="card-body">
 
@@ -420,37 +428,49 @@
 
 
     @* =========================================================
-       RESUMEN DE PARTICIPACIÓN
+       RESUMEN RELACIONAL
        ========================================================= *@
 
-    <div class="row g-4 mt-1">
+    <div class="mt-4">
 
-        <div class="col-md-4">
+        <h4 class="fw-semibold mb-3">
+            Participación y vinculaciones
+        </h4>
 
-            <div class="card border-0 shadow-sm h-100">
+        <div class="row g-4">
 
-                <div class="card-body">
 
-                    <div class="d-flex
-                                justify-content-between
-                                align-items-center">
+            @* =================================================
+               CASOS COMO VÍCTIMA
+               ================================================= *@
 
-                        <div>
+            <div class="col-md-4">
 
-                            <small class="text-muted d-block mb-1">
-                                Casos como víctima
-                            </small>
+                <div class="card border-0 shadow-sm h-100">
 
-                            <span class="fs-3 fw-bold">
-                                @Model.NumeroCasosComoVictima
-                            </span>
+                    <div class="card-body">
+
+                        <div class="d-flex
+                                    justify-content-between
+                                    align-items-center">
+
+                            <div>
+
+                                <span class="text-muted d-block mb-1">
+                                    Casos como víctima
+                                </span>
+
+                                <span class="fs-2 fw-bold">
+                                    @Model.NumeroCasosComoVictima
+                                </span>
+
+                            </div>
+
+                            <i class="bi bi-person-heart
+                                      fs-1 text-muted">
+                            </i>
 
                         </div>
-
-
-                        <i class="bi bi-person-heart
-                                  fs-2 text-muted">
-                        </i>
 
                     </div>
 
@@ -458,35 +478,38 @@
 
             </div>
 
-        </div>
 
+            @* =================================================
+               PRESUNTO AGRESOR
+               ================================================= *@
 
-        <div class="col-md-4">
+            <div class="col-md-4">
 
-            <div class="card border-0 shadow-sm h-100">
+                <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                    <div class="card-body">
 
-                    <div class="d-flex
-                                justify-content-between
-                                align-items-center">
+                        <div class="d-flex
+                                    justify-content-between
+                                    align-items-center">
 
-                        <div>
+                            <div>
 
-                            <small class="text-muted d-block mb-1">
-                                Casos como presunto agresor
-                            </small>
+                                <span class="text-muted d-block mb-1">
+                                    Casos como presunto agresor
+                                </span>
 
-                            <span class="fs-3 fw-bold">
-                                @Model.NumeroCasosComoPresuntoAgresor
-                            </span>
+                                <span class="fs-2 fw-bold">
+                                    @Model.NumeroCasosComoPresuntoAgresor
+                                </span>
+
+                            </div>
+
+                            <i class="bi bi-person-exclamation
+                                      fs-1 text-muted">
+                            </i>
 
                         </div>
-
-
-                        <i class="bi bi-person-exclamation
-                                  fs-2 text-muted">
-                        </i>
 
                     </div>
 
@@ -494,35 +517,38 @@
 
             </div>
 
-        </div>
 
+            @* =================================================
+               VINCULACIONES INSTITUCIONALES
+               ================================================= *@
 
-        <div class="col-md-4">
+            <div class="col-md-4">
 
-            <div class="card border-0 shadow-sm h-100">
+                <div class="card border-0 shadow-sm h-100">
 
-                <div class="card-body">
+                    <div class="card-body">
 
-                    <div class="d-flex
-                                justify-content-between
-                                align-items-center">
+                        <div class="d-flex
+                                    justify-content-between
+                                    align-items-center">
 
-                        <div>
+                            <div>
 
-                            <small class="text-muted d-block mb-1">
-                                Vinculaciones institucionales
-                            </small>
+                                <span class="text-muted d-block mb-1">
+                                    Vinculaciones institucionales
+                                </span>
 
-                            <span class="fs-3 fw-bold">
-                                @Model.NumeroVinculacionesInstitucionales
-                            </span>
+                                <span class="fs-2 fw-bold">
+                                    @Model.NumeroVinculacionesInstitucionales
+                                </span>
+
+                            </div>
+
+                            <i class="bi bi-building
+                                      fs-1 text-muted">
+                            </i>
 
                         </div>
-
-
-                        <i class="bi bi-building
-                                  fs-2 text-muted">
-                        </i>
 
                     </div>
 
