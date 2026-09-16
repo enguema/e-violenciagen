@@ -151,6 +151,388 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                // =============================================
+                // ELEMENTOS DEL FORMULARIO
+                // =============================================
+
+                const form =
+                    document.getElementById("personaForm");
+
+                const fotoInput =
+                    document.getElementById("fotoInput");
+
+                const photoPreview =
+                    document.getElementById("photoPreview");
+
+                const photoPlaceholder =
+                    document.getElementById("photoPlaceholder");
+
+                const btnGuardar =
+                    document.getElementById("btnGuardar");
+
+                const saveSpinner =
+                    document.getElementById("saveSpinner");
+
+                const formAlert =
+                    document.getElementById("formAlert");
+
+
+                // =============================================
+                // COMPROBACIÓN DE SEGURIDAD
+                // =============================================
+
+                if (!form) {
+
+                    console.error(
+                        "No se encontró el formulario personaForm."
+                    );
+
+                    return;
+                }
+
+
+                // =============================================
+                // PREVISUALIZACIÓN DE FOTO
+                // =============================================
+
+                if (fotoInput &&
+                    photoPreview &&
+                    photoPlaceholder) {
+
+                    fotoInput.addEventListener(
+                        "change",
+                        function () {
+
+                            const file =
+                                this.files?.[0];
+
+                            if (!file) {
+
+                                photoPreview.src = "";
+
+                                photoPreview.classList.add(
+                                    "d-none"
+                                );
+
+                                photoPlaceholder.classList.remove(
+                                    "d-none"
+                                );
+
+                                return;
+                            }
+
+
+                            const objectUrl =
+                                URL.createObjectURL(file);
+
+
+                            photoPreview.src =
+                                objectUrl;
+
+                            photoPreview.classList.remove(
+                                "d-none"
+                            );
+
+                            photoPlaceholder.classList.add(
+                                "d-none"
+                            );
+
+
+                            photoPreview.onload =
+                                function () {
+
+                                    URL.revokeObjectURL(
+                                        objectUrl
+                                    );
+
+                                };
+                        });
+                }
+
+
+                // =============================================
+                // ENVÍO DEL FORMULARIO
+                // =============================================
+
+                form.addEventListener(
+                    "submit",
+                    async function (event) {
+
+                        /*
+                         * MUY IMPORTANTE:
+                         *
+                         * Evita que el navegador haga el POST
+                         * tradicional y muestre directamente
+                         * el JSON del controlador.
+                         */
+                        event.preventDefault();
+
+
+                        // =====================================
+                        // VALIDACIÓN CLIENTE
+                        // =====================================
+
+                        if (
+                            typeof $ !== "undefined" &&
+                            $.validator &&
+                            !$(form).valid()
+                        ) {
+                            return;
+                        }
+
+
+                        hideAlert();
+
+                        setSavingState(true);
+
+
+                        try {
+
+                            /*
+                             * FormData transporta también:
+                             *
+                             * - fotografía
+                             * - AntiForgeryToken
+                             * - resto de campos
+                             */
+                            const formData =
+                                new FormData(form);
+
+
+                            const response =
+                                await fetch(
+                                    form.action,
+                                    {
+                                        method: "POST",
+                                        body: formData
+                                    });
+
+
+                            const result =
+                                await response.json();
+
+
+                            // =================================
+                            // REGISTRO CORRECTO
+                            // =================================
+
+                            if (
+                                response.ok &&
+                                result.success
+                            ) {
+
+                                showAlert(
+                                    result.message ??
+                                    "La persona se ha registrado correctamente.",
+                                    "success"
+                                );
+
+
+                                /*
+                                 * Dejamos visible la confirmación
+                                 * durante un instante y volvemos
+                                 * al listado de Personas.
+                                 */
+                                setTimeout(
+                                    function () {
+
+                                        window.location.href =
+                                            '@Url.Action(
+                                                "Index",
+                                                "Persona")';
+
+                                    },
+                                    900
+                                );
+
+                                return;
+                            }
+
+
+                            // =================================
+                            // MODELSTATE
+                            // =================================
+
+                            if (
+                                response.status === 400 &&
+                                result.errors
+                            ) {
+
+                                showModelErrors(
+                                    result.errors
+                                );
+
+                                showAlert(
+                                    result.message ??
+                                    "Revise los datos introducidos.",
+                                    "warning"
+                                );
+
+                                return;
+                            }
+
+
+                            // =================================
+                            // REGLA DE NEGOCIO / 422
+                            // =================================
+
+                            showAlert(
+                                result.message ??
+                                "No se pudo registrar la persona.",
+                                "danger"
+                            );
+
+                        }
+                        catch (error) {
+
+                            console.error(
+                                "Error registrando persona:",
+                                error
+                            );
+
+
+                            showAlert(
+                                "No se pudo comunicar con el servidor.",
+                                "danger"
+                            );
+
+                        }
+                        finally {
+
+                            setSavingState(false);
+
+                        }
+
+                    });
+
+
+                // =============================================
+                // ESTADO DEL BOTÓN
+                // =============================================
+
+                function setSavingState(saving) {
+
+                    if (!btnGuardar) {
+                        return;
+                    }
+
+                    btnGuardar.disabled = saving;
+
+
+                    if (saveSpinner) {
+
+                        saveSpinner.classList.toggle(
+                            "d-none",
+                            !saving
+                        );
+
+                    }
+
+                }
+
+
+                // =============================================
+                // ALERTAS
+                // =============================================
+
+                function showAlert(
+                    message,
+                    type
+                ) {
+
+                    if (!formAlert) {
+                        return;
+                    }
+
+
+                    formAlert.className =
+                        `alert alert-${type}`;
+
+                    formAlert.textContent =
+                        message;
+
+                    formAlert.classList.remove(
+                        "d-none"
+                    );
+
+
+                    window.scrollTo({
+                        top: 0,
+                        behavior: "smooth"
+                    });
+
+                }
+
+
+                function hideAlert() {
+
+                    if (!formAlert) {
+                        return;
+                    }
+
+                    formAlert.classList.add(
+                        "d-none"
+                    );
+
+                    formAlert.textContent = "";
+
+                }
+
+
+                // =============================================
+                // ERRORES DE MODELSTATE
+                // =============================================
+
+                function showModelErrors(errors) {
+
+                    Object.entries(errors)
+                        .forEach(
+                            ([key, messages]) => {
+
+                                const input =
+                                    form.elements[key];
+
+                                if (!input) {
+                                    return;
+                                }
+
+
+                                input.classList.add(
+                                    "is-invalid"
+                                );
+
+
+                                const validationSpan =
+                                    form.querySelector(
+                                        `[data-valmsg-for="${key}"]`
+                                    );
+
+
+                                if (validationSpan) {
+
+                                    validationSpan.textContent =
+                                        messages[0] ?? "";
+
+                                }
+
+                            });
+
+                }
+
+            });
+
+    </script>
+}
+@*@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
         document.addEventListener(
             "DOMContentLoaded",
             function () {
@@ -219,4 +601,4 @@
                     });
             });
     </script>
-}
+}*@
