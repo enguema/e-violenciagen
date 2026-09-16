@@ -522,9 +522,7 @@ public class PersonaService : IPersonaService
 
         Normalizar(model);
 
-        await ValidarReferenciasAsync(
-            model,
-            cancellationToken);
+        await ValidarReferenciasAsync(model, cancellationToken);
 
         string? nuevaRutaFoto = null;
 
@@ -577,8 +575,7 @@ public class PersonaService : IPersonaService
 
             _dbContext.Personas.Add(persona);
 
-            await _dbContext.SaveChangesAsync(
-                cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return persona.Id;
         }
@@ -857,12 +854,12 @@ public class PersonaService : IPersonaService
         if (model.TipoDocumentoIdentidadId.HasValue)
         {
             bool existeTipoDocumento =
-                /*await _dbContext.TipoDocumentosIdentidad
+                await _dbContext.TiposDocumentoIdentidad
                     .AsNoTracking()
                     .AnyAsync(
                         x => x.Id ==
                              model.TipoDocumentoIdentidadId.Value,
-                        cancellationToken);*/
+                        cancellationToken);
                 await _dbContext.Personas
                     .AsNoTracking()
                     .AnyAsync(
@@ -872,8 +869,7 @@ public class PersonaService : IPersonaService
 
             if (!existeTipoDocumento)
             {
-                throw new InvalidOperationException(
-                    "El tipo de documento seleccionado no existe.");
+                throw new InvalidOperationException("El tipo de documento seleccionado no existe.");
             }
         }
 
@@ -888,8 +884,7 @@ public class PersonaService : IPersonaService
 
             if (!existeBarrio)
             {
-                throw new InvalidOperationException(
-                    "El barrio seleccionado no existe.");
+                throw new InvalidOperationException("El barrio seleccionado no existe.");
             }
         }
     }

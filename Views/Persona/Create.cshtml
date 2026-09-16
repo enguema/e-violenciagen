@@ -146,3 +146,77 @@
     </form>
 
 </div>
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const fotoInput =
+                    document.getElementById("fotoInput");
+
+                const photoPreview =
+                    document.getElementById("photoPreview");
+
+                const photoPlaceholder =
+                    document.getElementById("photoPlaceholder");
+
+
+                // =============================================
+                // PREVISUALIZACIÓN DE FOTOGRAFÍA
+                // =============================================
+
+                fotoInput.addEventListener(
+                    "change",
+                    function () {
+
+                        const file =
+                            this.files?.[0];
+
+                        if (!file) {
+
+                            photoPreview.src = "";
+
+                            photoPreview.classList.add(
+                                "d-none"
+                            );
+
+                            photoPlaceholder.classList.remove(
+                                "d-none"
+                            );
+
+                            return;
+                        }
+
+
+                        const objectUrl =
+                            URL.createObjectURL(file);
+
+
+                        photoPreview.src =
+                            objectUrl;
+
+                        photoPreview.classList.remove(
+                            "d-none"
+                        );
+
+                        photoPlaceholder.classList.add(
+                            "d-none"
+                        );
+
+
+                        photoPreview.onload =
+                            function () {
+
+                                URL.revokeObjectURL(
+                                    objectUrl
+                                );
+
+                            };
+                    });
+            });
+    </script>
+}
