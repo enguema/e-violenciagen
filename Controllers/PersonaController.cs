@@ -432,7 +432,38 @@ public class PersonaController : Controller
         }
     }
 
+    // =========================================================
+    // BUSCADOR REUTILIZABLE
+    // =========================================================
 
+    /// <summary>
+    /// Endpoint ligero utilizado por componentes
+    /// de autocompletado de Persona.
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> Search(string term, CancellationToken cancellationToken)
+    {
+        /*
+         * No tratamos menos de dos caracteres como error.
+         * Simplemente devolvemos una lista vacía.
+         */
+        if (string.IsNullOrWhiteSpace(term) ||
+            term.Trim().Length < 2)
+        {
+            return Json(Array.Empty<object>());
+        }
+
+
+        var personas =
+            await _personaService.SearchAsync(
+                term,
+                limit: 10,
+                includeInactive: false,
+                cancellationToken);
+
+        return Json(personas);
+    }
+    
     // =========================================================
     // MÉTODOS PRIVADOS
     // =========================================================

@@ -1,5 +1,6 @@
 using e_violenciagen.Dtos.Common;
 using e_violenciagen.Dtos.Personas;
+using e_violenciagen.Models.Personas;
 using e_violenciagen.ViewModels.Common;
 using e_violenciagen.ViewModels.Personas;
 
@@ -120,4 +121,15 @@ public interface IPersonaService
     /// de cargar todos los datos de la persona.
     /// </summary>
     Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+/// Busca personas por nombre, apellidos o documento.
+///
+/// Está optimizado para autocompletado:
+/// devuelve pocos resultados y nunca carga
+/// todas las personas en memoria.
+/// </summary>
+Task<IReadOnlyList<PersonaSearchResultDto>> SearchAsync(string term, int limit = 10, bool includeInactive = false, CancellationToken cancellationToken = default);
+
+
 }

@@ -1,3 +1,4 @@
+@using e_violenciagen.ViewModels.Personas
 @model e_violenciagen.ViewModels.Casos.CasoCreateViewModel
 
 @{
@@ -127,6 +128,16 @@
 
 
                 <!-- VÍCTIMA -->
+
+                @await Html.PartialAsync("_PersonaSelector",
+    new PersonaSelectorViewModel
+    {
+        FieldName = "VictimaPersonaId",
+        Label = "Víctima principal",
+        Placeholder = "Buscar víctima por nombre o documento..."
+    })
+
+
                 <div class="card border-0 shadow-sm mb-4">
 
                     <div class="card-header bg-white border-0 py-3">
@@ -277,6 +288,16 @@
 
 
                 <!-- PRESUNTO AGRESOR -->
+
+                @await Html.PartialAsync("_PersonaSelector",
+    new PersonaSelectorViewModel
+    {
+        FieldName = "PresuntoAgresorPersonaId",
+        Label = "Presunto agresor identificado",
+        Placeholder = "Buscar por nombre o documento..."
+    })
+
+
                 <div class="card border-0 shadow-sm">
 
                     <div class="card-header bg-white border-0 py-3">
@@ -557,6 +578,7 @@
 {
     <partial name="_ValidationScriptsPartial" />
 
-    <script src="~/js/casos/create.js" asp-append-version="true">
+    <script src="~/js/casos/create.js" asp-append-version="true"></script>
+    <script src="~/js/persona-selector.js" asp-append-version="true">
     </script>
 }

@@ -1,0 +1,128 @@
+@model e_violenciagen.ViewModels.Personas.PersonaSelectorViewModel
+
+@{
+    /*
+     * Generamos identificadores únicos porque el mismo
+     * formulario puede contener más de un selector:
+     *
+     * - víctima
+     * - presunto agresor
+     */
+    string componentId =
+        $"personaSelector_{Guid.NewGuid():N}";
+
+    string inputId =
+        $"{componentId}_search";
+
+    string resultId =
+        $"{componentId}_results";
+
+    string selectedId =
+        $"{componentId}_selected";
+}
+
+
+<div id="@componentId"
+     class="persona-selector">
+
+    <label for="@inputId"
+           class="form-label">
+
+        @Model.Label
+
+    </label>
+
+
+    @* =========================================================
+       VALOR REAL DEL FORMULARIO
+       ========================================================= *@
+
+    <input type="hidden"
+           id="@selectedId"
+           name="@Model.FieldName"
+           value="@Model.SelectedPersonaId" />
+
+
+    @* =========================================================
+       BUSCADOR
+       ========================================================= *@
+
+    <div class="input-group">
+
+        <span class="input-group-text">
+
+            <i class="bi bi-search"></i>
+
+        </span>
+
+
+        <input type="search"
+               id="@inputId"
+               class="form-control"
+               placeholder="@Model.Placeholder"
+               autocomplete="off"
+               value="@Model.SelectedPersonaName" />
+
+
+        <button type="button"
+                class="btn btn-outline-secondary d-none"
+                data-persona-clear>
+
+            <i class="bi bi-x-lg"></i>
+
+        </button>
+
+    </div>
+
+
+    <div class="form-text">
+        Introduzca al menos 2 caracteres.
+    </div>
+
+
+    @* =========================================================
+       RESULTADOS
+       ========================================================= *@
+
+    <div id="@resultId"
+         class="list-group shadow-sm mt-2 d-none">
+    </div>
+
+
+    @* =========================================================
+       PERSONA SELECCIONADA
+       ========================================================= *@
+
+    <div class="alert alert-light border mt-3 d-none"
+         data-persona-selected>
+
+        <div class="d-flex align-items-center gap-3">
+
+            <div data-persona-photo>
+            </div>
+
+            <div class="flex-grow-1">
+
+                <div class="fw-semibold"
+                     data-persona-name>
+                </div>
+
+                <small class="text-muted"
+                       data-persona-document>
+                </small>
+
+            </div>
+
+            <button type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    data-persona-remove>
+
+                Cambiar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>

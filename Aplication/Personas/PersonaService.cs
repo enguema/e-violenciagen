@@ -9,6 +9,7 @@ using e_violenciagen.ViewModels.Common;
 using e_violenciagen.ViewModels.Personas;
 using e_violenciagen.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using e_violenciagen.Models.Personas;
 
 namespace e_violenciagen.Aplication.Personas;
 
@@ -860,12 +861,12 @@ public class PersonaService : IPersonaService
                         x => x.Id ==
                              model.TipoDocumentoIdentidadId.Value,
                         cancellationToken);
-                await _dbContext.Personas
-                    .AsNoTracking()
-                    .AnyAsync(
-                        x => x.Id ==
-                             model.TipoDocumentoIdentidadId.Value,
-                        cancellationToken);
+            await _dbContext.Personas
+                .AsNoTracking()
+                .AnyAsync(
+                    x => x.Id ==
+                         model.TipoDocumentoIdentidadId.Value,
+                    cancellationToken);
 
             if (!existeTipoDocumento)
             {
@@ -1162,5 +1163,131 @@ public class PersonaService : IPersonaService
 
             Barrios = barrios
         };
+    }
+
+    // =========================================================
+    // BUSCADOR REUTILIZABLE DE PERSONAS
+    // =========================================================
+
+    public async Task<IReadOnlyList<PersonaSearchResultDto>>SearchAsync(string term, int limit = 10, bool includeInactive = false, CancellationToken cancellationToken = default)
+    {
+        // =====================================================
+        // VALIDACIÓN DEL TEXTO
+        // =====================================================
+
+        string search = term?.Trim() ?? string.Empty;
+
+        /*
+         * Evitamos lanzar consultas demasiado amplias
+         * con uno o ningún carácter.
+         */
+        if (search.Length < 2)
+        {
+            return Array.Empty<PersonaSearchResultDto>();
+        }
+
+
+        // =====================================================
+        // LÍMITE DE RESULTADOS
+        // =====================================================
+
+        int take = limit switch
+        {
+            <= 0 => 10,
+            > 20 => 20,
+            _ => limit
+        };
+
+
+        // =====================================================
+        // CONSULTA BASE
+        // =====================================================
+
+        IQueryable<Persona> query =
+            _dbContext.Personas
+                .AsNoTracking();
+
+
+        /*
+         * Por defecto no mostramos Personas inactivas
+         * para nuevas vinculaciones.
+         */
+        if (!includeInactive)
+        {
+            query = query.Where(p => p.Activo);
+        }
+
+
+        // =====================================================
+        // BÚSQUEDA
+        // =====================================================
+
+        string pattern = $"%{search}%";
+
+        query = query.Where(p =>
+
+            EF.Functions.ILike(
+                p.Nombres,
+                pattern)
+
+            ||
+
+            EF.Functions.ILike(
+                p.Apellidos,
+                pattern)
+
+            ||
+
+            EF.Functions.ILike(
+                p.Nombres + " " + p.Apellidos,
+                pattern)
+
+            ||
+
+            (
+                p.NumeroDocumento != null &&
+                EF.Functions.ILike(
+                    p.NumeroDocumento,
+                    pattern)
+            )
+        );
+
+
+        // =====================================================
+        // PROYECCIÓN
+        // =====================================================
+
+        return await query
+            .OrderBy(p => p.Apellidos)
+            .ThenBy(p => p.Nombres)
+            .Take(take)
+            .Select(p => new PersonaSearchResultDto
+            {
+                Id = p.Id,
+
+                NombreCompleto =
+                    p.Nombres + " " + p.Apellidos,
+
+                TipoDocumento =
+                    p.TipoDocumentoIdentidad != null
+                        ? p.TipoDocumentoIdentidad.Nombre
+                        : null,
+
+                NumeroDocumento =
+                    p.NumeroDocumento,
+
+                FechaNacimiento =
+                    p.FechaNacimiento,
+
+                Sexo =
+                    p.Sexo,
+
+                RutaFoto =
+                    p.RutaFoto,
+
+                Activo =
+                    p.Activo
+            })
+            .ToListAsync(cancellationToken);
     }
 }
