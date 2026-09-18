@@ -1,0 +1,159 @@
+# ==========================================================
+# .NET / ASP.NET CORE
+# ==========================================================
+
+# Compilación
+bin/
+obj/
+
+# Logs
+*.log
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Archivos generados por compilación
+*.dll
+*.exe
+*.pdb
+*.cache
+
+
+# ==========================================================
+# VISUAL STUDIO
+# ==========================================================
+
+.vs/
+
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio build folders
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+
+
+# ==========================================================
+# VS CODE
+# ==========================================================
+
+.vscode/
+
+# Si posteriormente quieres compartir launch.json o tasks.json,
+# podemos hacer excepciones específicas.
+
+
+# ==========================================================
+# RIDER / JETBRAINS
+# ==========================================================
+
+.idea/
+*.sln.iml
+
+
+# ==========================================================
+# ASP.NET CORE
+# ==========================================================
+
+# Configuración local
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
+
+# User secrets
+secrets.json
+
+
+# ==========================================================
+# ENTITY FRAMEWORK
+# ==========================================================
+
+# No ignoramos Migrations.
+# Las migraciones deben versionarse en Git.
+
+# Migrations/
+
+
+# ==========================================================
+# BASE DE DATOS
+# ==========================================================
+
+*.db
+*.db-shm
+*.db-wal
+
+
+# ==========================================================
+# DOCKER
+# ==========================================================
+
+# Docker overrides locales
+docker-compose.override.yml
+compose.override.yml
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+
+
+# ==========================================================
+# NODE / FRONTEND
+# ==========================================================
+
+node_modules/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+dist/
+build/
+
+
+# ==========================================================
+# SISTEMA OPERATIVO
+# ==========================================================
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+
+# ==========================================================
+# ARCHIVOS DE BACKUP
+# ==========================================================
+
+*.bak
+*.backup
+*.old
+*.orig
+
+
+# ==========================================================
+# ARCHIVOS SUBIDOS POR USUARIOS
+# ==========================================================
+
+# Si las fotos de personas se generan/suben en ejecución,
+# normalmente no deben almacenarse en Git.
+
+wwwroot/fotos/personas/*
+!wwwroot/fotos/personas/.gitkeep
+
+
+# ==========================================================
+# ARCHIVOS GENERADOS POR LA APLICACIÓN
+# ==========================================================
+
+GeneratedFiles/
+Generated/
+Uploads/
+Temp/
