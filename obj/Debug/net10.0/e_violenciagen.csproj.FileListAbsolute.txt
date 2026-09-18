@@ -113,7 +113,6 @@ C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\scopedcss\Views\Shared\_
 C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\scopedcss\bundle\e_violenciagen.styles.css
 C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\scopedcss\projectbundle\e_violenciagen.bundle.scp.css
 C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\compressed\eha20sq9jf-{0}-61n19gt1b8-61n19gt1b8.gz
-C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\compressed\nu2f7ef90q-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
 C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\compressed\s7mreezyco-{0}-t1cqhe9u97-t1cqhe9u97.gz
 C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\compressed\tyhmzoq0bj-{0}-c2jlpeoesf-c2jlpeoesf.gz
 C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\compressed\i1uiaffidq-{0}-sejl45xvog-sejl45xvog.gz
@@ -426,7 +425,8 @@ C:\Users\enguema\source\repos\e-violenciagen\obj\Debug\net10.0\compressed\qy1amf
 C:\Users\enguema\source\repos\e-violenciagen\obj\Debug\net10.0\compressed\x6dwls1su6-{0}-jjsuc0puko-jjsuc0puko.gz
 C:\Users\enguema\source\repos\e-violenciagen\obj\Debug\net10.0\compressed\002l9rxd5r-{0}-9vr69e8ynj-9vr69e8ynj.gz
 C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\compressed\9g3mxu4r23-{0}-4kvd35mz09-4kvd35mz09.gz
-C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\compressed\bfr8l0yxup-{0}-b9sayid5wm-b9sayid5wm.gz
 C:\Users\enguema\source\repos\e-violenciagen\obj\Debug\net10.0\compressed\9g3mxu4r23-{0}-4kvd35mz09-4kvd35mz09.gz
 C:\Users\enguema\source\repos\e-violenciagen\obj\Debug\net10.0\compressed\bfr8l0yxup-{0}-pwfixo2vws-pwfixo2vws.gz
 C:\Users\enguema\source\repos\e-violenciagen\obj\Debug\net10.0\compressed\nu2f7ef90q-{0}-b0tfd000lg-b0tfd000lg.gz
+C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\compressed\bfr8l0yxup-{0}-pwfixo2vws-pwfixo2vws.gz
+C:\Users\enguema\Repos\e-violenciagen\obj\Debug\net10.0\compressed\nu2f7ef90q-{0}-b0tfd000lg-b0tfd000lg.gz
