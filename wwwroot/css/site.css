@@ -29,3 +29,306 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* ==========================================================
+   LAYOUT GENERAL
+   ========================================================== */
+
+.app-layout {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+
+/* ==========================================================
+   SIDEBAR
+   ========================================================== */
+
+.app-sidebar {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    bottom: 0;
+
+    width: 280px;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 1rem;
+
+    background-color: #212529;
+    color: #ffffff;
+
+    z-index: 1040;
+
+    transition: transform .25s ease;
+}
+
+
+/* ==========================================================
+   CABECERA DEL SIDEBAR
+   ========================================================== */
+
+.sidebar-brand {
+    min-height: 52px;
+
+    display: flex;
+    align-items: center;
+}
+
+
+.sidebar-brand-link {
+    display: flex;
+    align-items: center;
+
+    gap: .75rem;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+
+.sidebar-logo {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: .4rem;
+
+    background-color: #ffffff;
+    color: #212529;
+
+    font-size: 1.15rem;
+}
+
+
+.sidebar-divider {
+    margin: .75rem 0;
+
+    border-top: 1px solid rgba(255, 255, 255, .25);
+}
+
+
+/* ==========================================================
+   MENÚ
+   ========================================================== */
+
+.sidebar-menu {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: .2rem;
+}
+
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+
+    gap: .8rem;
+
+    padding: .7rem .85rem;
+
+    border-radius: .45rem;
+
+    color: rgba(255, 255, 255, .9);
+
+    text-decoration: none;
+
+    font-size: .95rem;
+
+    transition:
+        background-color .15s ease,
+        color .15s ease;
+}
+
+
+.sidebar-item:hover {
+    background-color: rgba(255, 255, 255, .08);
+
+    color: #ffffff;
+}
+
+
+.sidebar-item.active {
+    background-color: #0d6efd;
+
+    color: #ffffff;
+}
+
+
+.sidebar-icon {
+    width: 20px;
+
+    display: inline-flex;
+    justify-content: center;
+
+    font-size: 1rem;
+}
+
+
+/* ==========================================================
+   USUARIO
+   ========================================================== */
+
+.sidebar-user {
+    margin-top: auto;
+}
+
+
+.sidebar-user-button {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: .65rem;
+
+    padding: .45rem 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #ffffff;
+
+    text-align: left;
+}
+
+
+.sidebar-avatar {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background-color: #6c757d;
+
+    font-size: .8rem;
+    font-weight: 600;
+}
+
+
+/* ==========================================================
+   CONTENIDO PRINCIPAL
+   ========================================================== */
+
+.app-main {
+    min-height: 100vh;
+
+    margin-left: 280px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ==========================================================
+   TOPBAR
+   ========================================================== */
+
+.app-topbar {
+    min-height: 60px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 1.5rem;
+
+    background-color: #ffffff;
+
+    border-bottom: 1px solid #dee2e6;
+}
+
+
+/* ==========================================================
+   CONTENIDO
+   ========================================================== */
+
+.app-content {
+    flex: 1;
+
+    padding: 1.5rem;
+}
+
+
+/* ==========================================================
+   FOOTER
+   ========================================================== */
+
+.app-footer {
+    padding: 1rem 1.5rem;
+
+    border-top: 1px solid #dee2e6;
+
+    background-color: #ffffff;
+
+    color: #6c757d;
+
+    font-size: .85rem;
+}
+
+
+/* ==========================================================
+   BACKDROP MÓVIL
+   ========================================================== */
+
+.sidebar-backdrop {
+    display: none;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 991.98px) {
+
+    .app-sidebar {
+        transform: translateX(-100%);
+    }
+
+
+    .app-sidebar.show {
+        transform: translateX(0);
+    }
+
+
+    .app-main {
+        margin-left: 0;
+    }
+
+
+    .sidebar-backdrop.show {
+        display: block;
+
+        position: fixed;
+
+        inset: 0;
+
+        background-color: rgba(0, 0, 0, .45);
+
+        z-index: 1030;
+    }
+
+
+    .app-content {
+        padding: 1rem;
+    }
+
+}
