@@ -52,8 +52,9 @@ public class CasoCreateViewModel : IValidatableObject
     // =========================================================
     // VÍCTIMA PRINCIPAL
     // =========================================================
+    public Guid? VictimaPersonaId { get; set; }
 
-    public PersonaRegistroViewModel Victima { get; set; } = new();
+    //public PersonaRegistroViewModel Victima { get; set; } = new();
 
     public bool VictimaRequiereProteccion { get; set; }
 
@@ -69,6 +70,7 @@ public class CasoCreateViewModel : IValidatableObject
     /// El agresor puede ser desconocido al registrar el caso.
     /// </summary>
     public bool IncluirPresuntoAgresor { get; set; }
+    public Guid? PresuntoAgresorPersonaId { get; set; }
 
     public PersonaRegistroViewModel PresuntoAgresor { get; set; } = new();
 
@@ -91,9 +93,15 @@ public class CasoCreateViewModel : IValidatableObject
     // VALIDACIÓN DE NEGOCIO BÁSICA DEL FORMULARIO
     // =========================================================
 
-    public IEnumerable<ValidationResult> Validate(
-        ValidationContext validationContext)
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
+        if (!VictimaPersonaId.HasValue)
+        {
+            yield return new ValidationResult(
+                "Debe seleccionar la víctima principal.",
+                [nameof(VictimaPersonaId)]);
+        }
+
         if (TiposViolenciaIds.Count == 0)
         {
             yield return new ValidationResult(
@@ -101,9 +109,28 @@ public class CasoCreateViewModel : IValidatableObject
                 [nameof(TiposViolenciaIds)]);
         }
 
+        if (IncluirPresuntoAgresor &&
+            !PresuntoAgresorPersonaId.HasValue)
+        {
+            yield return new ValidationResult(
+                "Debe seleccionar el presunto agresor.",
+                [nameof(PresuntoAgresorPersonaId)]);
+        }
+
+        if (VictimaPersonaId.HasValue &&
+            PresuntoAgresorPersonaId.HasValue &&
+            VictimaPersonaId == PresuntoAgresorPersonaId)
+        {
+            yield return new ValidationResult(
+                "La víctima y el presunto agresor no pueden ser la misma persona.",
+                [
+                    nameof(VictimaPersonaId),
+                    nameof(PresuntoAgresorPersonaId)
+                ]);
+        }
 
         // La víctima principal sí es obligatoria.
-        if (string.IsNullOrWhiteSpace(Victima.Nombres))
+        /*if (string.IsNullOrWhiteSpace(Victima.Nombres))
         {
             yield return new ValidationResult(
                 "Debe indicar el nombre de la víctima.",
@@ -115,13 +142,21 @@ public class CasoCreateViewModel : IValidatableObject
             yield return new ValidationResult(
                 "Debe indicar los apellidos de la víctima.",
                 ["Victima.Apellidos"]);
-        }
+        }*/
 
 
         /*
          * Solo exigimos datos del presunto agresor si el usuario
          * indica que existe uno identificado.
          */
+        /*if (IncluirPresuntoAgresor &&
+            !PresuntoAgresor.HasValue)
+        {
+            yield return new ValidationResult(
+                "Debe seleccionar el presunto agresor.",
+                [nameof(PresuntoAgresorPersonaId)]);
+        }
+
         if (IncluirPresuntoAgresor)
         {
             if (string.IsNullOrWhiteSpace(PresuntoAgresor.Nombres))
@@ -137,6 +172,7 @@ public class CasoCreateViewModel : IValidatableObject
                     "Debe indicar los apellidos del presunto agresor.",
                     ["PresuntoAgresor.Apellidos"]);
             }
-        }
+        }*/
+
     }
 }

@@ -486,8 +486,20 @@ public class CasoService : ICasoService
                 "Debe seleccionar al menos un tipo de violencia.");
         }
 
+        // ---------------------------------------------------------
+        // VÍCTIMA PRINCIPAL
+        // ---------------------------------------------------------
 
-        // No aceptamos fechas futuras del hecho.
+        if (!model.VictimaPersonaId.HasValue)
+        {
+            throw new InvalidOperationException(
+                "Debe seleccionar una víctima principal.");
+        }
+
+        // ---------------------------------------------------------
+        // FECHA DEL HECHO
+        // ---------------------------------------------------------
+
         if (model.FechaHecho.HasValue)
         {
             DateOnly hoy =
@@ -571,7 +583,7 @@ public class CasoService : ICasoService
                 // VALIDAR TERRITORIO
                 // =================================================
 
-                if (model.BarrioHechoId.HasValue)
+                /*if (model.BarrioHechoId.HasValue)
                 {
                     bool barrioValido =
                         await _dbContext.Barrios
@@ -585,6 +597,54 @@ public class CasoService : ICasoService
                         throw new InvalidOperationException(
                             "El barrio seleccionado no es válido.");
                     }
+                }*/
+                if (model.BarrioHechoId.HasValue)
+                {
+                    var barrio =
+                        await _dbContext.Barrios
+                            .AsNoTracking()
+                            .Where(x =>
+                                x.Id == model.BarrioHechoId.Value &&
+                                x.Activo)
+                            .Select(x => new
+                            {
+                                x.Id,
+                                x.DistritoId,
+                                ProvinciaId =
+                                    x.Distrito.ProvinciaId
+                            })
+                            .SingleOrDefaultAsync(
+                                cancellationToken);
+
+
+                    if (barrio is null)
+                    {
+                        throw new InvalidOperationException(
+                            "El barrio seleccionado no es válido.");
+                    }
+
+
+                    /*
+                     * Aunque los Select de la interfaz son dependientes,
+                     * no confiamos únicamente en el navegador.
+                     *
+                     * También validamos la jerarquía territorial
+                     * en el servidor.
+                     */
+                    if (model.DistritoId.HasValue &&
+                        barrio.DistritoId != model.DistritoId.Value)
+                    {
+                        throw new InvalidOperationException(
+                            "El barrio seleccionado no pertenece al distrito indicado.");
+                    }
+
+
+                    if (model.ProvinciaId.HasValue &&
+                        barrio.ProvinciaId != model.ProvinciaId.Value)
+                    {
+                        throw new InvalidOperationException(
+                            "El distrito seleccionado no pertenece a la provincia indicada.");
+                    }
                 }
 
 
@@ -592,10 +652,43 @@ public class CasoService : ICasoService
                 // VÍCTIMA
                 // =================================================
 
-                Persona victima =
+                /*Persona victima =
                     await ResolverPersonaAsync(
                         model.Victima,
                         cancellationToken);
+                if (!model.VictimaPersonaId.HasValue)
+                {
+                    throw new InvalidOperationException(
+                        "Debe seleccionar una víctima principal.");
+                }
+
+                Persona? victima =
+                    await _dbContext.Personas
+                        .SingleOrDefaultAsync(
+                            p =>
+                                p.Id == model.VictimaPersonaId.Value &&
+                                p.Activo,
+                            cancellationToken);
+
+                if (victima is null)
+                {
+                    throw new InvalidOperationException(
+                        "La víctima seleccionada no existe o no está activa.");
+                }*/
+
+                Persona? victima =
+                await _dbContext.Personas
+                    .SingleOrDefaultAsync(
+                        p =>
+                            p.Id == model.VictimaPersonaId.Value &&
+                            p.Activo,
+                        cancellationToken);
+
+                if (victima is null)
+                {
+                    throw new InvalidOperationException(
+                        "La víctima seleccionada no existe o no está activa.");
+                }
 
 
                 // =================================================
@@ -606,23 +699,56 @@ public class CasoService : ICasoService
 
                 if (model.IncluirPresuntoAgresor)
                 {
+                    if (!model.PresuntoAgresorPersonaId.HasValue)
+                    {
+                        throw new InvalidOperationException(
+                            "Debe seleccionar el presunto agresor.");
+                    }
+
                     presuntoAgresor =
-                        await ResolverPersonaAsync(
-                            model.PresuntoAgresor,
-                            cancellationToken);
+                        await _dbContext.Personas
+                            .SingleOrDefaultAsync(
+                                p =>
+                                    p.Id == model.PresuntoAgresorPersonaId.Value &&
+                                    p.Activo,
+                                cancellationToken);
 
+                    if (presuntoAgresor is null)
+                    {
+                        throw new InvalidOperationException(
+                            "El presunto agresor seleccionado no existe o no está activo.");
+                    }
 
-                    /*
-                     * Si ambas personas ya existían, podemos comparar
-                     * directamente sus identificadores.
-                     */
+                    // Evitamos que la misma persona ocupe ambos roles
+                    // dentro del mismo expediente.
                     if (victima.Id == presuntoAgresor.Id)
                     {
                         throw new InvalidOperationException(
-                            "Una persona no puede figurar simultáneamente " +
-                            "como víctima y presunto agresor en el mismo caso.");
+                            "Una misma persona no puede ser Victima y Presunto Agresor en el mismo expediente.");
                     }
                 }
+
+                //Persona? presuntoAgresor = null;
+
+                /*if (model.IncluirPresuntoAgresor)
+                {
+                    presuntoAgresor =
+                        await ResolverPersonaAsync(
+                            model.PresuntoAgresor,
+                            cancellationToken);*/
+
+
+                /*
+                 * Si ambas personas ya existían, podemos comparar
+                 * directamente sus identificadores.
+                 */
+                /*if (victima.Id == presuntoAgresor.Id)
+                {
+                    throw new InvalidOperationException(
+                        "Una persona no puede figurar simultáneamente " +
+                        "como víctima y presunto agresor en el mismo caso.");
+                }*/
+                /*}*/
 
 
                 // =================================================
@@ -685,11 +811,11 @@ public class CasoService : ICasoService
                 // ASOCIAR VÍCTIMA PRINCIPAL
                 // =================================================
 
-                caso.Victimas.Add(
+                /*caso.Victimas.Add(
                     new CasoVictima
                     {
                         CasoId = caso.Id,
-                        PersonaId = victima.Id,
+                        PersonaId = model.VictimaPersonaId ?? Guid.NewGuid(),
 
                         Persona = victima,
 
@@ -705,7 +831,29 @@ public class CasoService : ICasoService
                                 : model.ObservacionesVictima.Trim(),
 
                         FechaVinculacion = DateTime.UtcNow
-                    });
+                    });*/
+
+                caso.Victimas.Add(new CasoVictima
+                {
+                    CasoId = caso.Id,
+
+                    // Persona previamente seleccionada mediante
+                    // _PersonaSelector.cshtml.
+                    PersonaId = victima.Id,
+
+                    EsVictimaPrincipal = true,
+
+                    RequiereProteccion =
+                        model.VictimaRequiereProteccion,
+
+                    Observaciones =
+                        string.IsNullOrWhiteSpace(
+                            model.ObservacionesVictima)
+                            ? null
+                            : model.ObservacionesVictima.Trim(),
+
+                    FechaVinculacion = DateTime.UtcNow
+                });
 
 
                 // =================================================
@@ -732,6 +880,9 @@ public class CasoService : ICasoService
                         });
                 }
 
+                // =================================================
+                // PERSISTENCIA
+                // =================================================
 
                 _dbContext.Casos.Add(caso);
 
@@ -759,7 +910,7 @@ public class CasoService : ICasoService
         });
     }
 
-    
+
 
     //========== Métodos privados ==========
     private async Task<string> GenerarCodigoCasoAsync(CancellationToken cancellationToken)
