@@ -1,4 +1,5 @@
 using e_violenciagen.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace e_violenciagen.Data;
@@ -13,7 +14,7 @@ namespace e_violenciagen.Data;
 /// del dominio porque únicamente estamos preparando
 /// la infraestructura de acceso a PostgreSQL.
 /// </summary>
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
@@ -97,6 +98,74 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<ApplicationUser>(entity =>
+        {
+            /*
+            * Nombre y apellidos son datos propios
+            * de nuestra aplicación, no de Identity.
+            */
+            entity.Property(u => u.Nombre)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(u => u.Apellidos)
+                .HasMaxLength(150)
+                .IsRequired();
+
+
+            /*
+            * Activo es nuestro control administrativo.
+            *
+            * Identity ya tiene su propio sistema de bloqueo
+            * mediante LockoutEnd y AccessFailedCount.
+            */
+            entity.Property(u => u.Activo)
+                .IsRequired();
+
+
+            /*
+            * La fecha de creación es obligatoria.
+            */
+            entity.Property(u => u.FechaCreacion)
+                .IsRequired();
+
+            // =========================================================
+            // INSTITUCIÓN
+            // =========================================================
+
+            entity.HasOne(u => u.Institucion)
+                .WithMany(i => i.Usuarios)
+                .HasForeignKey(u => u.InstitucionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            // =========================================================
+            // UNIDAD ORGANIZATIVA
+            // =========================================================
+
+            entity.HasOne(u => u.UnidadOrganizativa)
+                .WithMany(uo => uo.Usuarios)
+                .HasForeignKey(u => u.UnidadOrganizativaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+        });
+
+        // =========================================================
+        // IDENTITY - ROL
+        // =========================================================
+
+        modelBuilder.Entity<ApplicationRole>(entity =>
+        {
+            entity.Property(r => r.Descripcion)
+                .HasMaxLength(250);
+
+            entity.Property(r => r.Activo)
+                .IsRequired();
+
+            entity.Property(r => r.EsSistema)
+                .IsRequired();
+        });
 
         /*
          * Más adelante podremos aplicar configuraciones

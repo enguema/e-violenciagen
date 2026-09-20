@@ -57,4 +57,11 @@ public class UnidadOrganizativa : BaseEntity
     /// </summary>
     public ICollection<Actuacion> Actuaciones { get; set; }
         = new List<Actuacion>();
+
+    /// <summary>
+    /// Usuarios adscritos específicamente
+    /// a esta unidad organizativa.
+    /// </summary>
+    public ICollection<ApplicationUser> Usuarios { get; set; }
+        = new List<ApplicationUser>();
 }

@@ -28,4 +28,10 @@ public class Institucion : BaseEntity
     public ICollection<Actuacion> Actuaciones { get; set; }
         = new List<Actuacion>();
 
+    /// <summary>
+    /// Usuarios que pertenecen a esta institución.
+    /// </summary>
+    public ICollection<ApplicationUser> Usuarios { get; set; }
+        = new List<ApplicationUser>();
+
 }

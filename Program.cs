@@ -1,6 +1,7 @@
 using e_violenciagen.Aplication.Casos;
 using e_violenciagen.Aplication.Personas;
 using e_violenciagen.Data;
+using Microsoft.AspNetCore.Identity;
 using e_violenciagen.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +25,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<ICasoService, CasoService>();
 builder.Services.AddScoped<IPersonaService, PersonaService>();
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+{
+    /*
+         * De momento no personalizamos las reglas.
+         *
+         * Las políticas de contraseña, bloqueo,
+         * cookies, etc. las trataremos posteriormente.
+         */
+})
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
@@ -47,6 +59,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();//Permite servir CSS, JavaScript, imágenes y librerías almacenadas dentro de wwwroot.
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
