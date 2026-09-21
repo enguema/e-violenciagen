@@ -37,6 +37,10 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.Configure<AdministradorInicialOptions>(
+    builder.Configuration.GetSection(
+        AdministradorInicialOptions.SectionName));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())//Aquí cargamos datos de prueba
@@ -68,6 +72,12 @@ app.MapControllerRoute(//Ruta MVC Predeterminada
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+// =========================================================
+// DATOS INICIALES DE IDENTITY
+// =========================================================
+
+await IdentitySeeder.SeedAsync(app.Services);
 
 
 app.Run();
