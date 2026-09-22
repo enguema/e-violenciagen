@@ -22,6 +22,13 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
     }
 
     // =========================================================
+    // SEGURIDAD
+    // =========================================================
+    public DbSet<Permiso> Permisos { get; set; } = null!;
+
+    public DbSet<RolPermiso> RolPermisos { get; set; } = null!;
+
+    // =========================================================
     // MODELO INSTITUCIONAL
     // =========================================================
 
@@ -98,6 +105,82 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<RolPermiso>(entity =>
+        {
+            /*
+            * Clave primaria compuesta.
+            *
+            * Una combinación Rol + Permiso
+            * solo puede existir una vez.
+            */
+            entity.HasKey(rp => new
+            {
+                rp.RolId,
+                rp.PermisoId
+            });
+
+
+            // =====================================================
+            // ROL
+            // =====================================================
+
+            entity.HasOne(rp => rp.Rol)
+                .WithMany(r => r.RolPermisos)
+                .HasForeignKey(rp => rp.RolId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+            // =====================================================
+            // PERMISO
+            // =====================================================
+
+            entity.HasOne(rp => rp.Permiso)
+                .WithMany(p => p.RolPermisos)
+                .HasForeignKey(rp => rp.PermisoId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Permiso>(entity =>
+        {
+            /*
+            * Código técnico del permiso.
+            *
+            * Ejemplo:
+            * CASOS_CREAR
+            */
+            entity.Property(p => p.Codigo)
+                .HasMaxLength(100)
+                .IsRequired();
+
+
+            /*
+            * El código debe ser único.
+            *
+            * Nunca queremos dos permisos diferentes
+            * con el mismo identificador técnico.
+            */
+            entity.HasIndex(p => p.Codigo)
+                .IsUnique();
+
+
+            entity.Property(p => p.Nombre)
+                .HasMaxLength(150)
+                .IsRequired();
+
+
+            entity.Property(p => p.Descripcion)
+                .HasMaxLength(500);
+
+
+            entity.Property(p => p.Modulo)
+                .HasMaxLength(100)
+                .IsRequired();
+
+
+            entity.Property(p => p.Activo)
+                .IsRequired();
+        });
 
         modelBuilder.Entity<ApplicationUser>(entity =>
         {

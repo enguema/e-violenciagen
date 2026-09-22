@@ -12,7 +12,7 @@ builder.Services.AddControllersWithViews();
 
 //Db 1.
 
-string ConnectionString = builder.Configuration.GetConnectionString("HomeConnection")
+string ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("No se ha configurado la cadena seleccionada");
 
 //Db 2. egistramos el contexto en el contenedor de inyeccion de dependencias de ASP.NET Core
@@ -73,9 +73,15 @@ app.MapControllerRoute(//Ruta MVC Predeterminada
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+
 // =========================================================
-// DATOS INICIALES DE IDENTITY
+// SEED DE IDENTITY
 // =========================================================
+
+/*
+ * Identity se ejecuta después porque
+ * ApplicationUser necesita una Institucion existente.
+ */
 
 await IdentitySeeder.SeedAsync(app.Services);
 

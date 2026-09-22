@@ -47,4 +47,11 @@ public class ApplicationRole : IdentityRole<Guid>
     /// que el rol Administrador sea eliminado.
     /// </summary>
     public bool EsSistema { get; set; } = false;
+
+    /*
+     * Relación N:N con Permiso
+     * mediante RolPermiso.
+     */
+    public ICollection<RolPermiso> RolPermisos { get; set; }
+        = new List<RolPermiso>();
 }

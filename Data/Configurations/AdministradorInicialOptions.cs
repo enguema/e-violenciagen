@@ -20,13 +20,26 @@ public class AdministradorInicialOptions
     /*
      * La institución debe existir previamente
      * en nuestra base de datos.
-     */
+     
     public Guid InstitucionId { get; set; }
+    */
+
+    /*
+     * En vez de guardar un Guid de base de datos,
+     * identificamos la institución mediante
+     * un código estable.
+     *
+     * Ejemplo:
+     * MASIG
+     */
+    public string CodigoInstitucion { get; set; }
+        = string.Empty;
 
 
     /*
      * Nunca debemos almacenar esta contraseña
      * directamente en el repositorio Git.
+     * La contraseña vendrá de User Secrets o de una variable de entorno.
      */
     public string Password { get; set; } = string.Empty;
 }

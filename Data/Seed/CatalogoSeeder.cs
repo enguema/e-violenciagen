@@ -66,6 +66,11 @@ public static class CatalogoSeeder
                 dbContext,
                 cancellationToken);
         }
+
+        if (!await dbContext.Instituciones.AnyAsync(cancellationToken))
+        {
+            await CrearInstitucionesAsync(dbContext);
+        }
     }
 
 
@@ -663,6 +668,12 @@ public static class CatalogoSeeder
         {
             new TipoInstitucion
             {
+                Codigo = "MASIG",
+                Nombre = "Ministerio AA.SS. e Igualdad de Género",
+                Descripcion ="Ministerio de Asuntos Sociales e Igualdad de Género"
+            },
+            new TipoInstitucion
+            {
                 Codigo = "MINISTERIO",
                 Nombre = "Ministerio",
                 Descripcion ="Institución gubernamental encargada de asuntos de estado"
@@ -704,6 +715,66 @@ public static class CatalogoSeeder
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    private static async Task CrearInstitucionesAsync(AppDbContext context)
+    {
+        /*
+         * Antes de crear una institución necesitamos
+         * localizar su TipoInstitucion.
+         *
+         * No hardcodeamos el Guid porque puede cambiar
+         * entre bases de datos.
+         */
+        var tipoMinisterio = await context.TiposInstitucion
+            .FirstOrDefaultAsync(t =>
+                t.Nombre == "Ministerio");
+
+        if (tipoMinisterio is null)
+        {
+            throw new InvalidOperationException(
+                "No existe el TipoInstitucion 'Ministerio'. " +
+                "Debe ejecutarse primero CrearTiposInstitucionAsync().");
+        }
+
+
+        /*
+         * Utilizamos un código estable para identificar
+         * la institución.
+         *
+         * Esto permite ejecutar el Seeder varias veces
+         * sin generar registros duplicados.
+         */
+        const string codigoInstitucion = "MASIG";
+
+        bool existe = await context.Instituciones
+            .AnyAsync(i =>
+                i.Codigo == codigoInstitucion);
+
+        if (existe)
+        {
+            return;
+        }
+
+
+        var institucion = new Institucion
+        {
+            Id = Guid.NewGuid(),
+
+            Nombre =
+                "Ministerio de Asuntos Sociales e Igualdad de Género",
+
+            Codigo = codigoInstitucion,
+
+            TipoInstitucionId = tipoMinisterio.Id,
+
+            Activo = true
+        };
+
+
+        context.Instituciones.Add(institucion);
+
+        await context.SaveChangesAsync();
+    }
+    
     private static async Task CrearTiposDocumentoIdentidadAsync(AppDbContext dbContext, CancellationToken cancellationToken)
     {
         var tipos = new[]

@@ -62,11 +62,11 @@ public static class IdentitySeeder
             userManager,
             dbContext,
             adminOptions);
+        
     }
 
 
-    private static async Task CrearRolesAsync(
-        RoleManager<ApplicationRole> roleManager)
+    private static async Task CrearRolesAsync(RoleManager<ApplicationRole> roleManager)
     {
         foreach (string nombreRol in RolesSistema.Todos)
         {
@@ -117,8 +117,166 @@ public static class IdentitySeeder
         }
     }
 
+    private static async Task CrearAdministradorAsync(UserManager<ApplicationUser> userManager, AppDbContext dbContext, AdministradorInicialOptions options)
+    {
+        // =====================================================
+        // VALIDAR CONFIGURACIÓN
+        // =====================================================
 
-    private static async Task CrearAdministradorAsync(
+        if (string.IsNullOrWhiteSpace(
+            options.NombreUsuario))
+        {
+            throw new InvalidOperationException(
+                "No se ha configurado " +
+                "'AdministradorInicial:NombreUsuario'.");
+        }
+
+
+        if (string.IsNullOrWhiteSpace(
+            options.Password))
+        {
+            throw new InvalidOperationException(
+                "No se ha configurado " +
+                "'AdministradorInicial:Password'.");
+        }
+
+
+        if (string.IsNullOrWhiteSpace(
+            options.CodigoInstitucion))
+        {
+            throw new InvalidOperationException(
+                "No se ha configurado " +
+                "'AdministradorInicial:CodigoInstitucion'.");
+        }
+
+
+        // =====================================================
+        // COMPROBAR SI EL USUARIO YA EXISTE
+        // =====================================================
+
+        ApplicationUser? usuarioExistente =
+            await userManager.FindByNameAsync(
+                options.NombreUsuario);
+
+        if (usuarioExistente is not null)
+        {
+            /*
+             * Aunque el usuario ya exista, comprobamos
+             * que siga teniendo el rol Administrador.
+             */
+            bool tieneRol =
+                await userManager.IsInRoleAsync(
+                    usuarioExistente,
+                    RolesSistema.Administrador);
+
+            if (!tieneRol)
+            {
+                IdentityResult resultadoRol =
+                    await userManager.AddToRoleAsync(
+                        usuarioExistente,
+                        RolesSistema.Administrador);
+
+                ValidarResultado(
+                    resultadoRol,
+                    "asignar el rol Administrador");
+            }
+
+            return;
+        }
+
+
+        // =====================================================
+        // OBTENER INSTITUCIÓN
+        // =====================================================
+
+        /*
+         * Buscamos por código y no por Guid.
+         *
+         * El código es estable mientras que el Guid
+         * puede cambiar si recreamos la base de datos.
+         */
+        var institucion =
+            await dbContext.Instituciones
+                .FirstOrDefaultAsync(i =>
+                    i.Codigo ==
+                    options.CodigoInstitucion);
+
+        if (institucion is null)
+        {
+            throw new InvalidOperationException(
+                $"No existe una institución con código " +
+                $"'{options.CodigoInstitucion}'. " +
+                "Compruebe que el Seeder institucional " +
+                "se haya ejecutado.");
+        }
+
+
+        // =====================================================
+        // CREAR ADMINISTRADOR
+        // =====================================================
+
+        var administrador = new ApplicationUser
+        {
+            UserName = options.NombreUsuario,
+
+            Email = string.IsNullOrWhiteSpace(
+                options.Email)
+                ? null
+                : options.Email,
+
+            Nombre = options.Nombre,
+
+            Apellidos = options.Apellidos,
+
+
+            /*
+             * Utilizamos el Id real recuperado
+             * desde PostgreSQL.
+             */
+            InstitucionId = institucion.Id,
+
+
+            /*
+             * Por ahora el administrador pertenece
+             * directamente a la institución.
+             */
+            UnidadOrganizativaId = null,
+
+            Activo = true,
+
+            FechaCreacion = DateTime.UtcNow,
+
+            LockoutEnabled = true
+        };
+
+
+        IdentityResult resultadoUsuario =
+            await userManager.CreateAsync(
+                administrador,
+                options.Password);
+
+
+        ValidarResultado(
+            resultadoUsuario,
+            "crear el administrador inicial");
+
+
+        // =====================================================
+        // ASIGNAR ROL ADMINISTRADOR
+        // =====================================================
+
+        IdentityResult resultadoRolAdministrador =
+            await userManager.AddToRoleAsync(
+                administrador,
+                RolesSistema.Administrador);
+
+
+        ValidarResultado(
+            resultadoRolAdministrador,
+            "asignar el rol Administrador");
+    }
+    
+    private static async Task CrearAdministradorAsyncBORRAR(
         UserManager<ApplicationUser> userManager,
         AppDbContext dbContext,
         AdministradorInicialOptions options)
@@ -184,18 +342,28 @@ public static class IdentitySeeder
          * El administrador debe apuntar a una institución
          * realmente existente.
          */
-        bool institucionExiste =
+        /*bool institucionExiste =
             await dbContext.Instituciones
                 .AnyAsync(i =>
-                    i.Id == options.InstitucionId);
+                    i.Id == options.InstitucionId);*/
+        var institucion = await dbContext.Instituciones
+            .FirstOrDefaultAsync(i =>
+                i.Codigo == options.CodigoInstitucion);
 
-        if (!institucionExiste)
+        /*if (!institucionExiste)
         {
             throw new InvalidOperationException(
                 $"La institución '{options.InstitucionId}' "
                 + "configurada para el administrador "
                 + "no existe.");
+        }*/
+        if (institucion is null)
+        {
+            throw new InvalidOperationException(
+                $"No existe una institución con código " +
+                $"'{options.CodigoInstitucion}'.");
         }
+
 
 
         // =====================================================
@@ -214,7 +382,8 @@ public static class IdentitySeeder
 
             Apellidos = options.Apellidos,
 
-            InstitucionId = options.InstitucionId,
+            //InstitucionId = options.InstitucionId,
+            InstitucionId = institucion.Id,
 
             /*
              * El administrador inicial no necesita
