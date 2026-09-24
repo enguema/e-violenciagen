@@ -5,19 +5,22 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace e_violenciagen.Controllers;
+
 public class CuentaController : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager;
-
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly ILogger<CuentaController> _logger;
 
 
     public CuentaController(
+        ILogger<CuentaController> logger,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _logger = logger;
     }
 
 
@@ -61,8 +64,7 @@ public class CuentaController : Controller
     [AllowAnonymous]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(
-        LoginViewModel model)
+    public async Task<IActionResult> Login(LoginViewModel model)
     {
         if (!ModelState.IsValid)
         {
@@ -122,7 +124,7 @@ public class CuentaController : Controller
         // AUTENTICACIÓN CON IDENTITY
         // =====================================================
 
-        SignInResult resultado =
+        Microsoft.AspNetCore.Identity.SignInResult resultado =
             await _signInManager.PasswordSignInAsync(
                 usuario,
                 model.Password,
@@ -160,6 +162,10 @@ public class CuentaController : Controller
             {
                 // Más adelante podemos registrar
                 // este error mediante ILogger.
+                _logger.LogWarning(
+                "El usuario {UserId} inició sesión correctamente, " +
+                "pero no fue posible actualizar UltimoAcceso.",
+                usuario.Id);
             }
 
 
@@ -224,5 +230,12 @@ public class CuentaController : Controller
 
         return RedirectToAction(
             nameof(Login));
+    }
+
+    [Authorize]
+    [HttpGet]
+    public IActionResult AccesoDenegado()
+    {
+        return View();
     }
 }

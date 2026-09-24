@@ -56,6 +56,40 @@
                     <span class="navbar-toggler-icon"></span>
 
                 </button>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <div class="d-flex align-items-center gap-3">
+
+                        <span class="text-muted">
+                            @User.Identity.Name
+                        </span>
+
+                        <form asp-controller="Cuenta"
+                            asp-action="Logout"
+                            method="post"
+                            class="m-0">
+
+                            @Html.AntiForgeryToken()
+
+                            <button type="submit"
+                                    class="btn btn-outline-secondary btn-sm">
+                                Cerrar sesión
+                            </button>
+
+                        </form>
+
+                    </div>
+                }
+                else
+                {
+                    <a asp-controller="Cuenta"
+                    asp-action="Login"
+                    class="btn btn-primary btn-sm">
+
+                        Iniciar sesión
+
+                    </a>
+                }
 
             </header>
 

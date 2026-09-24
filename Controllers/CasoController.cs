@@ -1,5 +1,7 @@
 using e_violenciagen.Aplication.Casos;
+using e_violenciagen.Models;
 using e_violenciagen.ViewModels.Casos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 /// <summary>
@@ -25,7 +27,7 @@ public class CasoController : Controller
     // =========================================================
     // LISTADO
     // =========================================================
-
+    [Authorize(Policy = PermisosSistema.Casos.Ver)]
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
@@ -38,9 +40,9 @@ public class CasoController : Controller
     // CREAR CASO - FORMULARIO
     // =========================================================
 
+    [Authorize(Policy = PermisosSistema.Casos.Crear)]
     [HttpGet]
-    public async Task<IActionResult> Create(
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(CancellationToken cancellationToken)
     {
         var model =
             await _casoService.GetCreateFormAsync(
@@ -54,6 +56,7 @@ public class CasoController : Controller
     // CREAR CASO - GUARDAR
     // =========================================================
 
+    [Authorize(Policy = PermisosSistema.Casos.Crear)]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CasoCreateViewModel model, CancellationToken cancellationToken)
@@ -122,7 +125,8 @@ public class CasoController : Controller
     // =========================================================
     // EXPEDIENTE
     // =========================================================
-
+    [Authorize(
+    Policy = PermisosSistema.Casos.Ver)]
     [HttpGet]
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken)
     {

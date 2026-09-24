@@ -173,4 +173,6 @@ public static class PermisosSistema
             "SEGURIDAD",
             "Permite administrar roles y sus permisos.")
     ];
+
+    
 }
