@@ -125,8 +125,7 @@ public class CasoController : Controller
     // =========================================================
     // EXPEDIENTE
     // =========================================================
-    [Authorize(
-    Policy = PermisosSistema.Casos.Ver)]
+    [Authorize(Policy = PermisosSistema.Casos.Ver)]
     [HttpGet]
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken)
     {

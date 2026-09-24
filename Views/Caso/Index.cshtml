@@ -1,7 +1,18 @@
+@using Microsoft.AspNetCore.Authorization
+@*@using e_violenciagen.Security*@
+@inject IAuthorizationService AuthorizationService
+
 @model IReadOnlyList<e_violenciagen.ViewModels.Casos.CasoIndexItemViewModel>
 
 @{
     ViewData["Title"] = "Expedientes";
+}
+
+@{
+    var puedeCrearCaso =
+        await AuthorizationService.AuthorizeAsync(
+            User,
+            PermisosSistema.Casos.Crear);
 }
 
 <div class="container-fluid py-4">
@@ -28,10 +39,14 @@
                 <i class="bi bi-plus-lg me-2"></i>
                 Nuevo caso
             </button>*@
-            <a asp-controller="Caso" asp-action="Create" class="btn btn-primary px-4">
+            @if (puedeCrearCaso.Succeeded)
+            {
+                <a asp-controller="Caso" asp-action="Create" class="btn btn-primary px-4">
 
-                Nuevo caso
-            </a>
+                    Nuevo caso
+                </a>
+            }
+            
         </div>
     </div>
 

@@ -1,0 +1,167 @@
+@model IEnumerable<e_violenciagen.ViewModels.Seguridad.Usuarios.UsuarioListItemViewModel>
+
+@using Microsoft.AspNetCore.Authorization
+@*@using e_violenciagen.Security*@
+
+@inject IAuthorizationService AuthorizationService
+
+@{
+    ViewData["Title"] = "Usuarios";
+
+    var puedeCrear =
+        await AuthorizationService.AuthorizeAsync(
+            User,
+            PermisosSistema.Seguridad.UsuariosCrear);
+
+    var puedeEditar =
+        await AuthorizationService.AuthorizeAsync(
+            User,
+            PermisosSistema.Seguridad.UsuariosEditar);
+}
+
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1 class="h3 mb-1">
+                Usuarios
+            </h1>
+
+            <p class="text-muted mb-0">
+                Administración de cuentas de acceso.
+            </p>
+        </div>
+
+
+        @if (puedeCrear.Succeeded)
+        {
+            <a asp-action="Create"
+               class="btn btn-primary">
+                Nuevo usuario
+            </a>
+        }
+
+    </div>
+
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Nombre</th>
+                            <th>Institución</th>
+                            <th>Roles</th>
+                            <th>Estado</th>
+                            <th>Último acceso</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    @foreach (var usuario in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    @usuario.NombreUsuario
+                                </strong>
+                            </td>
+
+                            <td>
+                                @usuario.NombreCompleto
+                            </td>
+
+                            <td>
+                                @usuario.Institucion
+
+                                @if (!string.IsNullOrWhiteSpace(
+                                    usuario.UnidadOrganizativa))
+                                {
+                                    <div class="small text-muted">
+                                        @usuario.UnidadOrganizativa
+                                    </div>
+                                }
+                            </td>
+
+                            <td>
+                                @string.Join(", ", usuario.Roles)
+                            </td>
+
+                            <td>
+
+                                @if (usuario.Activo)
+                                {
+                                    <span class="badge text-bg-success">
+                                        Activo
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge text-bg-secondary">
+                                        Inactivo
+                                    </span>
+                                }
+
+                                @if (usuario.Bloqueado)
+                                {
+                                    <span class="badge text-bg-warning">
+                                        Bloqueado
+                                    </span>
+                                }
+
+                            </td>
+
+                            <td>
+                                @(usuario.UltimoAcceso?
+                                    .ToString("dd/MM/yyyy HH:mm")
+                                    ?? "Nunca")
+                            </td>
+
+                            <td class="text-end">
+
+                                <a asp-action="Details"
+                                   asp-route-id="@usuario.Id"
+                                   class="btn btn-sm btn-outline-secondary">
+
+                                    Ver
+
+                                </a>
+
+                                @if (puedeEditar.Succeeded)
+                                {
+                                    <a asp-action="Edit"
+                                       asp-route-id="@usuario.Id"
+                                       class="btn btn-sm btn-outline-primary">
+
+                                        Editar
+
+                                    </a>
+                                }
+
+                            </td>
+
+                        </tr>
+                    }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

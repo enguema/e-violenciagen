@@ -1,7 +1,31 @@
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
 @model e_violenciagen.ViewModels.Casos.CasoDetailsViewModel
 
 @{
     ViewData["Title"] = $"Expediente {Model.CodigoCaso}";
+}
+
+@{
+    var puedeEditar =
+        await AuthorizationService.AuthorizeAsync(
+            User,
+            PermisosSistema.Casos.Editar);
+
+    var puedeCerrar =
+        await AuthorizationService.AuthorizeAsync(
+            User,
+            PermisosSistema.Casos.Cerrar);
+
+    var puedeCrearActuacion =
+        await AuthorizationService.AuthorizeAsync(
+            User,
+            PermisosSistema.Actuaciones.Crear);
+
+    var puedeSubirDocumento =
+        await AuthorizationService.AuthorizeAsync(
+            User,
+            PermisosSistema.Documentos.Subir);
 }
 
 <div class="container-fluid py-4">
@@ -59,10 +83,13 @@
                         Volver
                     </a>
 
-                    <button class="btn btn-primary">
-                        <i class="bi bi-pencil-square me-1"></i>
-                        Editar
-                    </button>
+                    @if (puedeEditar.Succeeded)
+                    {
+                        <button class="btn btn-primary">
+                            <i class="bi bi-pencil-square me-1"></i>
+                            Editar
+                        </button>
+                    }
 
                 </div>
 

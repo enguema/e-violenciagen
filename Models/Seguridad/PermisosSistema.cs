@@ -8,6 +8,7 @@ namespace e_violenciagen.Models;
 /// </summary>
 public static class PermisosSistema
 {
+    
     // =========================================================
     // PERSONAS
     // =========================================================
@@ -65,6 +66,7 @@ public static class PermisosSistema
         public const string UsuariosCrear = "USUARIOS_CREAR";
         public const string UsuariosEditar = "USUARIOS_EDITAR";
         public const string RolesGestionar = "ROLES_GESTIONAR";
+        public const string UsuariosCambiarEstado = "USUARIOS_CAMBIAR_ESTADO";
     }
 
 
@@ -150,6 +152,12 @@ public static class PermisosSistema
 
         // SEGURIDAD
         new(
+            Seguridad.UsuariosCambiarEstado,
+            "Activar o desactivar usuarios",
+            "SEGURIDAD",
+            "Permite cambiar el estado administrativo de una cuenta."),
+    
+        new(
             Seguridad.UsuariosVer,
             "Consultar usuarios",
             "SEGURIDAD",
@@ -174,5 +182,5 @@ public static class PermisosSistema
             "Permite administrar roles y sus permisos.")
     ];
 
-    
+
 }
