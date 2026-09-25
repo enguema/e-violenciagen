@@ -52,4 +52,16 @@ public interface IUsuarioService
         UsuarioEditViewModel model,
         Guid usuarioActualId,
         CancellationToken cancellationToken = default);
+
+    Task<UsuarioResetPasswordViewModel?>PrepararResetPasswordAsync(Guid id);
+
+    Task RestablecerPasswordAsync(UsuarioResetPasswordViewModel model);
+    Task DesbloquearAsync(Guid id);
+
+    Task<object> GetDataTableAsync(
+    int draw,
+    int start,
+    int length,
+    string? search,
+    CancellationToken cancellationToken = default);
 }

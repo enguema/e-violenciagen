@@ -161,7 +161,7 @@ public class UsuarioController : Controller
         return View(model);
     }
 
-    [Authorize(Policy = PermisosSistema.Seguridad.UsuariosEditar)]
+   // [Authorize(Policy = PermisosSistema.Seguridad.UsuariosEditar)]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(
@@ -246,4 +246,134 @@ public class UsuarioController : Controller
             return View(model);
         }
     }
+
+    //[Authorize(Policy = PermisosSistema.Seguridad.UsuariosResetPassword)]
+    [HttpGet]
+    public async Task<IActionResult> ResetPassword(Guid id)
+    {
+        var model =
+            await _usuarioService
+                .PrepararResetPasswordAsync(id);
+
+        if (model is null)
+        {
+            return NotFound();
+        }
+
+        return View(model);
+    }
+
+    [Authorize(Policy = PermisosSistema.Seguridad.UsuariosResetPassword)]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(UsuarioResetPasswordViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        try
+        {
+            await _usuarioService
+                .RestablecerPasswordAsync(model);
+
+            TempData["SuccessMessage"] =
+                "Contraseña restablecida correctamente.";
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id = model.UsuarioId });
+        }
+        catch (InvalidOperationException ex)
+        {
+            ModelState.AddModelError(
+                string.Empty,
+                ex.Message);
+
+            return View(model);
+        }
+    }
+
+    //[Authorize(Policy = PermisosSistema.Seguridad.UsuariosDesbloquear)]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Desbloquear(Guid id)
+    {
+        try
+        {
+            await _usuarioService.DesbloquearAsync(id);
+
+            TempData["SuccessMessage"] =
+                "Usuario desbloqueado correctamente.";
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] =
+                ex.Message;
+        }
+
+        return RedirectToAction(
+            nameof(Details),
+            new { id });
+    }
+
+    //[Authorize(Policy = PermisosSistema.Seguridad.UsuariosVer)]
+    [HttpGet]
+    public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken)
+    {
+        UsuarioDetailViewModel? model =
+            await _usuarioService.GetByIdAsync(
+                id,
+                cancellationToken);
+
+        if (model is null)
+        {
+            return NotFound();
+        }
+
+        return View(model);
+    }
+
+    //[Authorize(Policy = PermisosSistema.Seguridad.UsuariosVer)]
+    [HttpPost]
+    public async Task<IActionResult> DataTable(CancellationToken cancellationToken)
+    {
+        /*
+         * Parámetros estándar enviados por DataTables.
+         */
+        int draw = int.TryParse(
+                Request.Form["draw"],
+                out int drawValue)
+                ? drawValue
+                : 0;
+
+        int start = int.TryParse(
+                Request.Form["start"],
+                out int startValue)
+                ? startValue
+                : 0;
+
+        int length = int.TryParse(
+                Request.Form["length"],
+                out int lengthValue)
+                ? lengthValue
+                : 10;
+
+
+        string? search = Request.Form["search[value]"]
+                .FirstOrDefault();
+
+
+        var resultado = await _usuarioService.GetDataTableAsync(
+                draw,
+                start,
+                length,
+                search,
+                cancellationToken);
+
+
+        return Json(resultado);
+    }
+
 }

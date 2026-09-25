@@ -1,0 +1,127 @@
+@model e_violenciagen.ViewModels.UsuarioDetailViewModel;
+
+@using Microsoft.AspNetCore.Authorization
+@*@using e_violenciagen.Security*@
+
+@inject IAuthorizationService AuthorizationService
+
+@{
+    ViewData["Title"] = "Detalle del usuario";
+
+    var puedeEditar =
+        await AuthorizationService.AuthorizeAsync(
+            User,
+            PermisosSistema.Seguridad.UsuariosEditar);
+
+    var puedeCambiarEstado =
+        await AuthorizationService.AuthorizeAsync(
+            User,
+            PermisosSistema.Seguridad.UsuariosCambiarEstado);
+
+    var puedeDesbloquear =
+        await AuthorizationService.AuthorizeAsync(
+            User,
+            PermisosSistema.Seguridad.UsuariosDesbloquear);
+
+    var puedeResetPassword =
+        await AuthorizationService.AuthorizeAsync(
+            User,
+            PermisosSistema.Seguridad.UsuariosResetPassword);
+
+    bool bloqueado =
+        Model.LockoutEnd.HasValue
+        && Model.LockoutEnd.Value > DateTimeOffset.UtcNow;
+}
+<div class="d-flex flex-wrap gap-2">
+
+    @*@if (puedeEditar.Succeeded)
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+
+            Editar
+
+        </a>
+    }*@
+
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+
+        Editar
+
+    </a>
+
+
+    @*@if (puedeResetPassword.Succeeded)
+    {
+        <a asp-action="ResetPassword" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+
+            Restablecer contraseña
+
+        </a>
+    }*@
+
+    <a asp-action="ResetPassword" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+
+        Restablecer contraseña
+
+    </a>
+
+
+    @*@if (bloqueado && puedeDesbloquear.Succeeded)
+    {
+        <form asp-action="Desbloquear" asp-route-id="@Model.Id" method="post">
+
+            @Html.AntiForgeryToken()
+
+            <button type="submit" class="btn btn-outline-warning">
+
+                Desbloquear
+
+            </button>
+
+        </form>
+    }*@
+
+    <form asp-action="Desbloquear" asp-route-id="@Model.Id" method="post">
+
+        @Html.AntiForgeryToken()
+
+        <button type="submit" class="btn btn-outline-warning">
+
+            Desbloquear
+
+        </button>
+
+    </form>
+
+    <form asp-action="CambiarEstado" asp-route-id="@Model.Id" method="post">
+
+        @Html.AntiForgeryToken()
+
+        <button type="submit" class="btn btn-outline-danger">
+
+            @(Model.Activo
+                ? "Desactivar"
+                : "Activar")
+
+        </button>
+
+    </form>
+
+    @*@if (puedeCambiarEstado.Succeeded)
+    {
+        <form asp-action="CambiarEstado" asp-route-id="@Model.Id" method="post">
+
+            @Html.AntiForgeryToken()
+
+            <button type="submit" class="btn btn-outline-danger">
+
+                @(Model.Activo
+                    ? "Desactivar"
+                    : "Activar")
+
+            </button>
+
+        </form>
+    }*@
+
+</div>

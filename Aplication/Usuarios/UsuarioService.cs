@@ -152,20 +152,40 @@ public class UsuarioService : IUsuarioService
             usuario,
             model.RolesSeleccionados,
             //usuarioActualId,
-            usuario.Id,
+            //usuario.Id,
+            model.Id,
             cancellationToken);
     }
 
     public async Task CambiarEstadoAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        ApplicationUser? usuario =
-            await _userManager.FindByIdAsync(
-                id.ToString());
+        ApplicationUser? usuario = await _userManager.FindByIdAsync(id.ToString());
 
         if (usuario is null)
         {
             throw new KeyNotFoundException(
                 "El usuario no existe.");
+        }
+
+        if (usuario.Id == id && usuario.Activo)
+        {
+            throw new InvalidOperationException(
+                "No puede desactivar su propia cuenta.");
+        }
+
+        if (usuario.Activo)
+        {
+            bool esAdministrador =
+                await _userManager.IsInRoleAsync(
+                    usuario,
+                    RolesSistema.Administrador);
+
+            if (esAdministrador)
+            {
+                await ValidarQueNoSeaUltimoAdministradorAsync(
+                    usuario.Id,
+                    cancellationToken);
+            }
         }
 
 
@@ -395,9 +415,62 @@ public class UsuarioService : IUsuarioService
         return resultado;
     }
 
-    public Task<UsuarioDetailViewModel?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<UsuarioDetailViewModel?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        ApplicationUser? usuario =
+            await _dbContext.Users
+                .AsNoTracking()
+                .Include(u => u.Institucion)
+                .Include(u => u.UnidadOrganizativa)
+                .FirstOrDefaultAsync(
+                    u => u.Id == id,
+                    cancellationToken);
+
+
+        if (usuario is null)
+        {
+            return null;
+        }
+
+
+        IList<string> roles =
+            await _userManager.GetRolesAsync(
+                usuario);
+
+
+        return new UsuarioDetailViewModel
+        {
+            Id = usuario.Id,
+
+            NombreUsuario =
+                usuario.UserName ?? string.Empty,
+
+            NombreCompleto =
+                $"{usuario.Nombre} {usuario.Apellidos}",
+
+            Email = usuario.Email,
+
+            Institucion =
+                usuario.Institucion.Nombre,
+
+            UnidadOrganizativa =
+                usuario.UnidadOrganizativa?.Nombre,
+
+            Activo =
+                usuario.Activo,
+
+            FechaCreacion =
+                usuario.FechaCreacion,
+
+            UltimoAcceso =
+                usuario.UltimoAcceso,
+
+            LockoutEnd =
+                usuario.LockoutEnd,
+
+            Roles =
+                roles.ToList()
+        };
     }
 
     public async Task<UsuarioCreateViewModel> PrepararCreateAsync(CancellationToken cancellationToken = default)
@@ -482,6 +555,216 @@ public class UsuarioService : IUsuarioService
                 Text = u.Nombre
             })
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<UsuarioResetPasswordViewModel?> PrepararResetPasswordAsync(Guid id)
+    {
+        ApplicationUser? usuario =
+            await _userManager.FindByIdAsync(
+                id.ToString());
+
+        if (usuario is null)
+        {
+            return null;
+        }
+
+
+        return new UsuarioResetPasswordViewModel
+        {
+            UsuarioId = usuario.Id,
+            NombreUsuario =
+                usuario.UserName ?? string.Empty
+        };
+    }
+
+    public async Task RestablecerPasswordAsync(UsuarioResetPasswordViewModel model)
+    {
+        ApplicationUser? usuario =
+            await _userManager.FindByIdAsync(
+                model.UsuarioId.ToString());
+
+        if (usuario is null)
+        {
+            throw new KeyNotFoundException(
+                "El usuario no existe.");
+        }
+
+
+        string token =
+            await _userManager
+                .GeneratePasswordResetTokenAsync(
+                    usuario);
+
+
+        IdentityResult resultado =
+            await _userManager.ResetPasswordAsync(
+                usuario,
+                token,
+                model.NuevaPassword);
+
+
+        ValidarIdentityResult(
+            resultado,
+            "restablecer la contraseña");
+
+
+        /*
+         * Invalidamos las sesiones existentes.
+         *
+         * Así evitamos que una cookie antigua continúe
+         * siendo válida después de un reset administrativo.
+         */
+        IdentityResult stampResultado =
+            await _userManager.UpdateSecurityStampAsync(
+                usuario);
+
+        ValidarIdentityResult(
+            stampResultado,
+            "invalidar las sesiones anteriores");
+    }
+
+    public async Task DesbloquearAsync(Guid id)
+    {
+        ApplicationUser? usuario =
+            await _userManager.FindByIdAsync(
+                id.ToString());
+
+        if (usuario is null)
+        {
+            throw new KeyNotFoundException(
+                "El usuario no existe.");
+        }
+
+
+        IdentityResult desbloqueo =
+            await _userManager.SetLockoutEndDateAsync(
+                usuario,
+                null);
+
+        ValidarIdentityResult(
+            desbloqueo,
+            "desbloquear el usuario");
+
+
+        IdentityResult contador =
+            await _userManager.ResetAccessFailedCountAsync(
+                usuario);
+
+        ValidarIdentityResult(
+            contador,
+            "reiniciar los intentos fallidos");
+    }
+
+    public async Task<object> GetDataTableAsync(int draw, int start, int length, string? search,
+    CancellationToken cancellationToken = default)
+    {
+        /*
+         * Consulta base.
+         *
+         * AsNoTracking porque solo estamos leyendo.
+         */
+        var query =
+            _dbContext.Users
+                .AsNoTracking()
+                .Include(u => u.Institucion)
+                .Include(u => u.UnidadOrganizativa)
+                .AsQueryable();
+
+
+        int recordsTotal =
+            await query.CountAsync(cancellationToken);
+
+
+        // =========================================================
+        // FILTRO GLOBAL DATATABLE
+        // =========================================================
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            search = search.Trim().ToLower();
+
+            query = query.Where(u =>
+                (u.UserName != null &&
+                 u.UserName.ToLower().Contains(search))
+                ||
+                u.Nombre.ToLower().Contains(search)
+                ||
+                u.Apellidos.ToLower().Contains(search)
+                ||
+                u.Institucion.Nombre.ToLower().Contains(search));
+        }
+
+
+        int recordsFiltered =
+            await query.CountAsync(cancellationToken);
+
+
+        // =========================================================
+        // PAGINACIÓN
+        // =========================================================
+
+        var usuarios =
+            await query
+                .OrderBy(u => u.Apellidos)
+                .ThenBy(u => u.Nombre)
+                .Skip(start)
+                .Take(length)
+                .ToListAsync(cancellationToken);
+
+
+        var data =
+            new List<UsuarioDataTableItemViewModel>();
+
+
+        foreach (var usuario in usuarios)
+        {
+            IList<string> roles =
+                await _userManager.GetRolesAsync(usuario);
+
+
+            data.Add(
+                new UsuarioDataTableItemViewModel
+                {
+                    Id = usuario.Id,
+
+                    NombreUsuario =
+                        usuario.UserName ?? string.Empty,
+
+                    NombreCompleto =
+                        $"{usuario.Nombre} {usuario.Apellidos}",
+
+                    Institucion =
+                        usuario.Institucion.Nombre,
+
+                    UnidadOrganizativa =
+                        usuario.UnidadOrganizativa?.Nombre
+                        ?? string.Empty,
+
+                    Roles =
+                        string.Join(", ", roles),
+
+                    Activo =
+                        usuario.Activo,
+
+                    Bloqueado =
+                        usuario.LockoutEnd.HasValue
+                        &&
+                        usuario.LockoutEnd.Value
+                            > DateTimeOffset.UtcNow,
+
+                    UltimoAcceso =
+                        usuario.UltimoAcceso
+                });
+        }
+
+
+        return new
+        {
+            draw,
+            recordsTotal,
+            recordsFiltered,
+            data
+        };
     }
 
     /*====== Helpers ======*/
@@ -680,9 +963,7 @@ public class UsuarioService : IUsuarioService
         }
     }
 
-    private async Task ValidarQueNoSeaUltimoAdministradorAsync(
-    Guid usuarioId,
-    CancellationToken cancellationToken)
+    private async Task ValidarQueNoSeaUltimoAdministradorAsync(Guid usuarioId, CancellationToken cancellationToken)
     {
         ApplicationRole? rolAdministrador =
             await _dbContext.Roles
