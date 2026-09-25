@@ -25,9 +25,135 @@ public class UsuarioService : IUsuarioService
         _roleManager = roleManager;
     }
 
-    public Task ActualizarAsync(UsuarioEditViewModel model, CancellationToken cancellationToken = default)
+    public async Task ActualizarAsync(UsuarioEditViewModel model, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        ApplicationUser? usuario =
+        await _userManager.FindByIdAsync(model.Id.ToString());
+
+        if (usuario is null)
+        {
+            throw new KeyNotFoundException("El usuario no existe.");
+        }
+
+
+        // =====================================================
+        // VALIDAR INSTITUCIÓN
+        // =====================================================
+
+        if (!model.InstitucionId.HasValue)
+        {
+            throw new InvalidOperationException("Debe seleccionar una institución.");
+        }
+
+        bool institucionValida =
+            await _dbContext.Instituciones
+                .AnyAsync(
+                    i =>
+                        i.Id == model.InstitucionId.Value
+                        && i.Activo,
+                    cancellationToken);
+
+        if (!institucionValida)
+        {
+            throw new InvalidOperationException("La institución seleccionada no existe o está inactiva.");
+        }
+
+
+        // =====================================================
+        // VALIDAR UNIDAD
+        // =====================================================
+
+        if (model.UnidadOrganizativaId.HasValue)
+        {
+            bool unidadValida =
+                await _dbContext.UnidadesOrganizativas
+                    .AnyAsync(
+                        u =>
+                            u.Id == model.UnidadOrganizativaId.Value
+                            && u.InstitucionId ==
+                               model.InstitucionId.Value,
+                        cancellationToken);
+
+            if (!unidadValida)
+            {
+                throw new InvalidOperationException(
+                    "La unidad organizativa seleccionada "
+                    + "no pertenece a la institución indicada.");
+            }
+        }
+
+
+        // =====================================================
+        // VALIDAR USERNAME DUPLICADO
+        // =====================================================
+
+        ApplicationUser? usuarioMismoNombre =
+            await _userManager.FindByNameAsync(model.NombreUsuario);
+
+        if (usuarioMismoNombre is not null
+            && usuarioMismoNombre.Id != usuario.Id)
+        {
+            throw new InvalidOperationException("Ya existe otro usuario con ese nombre.");
+        }
+
+
+        // =====================================================
+        // ACTUALIZAR DATOS
+        // =====================================================
+
+        usuario.Nombre =
+            model.Nombre.Trim();
+
+        usuario.Apellidos =
+            model.Apellidos.Trim();
+
+        usuario.InstitucionId =
+            model.InstitucionId.Value;
+
+        usuario.UnidadOrganizativaId =
+            model.UnidadOrganizativaId;
+
+
+        IdentityResult nombreResultado =
+            await _userManager.SetUserNameAsync(
+                usuario,
+                model.NombreUsuario.Trim());
+
+        ValidarIdentityResult(
+            nombreResultado,
+            "actualizar el nombre de usuario");
+
+
+        IdentityResult emailResultado =
+            await _userManager.SetEmailAsync(
+                usuario,
+                string.IsNullOrWhiteSpace(model.Email)
+                    ? null!
+                    : model.Email.Trim());
+
+        ValidarIdentityResult(
+            emailResultado,
+            "actualizar el correo electrónico");
+
+
+        IdentityResult resultadoUsuario =
+            await _userManager.UpdateAsync(usuario);
+
+        ValidarIdentityResult(
+            resultadoUsuario,
+            "actualizar el usuario");
+
+
+        // =====================================================
+        // ACTUALIZAR ROLES
+        // =====================================================
+
+        await ActualizarRolesAsync(
+            usuario,
+            model.RolesSeleccionados,
+            //usuarioActualId,
+            usuario.Id,
+            cancellationToken);
     }
 
     public async Task CambiarEstadoAsync(Guid id, CancellationToken cancellationToken = default)
@@ -285,9 +411,61 @@ public class UsuarioService : IUsuarioService
         return model;
     }
 
-    public Task<UsuarioEditViewModel?> PrepararEditAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<UsuarioEditViewModel?> PrepararEditAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        ApplicationUser? usuario =
+       await _dbContext.Users
+           .AsNoTracking()
+           .FirstOrDefaultAsync(
+               u => u.Id == id,
+               cancellationToken);
+
+        if (usuario is null)
+        {
+            return null;
+        }
+
+
+        IList<string> rolesActuales =
+            await _userManager.GetRolesAsync(usuario);
+
+
+        List<Guid> rolesSeleccionados =
+            await _dbContext.Roles
+                .AsNoTracking()
+                .Where(r =>
+                    r.Name != null &&
+                    rolesActuales.Contains(r.Name))
+                .Select(r => r.Id)
+                .ToListAsync(cancellationToken);
+
+
+        var model = new UsuarioEditViewModel
+        {
+            Id = usuario.Id,
+
+            Nombre = usuario.Nombre,
+
+            Apellidos = usuario.Apellidos,
+
+            NombreUsuario =
+                usuario.UserName ?? string.Empty,
+
+            Email = usuario.Email,
+
+            InstitucionId =
+                usuario.InstitucionId,
+
+            UnidadOrganizativaId =
+                usuario.UnidadOrganizativaId,
+
+            RolesSeleccionados =
+                rolesSeleccionados
+        };
+
+        await CargarCombosEditAsync(model, cancellationToken);
+
+        return model;
     }
 
     public async Task<IReadOnlyList<SelectListItem>>
@@ -352,5 +530,201 @@ public class UsuarioService : IUsuarioService
             $"No se pudo {operacion}: {errores}");
     }
 
+    private async Task CargarCombosEditAsync(UsuarioEditViewModel model, CancellationToken cancellationToken)
+    {
+        model.Instituciones =
+            await _dbContext.Instituciones
+                .AsNoTracking()
+                .Where(i => i.Activo)
+                .OrderBy(i => i.Nombre)
+                .Select(i => new SelectListItem
+                {
+                    Value = i.Id.ToString(),
+                    Text = i.Nombre
+                })
+                .ToListAsync(cancellationToken);
 
+
+        model.Roles =
+            await _dbContext.Roles
+                .AsNoTracking()
+                .Where(r => r.Activo)
+                .OrderBy(r => r.Name)
+                .Select(r => new SelectListItem
+                {
+                    Value = r.Id.ToString(),
+                    Text = r.Name!
+                })
+                .ToListAsync(cancellationToken);
+
+
+        if (model.InstitucionId.HasValue)
+        {
+            model.UnidadesOrganizativas =
+                await _dbContext.UnidadesOrganizativas
+                    .AsNoTracking()
+                    .Where(u =>
+                        u.InstitucionId ==
+                        model.InstitucionId.Value)
+                    .OrderBy(u => u.Nombre)
+                    .Select(u => new SelectListItem
+                    {
+                        Value = u.Id.ToString(),
+                        Text = u.Nombre
+                    })
+                    .ToListAsync(cancellationToken);
+        }
+    }
+
+    private async Task ActualizarRolesAsync(
+    ApplicationUser usuario,
+    IReadOnlyCollection<Guid> rolesSeleccionados,
+    Guid usuarioActualId,
+    CancellationToken cancellationToken)
+    {
+        IList<string> rolesActuales =
+            await _userManager.GetRolesAsync(usuario);
+
+
+        List<string> rolesNuevos =
+            await _dbContext.Roles
+                .AsNoTracking()
+                .Where(r =>
+                    rolesSeleccionados.Contains(r.Id)
+                    && r.Activo
+                    && r.Name != null)
+                .Select(r => r.Name!)
+                .ToListAsync(cancellationToken);
+
+
+        // =====================================================
+        // PROTECCIÓN DEL ADMINISTRADOR
+        // =====================================================
+
+        bool eraAdministrador =
+            rolesActuales.Contains(
+                RolesSistema.Administrador);
+
+        bool seguiraAdministrador =
+            rolesNuevos.Contains(
+                RolesSistema.Administrador);
+
+
+        if (eraAdministrador && !seguiraAdministrador)
+        {
+            /*
+             * Un usuario no debe poder quitarse
+             * a sí mismo su propio rol Administrador.
+             */
+            if (usuario.Id == usuarioActualId)
+            {
+                throw new InvalidOperationException(
+                    "No puede quitarse a sí mismo "
+                    + "el rol Administrador.");
+            }
+
+
+            /*
+             * Además evitamos eliminar el rol al último
+             * administrador operativo del sistema.
+             */
+            await ValidarQueNoSeaUltimoAdministradorAsync(
+                usuario.Id,
+                cancellationToken);
+        }
+
+
+        // =====================================================
+        // CALCULAR DIFERENCIAS
+        // =====================================================
+
+        string[] rolesAEliminar =
+            rolesActuales
+                .Except(
+                    rolesNuevos,
+                    StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+
+        string[] rolesAAgregar =
+            rolesNuevos
+                .Except(
+                    rolesActuales,
+                    StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+
+        if (rolesAEliminar.Length > 0)
+        {
+            IdentityResult eliminarResultado =
+                await _userManager.RemoveFromRolesAsync(
+                    usuario,
+                    rolesAEliminar);
+
+            ValidarIdentityResult(
+                eliminarResultado,
+                "quitar roles del usuario");
+        }
+
+
+        if (rolesAAgregar.Length > 0)
+        {
+            IdentityResult agregarResultado =
+                await _userManager.AddToRolesAsync(
+                    usuario,
+                    rolesAAgregar);
+
+            ValidarIdentityResult(
+                agregarResultado,
+                "asignar roles al usuario");
+        }
+    }
+
+    private async Task ValidarQueNoSeaUltimoAdministradorAsync(
+    Guid usuarioId,
+    CancellationToken cancellationToken)
+    {
+        ApplicationRole? rolAdministrador =
+            await _dbContext.Roles
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    r => r.Name ==
+                        RolesSistema.Administrador,
+                    cancellationToken);
+
+        if (rolAdministrador is null)
+        {
+            throw new InvalidOperationException(
+                "No se encontró el rol Administrador.");
+        }
+
+
+        int administradoresActivos =
+            await (
+                from userRole in _dbContext.UserRoles
+                join usuario in _dbContext.Users
+                    on userRole.UserId equals usuario.Id
+
+                where
+                    userRole.RoleId == rolAdministrador.Id
+                    && usuario.Activo
+
+                select usuario.Id
+            )
+            .Distinct()
+            .CountAsync(cancellationToken);
+
+
+        if (administradoresActivos <= 1)
+        {
+            throw new InvalidOperationException(
+                "No puede quitarse el rol Administrador "
+                + "al último administrador activo del sistema.");
+        }
+    }
+
+    public Task ActualizarAsync(UsuarioEditViewModel model, Guid usuarioActualId, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
 }

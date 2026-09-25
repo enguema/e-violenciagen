@@ -3,6 +3,7 @@ using e_violenciagen.ViewModels.Seguridad.Usuarios;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace e_violenciagen.Aplication;
+
 public interface IUsuarioService
 {
     Task<List<UsuarioListItemViewModel>> GetAllAsync(
@@ -40,5 +41,15 @@ public interface IUsuarioService
     Task<IReadOnlyList<SelectListItem>>
     GetUnidadesPorInstitucionAsync(
         Guid institucionId,
+        CancellationToken cancellationToken = default);
+
+    /*Task<UsuarioEditViewModel?> PrepararEditAsync(
+    Guid id,
+    CancellationToken cancellationToken = default);*/
+
+
+    Task ActualizarAsync(
+        UsuarioEditViewModel model,
+        Guid usuarioActualId,
         CancellationToken cancellationToken = default);
 }

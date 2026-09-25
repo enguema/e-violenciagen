@@ -99,9 +99,7 @@ public static class PermissionSeeder
     }
 
 
-    private static async Task AsignarPermisosARolesAsync(
-        AppDbContext dbContext,
-        RoleManager<ApplicationRole> roleManager)
+    private static async Task AsignarPermisosARolesAsync(AppDbContext dbContext, RoleManager<ApplicationRole> roleManager)
     {
         /*
          * Traemos todos los permisos una sola vez.
@@ -117,21 +115,16 @@ public static class PermissionSeeder
                     p => p);
 
 
-        foreach (
-            var configuracionRol
-            in MatrizPermisosRoles.PorRol)
+        foreach (var configuracionRol in MatrizPermisosRoles.PorRol)
         {
-            string nombreRol =
-                configuracionRol.Key;
+            string nombreRol = configuracionRol.Key;
 
 
             /*
              * Los roles deberían existir ya
              * porque IdentitySeeder se ejecuta primero.
              */
-            ApplicationRole? rol =
-                await roleManager.FindByNameAsync(
-                    nombreRol);
+            ApplicationRole? rol = await roleManager.FindByNameAsync(nombreRol);
 
 
             if (rol is null)

@@ -1,0 +1,264 @@
+@model e_violenciagen.ViewModels.Seguridad.Usuarios.UsuarioCreateViewModel
+
+@{
+    ViewData["Title"] = "Nuevo usuario";
+}
+
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1 class="h3 mb-1">
+                Nuevo usuario
+            </h1>
+
+            <p class="text-muted mb-0">
+                Crear una nueva cuenta de acceso al sistema.
+            </p>
+        </div>
+
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            Volver
+        </a>
+
+    </div>
+
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body p-4">
+
+            <form asp-action="Create" method="post">
+
+                @Html.AntiForgeryToken()
+
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger">
+                    </div>
+                }
+
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Nombre" class="form-label">
+                        </label>
+
+                        <input asp-for="Nombre" class="form-control" />
+
+                        <span asp-validation-for="Nombre" class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Apellidos" class="form-label">
+                        </label>
+
+                        <input asp-for="Apellidos" class="form-control" />
+
+                        <span asp-validation-for="Apellidos" class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="NombreUsuario" class="form-label">
+                        </label>
+
+                        <input asp-for="NombreUsuario" class="form-control" autocomplete="off" />
+
+                        <span asp-validation-for="NombreUsuario" class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Email" class="form-label">
+                        </label>
+
+                        <input asp-for="Email" class="form-control" />
+
+                        <span asp-validation-for="Email" class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="InstitucionId" class="form-label">
+                        </label>
+
+                        <select asp-for="InstitucionId" asp-items="Model.Instituciones" class="form-select"
+                                id="institucionSelect">
+
+                            <option value="">
+                                Seleccione una institución
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="InstitucionId" class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="UnidadOrganizativaId" class="form-label">
+                        </label>
+
+                        <select asp-for="UnidadOrganizativaId" class="form-select" id="unidadSelect">
+
+                            <option value="">
+                                Sin unidad específica
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Password" class="form-label">
+                        </label>
+
+                        <input asp-for="Password" class="form-control" autocomplete="new-password" />
+
+                        <span asp-validation-for="Password" class="text-danger">
+                        </span>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label asp-for="ConfirmarPassword" class="form-label">
+                        </label>
+
+                        <input asp-for="ConfirmarPassword" class="form-control" autocomplete="new-password" />
+
+                        <span asp-validation-for="ConfirmarPassword" class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <hr class="my-4" />
+
+
+                <h2 class="h5 mb-3">
+                    Roles
+                </h2>
+
+
+                @*@foreach (var rol in Model.Roles)
+                {
+                    <div class="form-check mb-2">
+
+                        <input class="form-check-input" type="checkbox" name="RolesSeleccionados" value="@rol.Value"
+                               id="rol_@rol.Value" />
+
+                        <label class="form-check-label" for="rol_@rol.Value">
+                            @rol.Text
+                        </label>
+
+                    </div>
+                }*@
+                @foreach (var rol in Model.Roles)
+                {
+                    bool seleccionado =
+                        Guid.TryParse(
+                            rol.Value,
+                            out Guid rolId)
+                        &&
+                        Model.RolesSeleccionados.Contains(rolId);
+
+                    <div class="form-check mb-2">
+
+                        <input class="form-check-input" type="checkbox" name="RolesSeleccionados" value="@rol.Value"
+                               id="rol_@rol.Value" checked="@seleccionado" />
+
+                        <label class="form-check-label" for="rol_@rol.Value">
+
+                            @rol.Text
+
+                        </label>
+
+                    </div>
+                }
+
+
+                <div class="mt-4">
+
+                    <button type="submit" class="btn btn-primary">
+                        Guardar usuario
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document
+            .getElementById('institucionSelect')
+            .addEventListener('change', async function () {
+
+                const institucionId = this.value;
+                const unidadSelect =
+                    document.getElementById('unidadSelect');
+
+                unidadSelect.innerHTML =
+                    '<option value="">Sin unidad específica</option>';
+
+                if (!institucionId) {
+                    return;
+                }
+
+                const response = await fetch(
+                    `/Usuario/UnidadesPorInstitucion?institucionId=${institucionId}`);
+
+                if (!response.ok) {
+                    return;
+                }
+
+                const unidades = await response.json();
+
+                unidades.forEach(unidad => {
+
+                    const option =
+                        document.createElement('option');
+
+                    option.value = unidad.value;
+                    option.textContent = unidad.text;
+
+                    unidadSelect.appendChild(option);
+                });
+            });
+    </script>
+}

@@ -15,7 +15,7 @@ builder.Services.AddControllersWithViews();
 
 //Db 1.
 
-string ConnectionString = builder.Configuration.GetConnectionString("HomeConnection")
+string ConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("No se ha configurado la cadena seleccionada");
 
 //Db 2. egistramos el contexto en el contenedor de inyeccion de dependencias de ASP.NET Core

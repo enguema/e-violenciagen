@@ -53,7 +53,7 @@ public class PersonaController : Controller
     /// El DataTable solicitará los datos posteriormente
     /// mediante AJAX a la acción DataTable.
     /// </summary>
-    [Authorize(Policy = PermisosSistema.Personas.Ver)]
+    //[Authorize(Policy = PermisosSistema.Personas.Ver)]
     [HttpGet]
     public IActionResult Index()
     {
@@ -72,7 +72,7 @@ public class PersonaController : Controller
     /// Toda la búsqueda, ordenación y paginación ocurre
     /// posteriormente en PersonaService/PostgreSQL.
     /// </summary>
-    [Authorize(Policy = PermisosSistema.Personas.Ver)]
+    //[Authorize(Policy = PermisosSistema.Personas.Ver)]
     [HttpPost]
     public async Task<IActionResult> DataTable(DataTableRequest request, CancellationToken cancellationToken)
     {
@@ -116,7 +116,7 @@ public class PersonaController : Controller
     /// <summary>
     /// Muestra la ficha detallada de una persona.
     /// </summary>
-    [Authorize(Policy = PermisosSistema.Personas.Ver)]
+    //[Authorize(Policy = PermisosSistema.Personas.Ver)]
     [HttpGet]
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken)
     {
@@ -175,7 +175,7 @@ public class PersonaController : Controller
     /// Los catálogos necesarios para los selects
     /// los incorporaremos cuando construyamos la vista Create.
     /// </summary>
-    [Authorize(Policy = PermisosSistema.Personas.Crear)]
+    //[Authorize(Policy = PermisosSistema.Personas.Crear)]
     [HttpGet]
     public async Task<IActionResult> Create(CancellationToken cancellationToken)
     {
@@ -196,7 +196,7 @@ public class PersonaController : Controller
     /// La operación está preparada para ser invocada mediante
     /// fetch/AJAX usando FormData, necesario por la fotografía.
     /// </summary>
-    [Authorize(Policy = PermisosSistema.Personas.Crear)]
+    //[Authorize(Policy = PermisosSistema.Personas.Crear)]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(PersonaFormViewModel model, CancellationToken cancellationToken)
@@ -251,7 +251,7 @@ public class PersonaController : Controller
     /// Recupera los datos de la persona en formato
     /// PersonaFormViewModel para mostrarlos en Edit.
     /// </summary>
-    [Authorize(Policy = PermisosSistema.Personas.Editar)]
+    //[Authorize(Policy = PermisosSistema.Personas.Editar)]
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
     {
@@ -279,7 +279,7 @@ public class PersonaController : Controller
     /// - sustituirla;
     /// - eliminarla.
     /// </summary>
-    [Authorize(Policy = PermisosSistema.Personas.Editar)]
+    //[Authorize(Policy = PermisosSistema.Personas.Editar)]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Guid id, PersonaFormViewModel model, CancellationToken cancellationToken)
@@ -449,7 +449,7 @@ public class PersonaController : Controller
     /// Endpoint ligero utilizado por componentes
     /// de autocompletado de Persona.
     /// </summary>
-    [Authorize(Policy = PermisosSistema.Personas.Ver)]
+    //[Authorize(Policy = PermisosSistema.Personas.Ver)]
     [HttpGet]
     public async Task<IActionResult> Search(string term, CancellationToken cancellationToken)
     {

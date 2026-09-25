@@ -1,3 +1,6 @@
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+
 @{
     /*
         Obtenemos el controlador actual.
@@ -9,19 +12,27 @@
         ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
 }
 
+@{
+    Microsoft.AspNetCore.Authorization.AuthorizationResult? puedeVerUsuarios = null;
 
-<aside id="appSidebar"
-       class="app-sidebar">
+    if (User.Identity?.IsAuthenticated == true)
+    {
+        puedeVerUsuarios =
+            await AuthorizationService.AuthorizeAsync(
+                User,
+                PermisosSistema.Seguridad.UsuariosVer);
+    }
+}
+
+
+<aside id="appSidebar" class="app-sidebar">
 
     <!-- ============================================
          LOGO / NOMBRE DEL SISTEMA
          ============================================ -->
     <div class="sidebar-brand">
 
-        <a asp-area=""
-           asp-controller="Home"
-           asp-action="Index"
-           class="sidebar-brand-link">
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="sidebar-brand-link">
 
             <div class="sidebar-logo">
                 <strong>G</strong>
@@ -35,9 +46,7 @@
         <!--
             Botón visible solamente en móvil.
         -->
-        <button type="button"
-                id="btnCloseSidebar"
-                class="btn btn-link text-white d-lg-none ms-auto p-0">
+        <button type="button" id="btnCloseSidebar" class="btn btn-link text-white d-lg-none ms-auto p-0">
 
             <span class="fs-4">&times;</span>
 
@@ -56,11 +65,8 @@
 
 
         <!-- INICIO -->
-        <a asp-area=""
-           asp-controller="Home"
-           asp-action="Index"
-           class="sidebar-item
-                  @(controllerActual == "Home" ? "active" : "")">
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="sidebar-item
+            @(controllerActual == "Home" ? "active" : "")">
 
             <span class="sidebar-icon">
                 ⌂
@@ -72,11 +78,8 @@
 
 
         <!-- PERSONAS -->
-        <a asp-area=""
-           asp-controller="Persona"
-           asp-action="Index"
-           class="sidebar-item
-                  @(controllerActual == "Persona" ? "active" : "")">
+        <a asp-area="" asp-controller="Persona" asp-action="Index" class="sidebar-item
+            @(controllerActual == "Persona" ? "active" : "")">
 
             <span class="sidebar-icon">
                 ♙
@@ -88,11 +91,8 @@
 
 
         <!-- CASOS -->
-        <a asp-area=""
-           asp-controller="Caso"
-           asp-action="Index"
-           class="sidebar-item
-                  @(controllerActual == "Caso" ? "active" : "")">
+        <a asp-area="" asp-controller="Caso" asp-action="Index" class="sidebar-item
+            @(controllerActual == "Caso" ? "active" : "")">
 
             <span class="sidebar-icon">
                 ▣
@@ -104,11 +104,8 @@
 
 
         <!-- EXPEDIENTES -->
-        <a asp-area=""
-           asp-controller="Expediente"
-           asp-action="Index"
-           class="sidebar-item
-                  @(controllerActual == "Expediente" ? "active" : "")">
+        <a asp-area="" asp-controller="Expediente" asp-action="Index" class="sidebar-item
+            @(controllerActual == "Expediente" ? "active" : "")">
 
             <span class="sidebar-icon">
                 ▤
@@ -120,11 +117,8 @@
 
 
         <!-- ACTUACIONES -->
-        <a asp-area=""
-           asp-controller="Actuacion"
-           asp-action="Index"
-           class="sidebar-item
-                  @(controllerActual == "Actuacion" ? "active" : "")">
+        <a asp-area="" asp-controller="Actuacion" asp-action="Index" class="sidebar-item
+            @(controllerActual == "Actuacion" ? "active" : "")">
 
             <span class="sidebar-icon">
                 ✓
@@ -133,6 +127,33 @@
             <span>Actuaciones</span>
 
         </a>
+
+        <!-- ADMINISTRACIÓN -->
+        <a asp-area="" asp-controller="Usuario" asp-action="Index" class="sidebar-item
+            @(controllerActual == "Usuario" ? "active" : "")">
+
+            <span class="sidebar-icon">
+                ✓
+            </span>
+
+            <span>Administración</span>
+
+        </a>
+        @*@if (puedeVerUsuarios?.Succeeded == true)
+        {
+            <div class="sidebar-divider"></div>
+
+            <a asp-area="" asp-controller="Usuario" asp-action="Index" class="sidebar-item
+                @(controllerActual == "Usuario" ? "active" : "")">
+
+                <span class="sidebar-icon">
+                    ✓
+                </span>
+
+                <span>Administración</span>
+
+            </a>
+        }*@
 
     </nav>
 
@@ -147,9 +168,7 @@
 
         <div class="dropdown">
 
-            <button type="button"
-                    class="sidebar-user-button dropdown-toggle"
-                    data-bs-toggle="dropdown"
+            <button type="button" class="sidebar-user-button dropdown-toggle" data-bs-toggle="dropdown"
                     aria-expanded="false">
 
                 <div class="sidebar-avatar">
@@ -166,8 +185,7 @@
             <ul class="dropdown-menu dropdown-menu-dark">
 
                 <li>
-                    <a class="dropdown-item"
-                       href="#">
+                    <a class="dropdown-item" href="#">
                         Mi perfil
                     </a>
                 </li>
@@ -177,8 +195,7 @@
                 </li>
 
                 <li>
-                    <a class="dropdown-item"
-                       href="#">
+                    <a class="dropdown-item" href="#">
                         Cerrar sesión
                     </a>
                 </li>
@@ -196,6 +213,5 @@
     Fondo oscuro que aparece detrás del sidebar
     cuando se abre desde un móvil.
 -->
-<div id="sidebarBackdrop"
-     class="sidebar-backdrop d-lg-none">
+<div id="sidebarBackdrop" class="sidebar-backdrop d-lg-none">
 </div>
