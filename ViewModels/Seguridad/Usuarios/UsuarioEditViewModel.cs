@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
-namespace e_violenciagen.ViewModels;
+namespace e_violenciagen.ViewModels.Seguridad.Usuarios;
 
 public class UsuarioEditViewModel
 {
@@ -39,12 +39,9 @@ public class UsuarioEditViewModel
     public List<Guid> RolesSeleccionados { get; set; } = [];
 
 
-    public IEnumerable<SelectListItem> Instituciones { get; set; }
-        = [];
+    public IEnumerable<SelectListItem> Instituciones { get; set; } = [];
 
-    public IEnumerable<SelectListItem> UnidadesOrganizativas { get; set; }
-        = [];
+    public IEnumerable<SelectListItem> UnidadesOrganizativas { get; set; }  = [];
 
-    public IEnumerable<SelectListItem> Roles { get; set; }
-        = [];
+    public IEnumerable<SelectListItem> Roles { get; set; }  = [];
 }

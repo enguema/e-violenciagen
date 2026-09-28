@@ -192,7 +192,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(//Ruta MVC Predeterminada
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Cuenta}/{action=Login}/{id?}")
     .WithStaticAssets();
 
 

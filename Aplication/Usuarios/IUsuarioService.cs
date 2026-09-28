@@ -48,10 +48,10 @@ public interface IUsuarioService
     CancellationToken cancellationToken = default);*/
 
 
-    Task ActualizarAsync(
+    /*Task ActualizarAsync(
         UsuarioEditViewModel model,
         Guid usuarioActualId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default);*/
 
     Task<UsuarioResetPasswordViewModel?>PrepararResetPasswordAsync(Guid id);
 

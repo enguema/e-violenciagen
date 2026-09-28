@@ -44,17 +44,19 @@
             </p>
         </div>
 
+        <a asp-controller="Usuario" asp-action="Create" class="btn btn-primary">
 
-        @if (puedeCrear.Succeeded)
+            Nuevo usuario
+
+        </a>
+        @*@if (puedeCrear.Succeeded)
         {
-            <a asp-controller="Usuario"
-               asp-action="Create"
-               class="btn btn-primary">
+            <a asp-controller="Usuario" asp-action="Create" class="btn btn-primary">
 
                 Nuevo usuario
 
             </a>
-        }
+        }*@
 
     </div>
 
@@ -89,8 +91,7 @@
 
             <div class="table-responsive">
 
-                <table id="usuariosTable"
-                       class="table table-hover align-middle w-100">
+                <table id="usuariosTable" class="table table-hover align-middle w-100">
 
                     <thead>
 
@@ -182,8 +183,8 @@
 
                                 html +=
                                     `<div class="small text-muted">
-                                        ${data.unidadOrganizativa}
-                                     </div>`;
+                                            ${data.unidadOrganizativa}
+                                         </div>`;
                             }
 
                             return html;
@@ -286,22 +287,22 @@
                              */
                             html +=
                                 `<a href="/Usuario/Details/${id}"
-                                    class="btn btn-sm btn-outline-secondary me-1">
-                                    Ver
-                                 </a>`;
+                                        class="btn btn-sm btn-outline-secondary me-1">
+                                        Ver
+                                     </a>`;
 
 
                             @if (puedeEditar.Succeeded)
-                            {
-                                <text>
+                                {
+                                    <text>
 
-                                html +=
-                                    `<a href="/Usuario/Edit/${id}"
-                                        class="btn btn-sm btn-outline-primary me-1">
-                                        Editar
-                                     </a>`;
+                                            html +=
+                                            `<a href="/Usuario/Edit/${id}"
+                class="btn btn-sm btn-outline-primary me-1">
+                                                Editar
+                                        </a>`;
 
-                                </text>
+                                    </text>
                             }
 
 
@@ -346,5 +347,5 @@
 
         });
 
-    </script>
+</script>
 }

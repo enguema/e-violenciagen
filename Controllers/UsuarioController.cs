@@ -143,20 +143,17 @@ public class UsuarioController : Controller
             nameof(Index));
     }
 
-    [Authorize(Policy = PermisosSistema.Seguridad.UsuariosEditar)]
+    //[Authorize(Policy = PermisosSistema.Seguridad.UsuariosEditar)]
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
     {
         UsuarioEditViewModel? model =
-            await _usuarioService.PrepararEditAsync(
-                id,
-                cancellationToken);
+            await _usuarioService.PrepararEditAsync(id, cancellationToken);
 
         if (model is null)
         {
             return NotFound();
         }
-
 
         return View(model);
     }
@@ -164,30 +161,22 @@ public class UsuarioController : Controller
    // [Authorize(Policy = PermisosSistema.Seguridad.UsuariosEditar)]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(
-    UsuarioEditViewModel model,
-    CancellationToken cancellationToken)
+    public async Task<IActionResult> Edit(UsuarioEditViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
-            UsuarioEditViewModel? datos =
-                await _usuarioService.PrepararEditAsync(
-                    model.Id,
-                    cancellationToken);
+            UsuarioEditViewModel? datos =  await _usuarioService.PrepararEditAsync(model.Id, cancellationToken);
 
             if (datos is null)
             {
                 return NotFound();
             }
 
-            model.Instituciones =
-                datos.Instituciones;
+            model.Instituciones = datos.Instituciones;
 
-            model.UnidadesOrganizativas =
-                datos.UnidadesOrganizativas;
+            model.UnidadesOrganizativas = datos.UnidadesOrganizativas;
 
-            model.Roles =
-                datos.Roles;
+            model.Roles = datos.Roles;
 
             return View(model);
         }
@@ -207,7 +196,7 @@ public class UsuarioController : Controller
         {
             await _usuarioService.ActualizarAsync(
                 model,
-                usuarioActualId,
+                //usuarioActualId,
                 cancellationToken);
 
             TempData["SuccessMessage"] =
@@ -263,7 +252,7 @@ public class UsuarioController : Controller
         return View(model);
     }
 
-    [Authorize(Policy = PermisosSistema.Seguridad.UsuariosResetPassword)]
+    //[Authorize(Policy = PermisosSistema.Seguridad.UsuariosResetPassword)]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ResetPassword(UsuarioResetPasswordViewModel model)

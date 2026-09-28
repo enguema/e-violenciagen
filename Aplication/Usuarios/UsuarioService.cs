@@ -1004,8 +1004,8 @@ public class UsuarioService : IUsuarioService
         }
     }
 
-    public Task ActualizarAsync(UsuarioEditViewModel model, Guid usuarioActualId, CancellationToken cancellationToken = default)
+    /*public Task ActualizarAsync(UsuarioEditViewModel model, Guid usuarioActualId, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
-    }
+    }*/
 }

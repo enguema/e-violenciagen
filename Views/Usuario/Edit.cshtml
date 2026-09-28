@@ -1,7 +1,7 @@
-@model e_violenciagen.ViewModels.Seguridad.Usuarios.UsuarioCreateViewModel
+@model e_violenciagen.ViewModels.Seguridad.Usuarios.UsuarioEditViewModel;
 
 @{
-    ViewData["Title"] = "Nuevo usuario";
+    ViewData["Title"] = "Editar usuario";
 }
 
 
@@ -30,7 +30,7 @@
 
         <div class="card-body p-4">
 
-            <form asp-action="Create" method="post">
+            <form asp-controller="Usuario" asp-action="Edit" asp-route-id="@Model.Id" method="post">
 
                 @Html.AntiForgeryToken()
 
@@ -132,7 +132,7 @@
                     </div>
 
 
-                    <div class="col-md-6">
+                    @*<div class="col-md-6">
 
                         <label asp-for="Password" class="form-label">
                         </label>
@@ -155,7 +155,7 @@
                         <span asp-validation-for="ConfirmarPassword" class="text-danger">
                         </span>
 
-                    </div>
+                    </div>*@
 
                 </div>
 
@@ -208,7 +208,7 @@
                 <div class="mt-4">
 
                     <button type="submit" class="btn btn-primary">
-                        Guardar usuario
+                        Guardar1 usuario
                     </button>
 
                 </div>
