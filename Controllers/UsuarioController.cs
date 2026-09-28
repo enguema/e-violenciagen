@@ -123,7 +123,7 @@ public class UsuarioController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CambiarEstado(Guid id, CancellationToken cancellationToken)
     {
-        try
+        /*try
         {
             await _usuarioService.CambiarEstadoAsync(
                 id,
@@ -140,8 +140,56 @@ public class UsuarioController : Controller
 
 
         return RedirectToAction(
-            nameof(Index));
+            nameof(Index));*/
+        string? currentUserId =
+        User.FindFirstValue(
+            ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(
+            currentUserId,
+            out Guid usuarioActualId))
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            bool activo =
+                await _usuarioService.CambiarEstadoAsync(
+                    id,
+                    //usuarioActualId,
+                    cancellationToken);
+
+
+            return Json(new
+            {
+                success = true,
+
+                message = activo
+                    ? "Usuario activado correctamente."
+                    : "Usuario desactivado correctamente.",
+
+                activo
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = ex.Message
+            });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = ex.Message
+            });
+        }
     }
+
 
     //[Authorize(Policy = PermisosSistema.Seguridad.UsuariosEditar)]
     [HttpGet]
@@ -158,14 +206,14 @@ public class UsuarioController : Controller
         return View(model);
     }
 
-   // [Authorize(Policy = PermisosSistema.Seguridad.UsuariosEditar)]
+    // [Authorize(Policy = PermisosSistema.Seguridad.UsuariosEditar)]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(UsuarioEditViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
-            UsuarioEditViewModel? datos =  await _usuarioService.PrepararEditAsync(model.Id, cancellationToken);
+            UsuarioEditViewModel? datos = await _usuarioService.PrepararEditAsync(model.Id, cancellationToken);
 
             if (datos is null)
             {
@@ -236,7 +284,7 @@ public class UsuarioController : Controller
         }
     }
 
-    //[Authorize(Policy = PermisosSistema.Seguridad.UsuariosResetPassword)]
+    //[Authorize(Policy = PermisosSistema.Seguridad.UsuariosResetPassword)] ---- BORRARLO
     [HttpGet]
     public async Task<IActionResult> ResetPassword(Guid id)
     {
@@ -258,6 +306,56 @@ public class UsuarioController : Controller
     public async Task<IActionResult> ResetPassword(UsuarioResetPasswordViewModel model)
     {
         if (!ModelState.IsValid)
+        {
+            string mensaje =
+                string.Join(
+                    " ",
+                    ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage));
+
+            return BadRequest(new
+            {
+                success = false,
+
+                message = string.IsNullOrWhiteSpace(mensaje)
+                    ? "Revise los datos introducidos."
+                    : mensaje
+            });
+        }
+
+
+        try
+        {
+            await _usuarioService
+                .RestablecerPasswordAsync(model);
+
+
+            return Json(new
+            {
+                success = true,
+
+                message =
+                    "Contraseña restablecida correctamente."
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = ex.Message
+            });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = ex.Message
+            });
+        }
+        /*if (!ModelState.IsValid)
         {
             return View(model);
         }
@@ -281,7 +379,7 @@ public class UsuarioController : Controller
                 ex.Message);
 
             return View(model);
-        }
+        }*/
     }
 
     //[Authorize(Policy = PermisosSistema.Seguridad.UsuariosDesbloquear)]

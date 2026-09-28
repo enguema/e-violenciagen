@@ -157,28 +157,97 @@ public class UsuarioService : IUsuarioService
             cancellationToken);
     }
 
-    public async Task CambiarEstadoAsync(Guid id, CancellationToken cancellationToken = default)
+    /*public async Task CambiarEstadoAsync(Guid id, CancellationToken cancellationToken = default)
+    {*/
+    /*ApplicationUser? usuario = await _userManager.FindByIdAsync(id.ToString());
+
+    if (usuario is null)
+    {
+        throw new KeyNotFoundException("El usuario no existe.");
+    }
+
+    if (usuario.Id == id && usuario.Activo)
+    {
+        throw new InvalidOperationException("No puede desactivar su propia cuenta.");
+    }
+
+    if (usuario.Activo)
+    {
+        bool esAdministrador =
+            await _userManager.IsInRoleAsync(
+                usuario,
+                RolesSistema.Administrador);
+
+        if (esAdministrador)
+        {
+            await ValidarQueNoSeaUltimoAdministradorAsync(
+                usuario.Id,
+                cancellationToken);
+        }
+    }*/
+
+
+    //usuario.Activo = !usuario.Activo;
+
+
+    /*
+     * Si lo estamos desactivando, invalidamos
+     * también las sesiones existentes.
+     *
+     * El SecurityStamp permite que Identity
+     * invalide cookies cuando corresponda.
+     */
+    /*if (!usuario.Activo)
+    {
+        await _userManager.UpdateSecurityStampAsync(
+            usuario);
+    }
+
+
+    IdentityResult resultado =
+        await _userManager.UpdateAsync(usuario);
+
+    ValidarIdentityResult(
+        resultado,
+        "actualizar el estado del usuario");*/
+    /*}*/
+
+    public async Task<bool> CambiarEstadoAsync(
+    Guid id,
+    //Guid usuarioActualId,
+    CancellationToken cancellationToken = default)
     {
         ApplicationUser? usuario = await _userManager.FindByIdAsync(id.ToString());
 
         if (usuario is null)
         {
-            throw new KeyNotFoundException(
-                "El usuario no existe.");
+            throw new KeyNotFoundException("El usuario no existe.");
         }
 
-        if (usuario.Id == id && usuario.Activo)
+
+        // =========================================================
+        // EVITAR AUTO-DESACTIVACIÓN
+        // =========================================================
+
+        /*if (usuario.Id == usuarioActualId
+            && usuario.Activo)
         {
             throw new InvalidOperationException(
                 "No puede desactivar su propia cuenta.");
+        }*/
+        if (usuario.Id == id && usuario.Activo)
+        {
+            throw new InvalidOperationException("No puede desactivar su propia cuenta.");
         }
+
+
+        // =========================================================
+        // PROTEGER AL ÚLTIMO ADMINISTRADOR
+        // =========================================================
 
         if (usuario.Activo)
         {
-            bool esAdministrador =
-                await _userManager.IsInRoleAsync(
-                    usuario,
-                    RolesSistema.Administrador);
+            bool esAdministrador = await _userManager.IsInRoleAsync(usuario, RolesSistema.Administrador);
 
             if (esAdministrador)
             {
@@ -189,20 +258,26 @@ public class UsuarioService : IUsuarioService
         }
 
 
+        // =========================================================
+        // CAMBIAR ESTADO
+        // =========================================================
+
         usuario.Activo = !usuario.Activo;
 
 
         /*
-         * Si lo estamos desactivando, invalidamos
-         * también las sesiones existentes.
-         *
-         * El SecurityStamp permite que Identity
-         * invalide cookies cuando corresponda.
+         * Si desactivamos la cuenta, cambiamos el SecurityStamp
+         * para invalidar las sesiones de Identity.
          */
         if (!usuario.Activo)
         {
-            await _userManager.UpdateSecurityStampAsync(
-                usuario);
+            IdentityResult stampResultado =
+                await _userManager.UpdateSecurityStampAsync(
+                    usuario);
+
+            ValidarIdentityResult(
+                stampResultado,
+                "invalidar las sesiones del usuario");
         }
 
 
@@ -212,6 +287,15 @@ public class UsuarioService : IUsuarioService
         ValidarIdentityResult(
             resultado,
             "actualizar el estado del usuario");
+
+
+        /*
+         * Devolvemos el nuevo estado.
+         *
+         * true  = Activo
+         * false = Inactivo
+         */
+        return usuario.Activo;
     }
 
     public async Task CrearAsync(UsuarioCreateViewModel model, CancellationToken cancellationToken = default)

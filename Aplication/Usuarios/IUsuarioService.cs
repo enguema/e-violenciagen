@@ -34,9 +34,13 @@ public interface IUsuarioService
         CancellationToken cancellationToken = default);
 
 
-    Task CambiarEstadoAsync(
+    /*Task CambiarEstadoAsync(
         Guid id,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default);*/
+    Task<bool> CambiarEstadoAsync(
+    Guid id,
+    //Guid usuarioActualId,
+    CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<SelectListItem>>
     GetUnidadesPorInstitucionAsync(
@@ -53,7 +57,7 @@ public interface IUsuarioService
         Guid usuarioActualId,
         CancellationToken cancellationToken = default);*/
 
-    Task<UsuarioResetPasswordViewModel?>PrepararResetPasswordAsync(Guid id);
+    Task<UsuarioResetPasswordViewModel?> PrepararResetPasswordAsync(Guid id);
 
     Task RestablecerPasswordAsync(UsuarioResetPasswordViewModel model);
     Task DesbloquearAsync(Guid id);

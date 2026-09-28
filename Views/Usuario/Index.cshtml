@@ -23,6 +23,12 @@
         await AuthorizationService.AuthorizeAsync(
             User,
             PermisosSistema.Seguridad.UsuariosCambiarEstado);
+
+
+    var puedeResetPassword =
+        await AuthorizationService.AuthorizeAsync(
+            User,
+            PermisosSistema.Seguridad.UsuariosResetPassword);
 }
 
 
@@ -64,6 +70,7 @@
     @* =========================================================
        MENSAJES
        ========================================================= *@
+    <div id="usuarioAlertContainer"></div>
 
     @if (TempData["SuccessMessage"] is not null)
     {
@@ -120,6 +127,139 @@
 
                 </table>
 
+                @* ============================================================
+                    MODAL ACTIVAR / DESACTIVAR USUARIO
+                    ============================================================ *@
+
+                <div class="modal fade" id="estadoUsuarioModal" tabindex="-1" aria-labelledby="estadoUsuarioModalLabel"
+                     aria-hidden="true">
+
+                    <div class="modal-dialog modal-dialog-centered">
+
+                        <div class="modal-content">
+
+                            <form asp-controller="Usuario" asp-action="CambiarEstado" method="post"
+                                  id="estadoUsuarioForm">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden" name="id" id="estadoUsuarioId" />
+
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="estadoUsuarioModalLabel">
+                                        Cambiar estado
+                                    </h5>
+
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                                    </button>
+                                </div>
+
+
+                                <div class="modal-body">
+                                    <div id="estadoUsuarioError" class="alert alert-danger d-none">
+                                    </div>
+
+                                    <p class="mb-0" id="estadoUsuarioMensaje">
+                                    </p>
+                                </div>
+
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                        Cancelar
+                                    </button>
+
+                                    <button type="submit" id="estadoUsuarioConfirmar" class="btn btn-danger">
+                                        Confirmar
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                @* ============================================================
+   MODAL RESTABLECER CONTRASEÑA
+   ============================================================ *@
+
+                <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel"
+                     aria-hidden="true">
+
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <form asp-controller="Usuario" asp-action="ResetPassword" method="post"
+                                  id="resetPasswordForm">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden" name="UsuarioId" id="resetPasswordUsuarioId" />
+
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="resetPasswordModalLabel">
+                                        Restablecer contraseña
+                                    </h5>
+
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                                    </button>
+                                </div>
+
+
+                                <div class="modal-body">
+                                    <div id="resetPasswordError" class="alert alert-danger d-none">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <span class="text-muted">
+                                            Usuario:
+                                        </span>
+                                        <strong id="resetPasswordUsuario">
+                                        </strong>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="nuevaPassword" class="form-label">
+                                            Nueva contraseña
+                                        </label>
+                                        <input type="password" name="NuevaPassword" id="nuevaPassword"
+                                               class="form-control" autocomplete="new-password" required />
+                                    </div>
+
+
+                                    <div class="mb-3">
+                                        <label for="confirmarPassword" class="form-label">
+                                            Confirmar contraseña
+                                        </label>
+                                        <input type="password" name="ConfirmarPassword" id="confirmarPassword"
+                                               class="form-control" autocomplete="new-password" required />
+                                    </div>
+                                </div>
+
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                        Cancelar
+                                    </button>
+
+                                    <button type="submit" class="btn btn-primary" id="resetPasswordConfirmar">
+                                        Restablecer contraseña
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
             </div>
 
         </div>
@@ -137,8 +277,8 @@
 
             $('#usuariosTable').DataTable({
 
+                // =========== opciones  de tabla ======
                 processing: true,
-
                 serverSide: true,
 
                 ajax: {
@@ -146,9 +286,7 @@
                     type: 'POST'
                 },
 
-
                 columns: [
-
                     // ==========================================
                     // USUARIO
                     // ==========================================
@@ -156,7 +294,6 @@
                     {
                         data: 'nombreUsuario'
                     },
-
 
                     // ==========================================
                     // NOMBRE
@@ -166,27 +303,21 @@
                         data: 'nombreCompleto'
                     },
 
-
                     // ==========================================
                     // INSTITUCIÓN
                     // ==========================================
 
                     {
                         data: null,
-
                         render: function (data) {
-
                             let html =
                                 data.institucion ?? '';
-
                             if (data.unidadOrganizativa) {
-
                                 html +=
                                     `<div class="small text-muted">
-                                            ${data.unidadOrganizativa}
-                                         </div>`;
+                                                                                       ${data.unidadOrganizativa}
+                                                                                 </div>`;
                             }
-
                             return html;
                         }
                     },
@@ -198,9 +329,7 @@
 
                     {
                         data: 'roles',
-
                         render: function (data) {
-
                             return data || '-';
                         }
                     },
@@ -212,31 +341,18 @@
 
                     {
                         data: null,
-
                         orderable: false,
-
                         render: function (data) {
-
                             let html = '';
-
                             if (data.activo) {
-
-                                html +=
-                                    '<span class="badge text-bg-success">Activo</span>';
+                                html += '<span class="badge text-bg-success">Activo</span>';
                             }
                             else {
-
-                                html +=
-                                    '<span class="badge text-bg-secondary">Inactivo</span>';
+                                html += '<span class="badge text-bg-secondary">Inactivo</span>';
                             }
-
-
                             if (data.bloqueado) {
-
-                                html +=
-                                    ' <span class="badge text-bg-warning">Bloqueado</span>';
+                                html += ' <span class="badge text-bg-warning">Bloqueado</span>';
                             }
-
 
                             return html;
                         }
@@ -249,7 +365,6 @@
 
                     {
                         data: 'ultimoAcceso',
-
                         render: function (data) {
 
                             if (!data) {
@@ -267,46 +382,93 @@
                     // ==========================================
 
                     {
-                        data: 'id',
-
+                        data: null,
                         searchable: false,
-
                         orderable: false,
-
                         className: 'text-end',
-
-                        render: function (id) {
-
-                            let html = '';
+                        render: function (data) {
+                            let opciones = '';
 
 
-                            /*
-                             * Details siempre está disponible
-                             * porque si llegó al Index ya tiene
-                             * USUARIOS_VER.
-                             */
-                            html +=
-                                `<a href="/Usuario/Details/${id}"
-                                        class="btn btn-sm btn-outline-secondary me-1">
-                                        Ver
-                                     </a>`;
-
+                            // ==============================================
+                            // EDITAR
+                            // ==============================================
 
                             @if (puedeEditar.Succeeded)
                                 {
                                     <text>
-
-                                            html +=
-                                            `<a href="/Usuario/Edit/${id}"
-                class="btn btn-sm btn-outline-primary me-1">
-                                                Editar
-                                        </a>`;
-
+                                            opciones += `
+                                            <li>
+                                                    <a class="dropdown-item" href="/Usuario/Edit/${data.id}">
+                                                            Editar
+                                                    </a>
+                                            </li>`;
                                     </text>
                             }
 
 
-                            return html;
+                                // ==============================================
+                                // ACTIVAR / DESACTIVAR
+                                // ==============================================
+
+                                @if (puedeCambiarEstado.Succeeded)
+                                {
+                                    <text>
+                                            opciones += `
+                                            <li>
+                                                    <button type="button" class="dropdown-item js-cambiar-estado">
+                                                            ${data.activo ? 'Desactivar' : 'Activar'}
+                                                    </button>
+                                            </li>`;
+                                    </text>
+                            }
+
+
+                                // ==============================================
+                                // RESET PASSWORD
+                                // ==============================================
+
+                                @if (puedeResetPassword.Succeeded)
+                                {
+                                    <text>
+                                            opciones += `
+                                            <li>
+                                                    <button type="button" class="dropdown-item js-reset-password">
+                                                            Restablecer contraseña
+                                                    </button>
+                                            </li>`;
+                                    </text>
+                            }
+
+
+                                                                    /*
+                                                                     * Si por permisos no existe ninguna acción,
+                                                                     * no mostramos el menú.
+                                                                     */
+                                                                    if (!opciones) {
+                                return '';
+                            }
+
+                            return `
+                                                                        <div class="dropdown">
+
+                                                                            <button type="button"
+                                                                                    class="btn btn-sm btn-light"
+                                                                                    data-bs-toggle="dropdown"
+                                                                                    data-bs-boundary="viewport"
+                                                                                    aria-expanded="false"
+                                                                                    aria-label="Acciones">
+
+                                                                                <span class="fs-5 lh-1">
+                                                                                    &#8942;
+                                                                                </span>
+
+                                                                            </button>
+
+                                                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                                                ${opciones}
+                                                                            </ul>
+                                                                        </div>`;
                         }
                     }
                 ],
@@ -314,26 +476,13 @@
 
                 pageLength: 10,
 
-
                 language: {
-
-                    processing:
-                        'Cargando usuarios...',
-
-                    search:
-                        'Buscar:',
-
-                    lengthMenu:
-                        'Mostrar _MENU_ registros',
-
-                    info:
-                        'Mostrando _START_ a _END_ de _TOTAL_ usuarios',
-
-                    infoEmpty:
-                        'No hay usuarios registrados',
-
-                    zeroRecords:
-                        'No se encontraron usuarios',
+                    processing: 'Cargando usuarios...',
+                    search: 'Buscar:',
+                    lengthMenu: 'Mostrar _MENU_ registros',
+                    info: 'Mostrando _START_ a _END_ de _TOTAL_ usuarios',
+                    infoEmpty: 'No hay usuarios registrados',
+                    zeroRecords: 'No se encontraron usuarios',
 
                     paginate: {
                         first: 'Primero',
@@ -345,7 +494,326 @@
 
             });
 
-        });
+            // ===== fin opciones  de tabla =====
 
-</script>
+                $('#usuariosTable tbody').on(
+                    'click',
+                    '.js-cambiar-estado',
+                    function () {
+
+                        /*
+                         * Obtenemos directamente los datos de la fila
+                         * desde DataTables.
+                         *
+                         * Así evitamos colocar nombres y otros datos
+                         * potencialmente problemáticos en atributos HTML.
+                         */
+                        const row =
+                            table.row(
+                                $(this).closest('tr')
+                            ).data();
+
+
+                        document
+                            .getElementById('estadoUsuarioId')
+                            .value = row.id;
+
+
+                        const titulo =
+                            document.getElementById(
+                                'estadoUsuarioModalLabel');
+
+
+                        const mensaje =
+                            document.getElementById(
+                                'estadoUsuarioMensaje');
+
+
+                        const boton =
+                            document.getElementById(
+                                'estadoUsuarioConfirmar');
+
+
+                        const error =
+                            document.getElementById(
+                                'estadoUsuarioError');
+
+
+                        error.classList.add('d-none');
+                        error.textContent = '';
+
+
+                        if (row.activo) {
+
+                            titulo.textContent =
+                                'Desactivar usuario';
+
+                            mensaje.textContent =
+                                `¿Desea desactivar al usuario "${row.nombreUsuario}"?`;
+
+                            boton.textContent =
+                                'Desactivar';
+
+                            boton.className =
+                                'btn btn-danger';
+                        }
+                        else {
+
+                            titulo.textContent =
+                                'Activar usuario';
+
+                            mensaje.textContent =
+                                `¿Desea activar al usuario "${row.nombreUsuario}"?`;
+
+                            boton.textContent =
+                                'Activar';
+
+                            boton.className =
+                                'btn btn-success';
+                        }
+
+
+                        const modal =
+                            new bootstrap.Modal(
+                                document.getElementById(
+                                    'estadoUsuarioModal'));
+
+                        modal.show();
+                    });
+
+                    //===== Enviar cambio de estado por fetch =====
+                    document
+                    .getElementById('estadoUsuarioForm')
+                    .addEventListener(
+                        'submit',
+                        async function (event) {
+
+                            event.preventDefault();
+                            const form = this;
+
+                            const boton =
+                                document.getElementById(
+                                    'estadoUsuarioConfirmar');
+
+                            const error =
+                                document.getElementById(
+                                    'estadoUsuarioError');
+
+
+                            boton.disabled = true;
+                            error.classList.add('d-none');
+
+                            try {
+
+                                const response =
+                                    await fetch(
+                                        form.action,
+                                        {
+                                            method: 'POST',
+
+                                            /*
+                                             * FormData incluye automáticamente
+                                             * el __RequestVerificationToken.
+                                             */
+                                            body: new FormData(form)
+                                        });
+
+
+                                const result =
+                                    await response.json();
+
+
+                                if (!response.ok ||
+                                    !result.success) {
+
+                                    throw new Error(
+                                        result.message
+                                        ?? 'No se pudo actualizar el usuario.');
+                                }
+
+
+                                // Cerrar modal.
+                                bootstrap.Modal
+                                    .getInstance(
+                                        document.getElementById(
+                                            'estadoUsuarioModal'))
+                                    ?.hide();
+
+
+                                /*
+                                 * Refrescamos solo los datos de DataTables.
+                                 *
+                                 * false mantiene la página actual.
+                                 */
+                                table.ajax.reload(null, false);
+
+
+                                mostrarAlerta(result.message, 'success');
+                            }
+                            catch (err) {
+                                error.textContent = err.message;
+                                error.classList.remove('d-none');
+                            }
+                            finally {
+                                boton.disabled = false;
+                            }
+                        });
+                
+                    //===== Abrir modal de restablecer contraseña =====
+                    $('#usuariosTable tbody').on(
+                    'click',
+                    '.js-reset-password',
+                    function () {
+
+                        const row =
+                            table.row(
+                                $(this).closest('tr')
+                            ).data();
+
+
+                        document
+                            .getElementById(
+                                'resetPasswordUsuarioId')
+                            .value = row.id;
+
+                        document
+                            .getElementById('resetPasswordUsuario')
+                            .textContent =
+                            row.nombreUsuario;
+
+
+                        /*
+                         * Limpiamos siempre los campos.
+                         */
+                        document
+                            .getElementById('nuevaPassword')
+                            .value = '';
+
+                        document
+                            .getElementById('confirmarPassword')
+                            .value = '';
+
+                        const error =
+                            document.getElementById('resetPasswordError');
+
+                        error.classList.add('d-none');
+                        error.textContent = '';
+
+
+                        const modal =
+                            new bootstrap.Modal(
+                                document.getElementById('resetPasswordModal'));
+
+                        modal.show();
+                    });
+
+                    document
+                    .getElementById('resetPasswordForm')
+                    .addEventListener(
+                        'submit',
+                        async function (event) {
+
+                            event.preventDefault();
+
+
+                            const form = this;
+
+                            const error =
+                                document.getElementById(
+                                    'resetPasswordError');
+
+                            const boton =
+                                document.getElementById(
+                                    'resetPasswordConfirmar');
+
+
+                            error.classList.add('d-none');
+
+
+                            const password =
+                                document.getElementById(
+                                    'nuevaPassword')
+                                    .value;
+
+
+                            const confirmacion =
+                                document.getElementById(
+                                    'confirmarPassword')
+                                    .value;
+
+
+                            /*
+                             * Validación rápida del navegador.
+                             *
+                             * El servidor vuelve a validar igualmente.
+                             */
+                            if (password !== confirmacion) {
+                                error.textContent = 'Las contraseñas no coinciden.';
+                                error.classList.remove('d-none');
+                                return;
+                            }
+
+
+                            boton.disabled = true;
+
+                            try {
+                                const response =
+                                    await fetch(
+                                        form.action,
+                                        {
+                                            method: 'POST',
+                                            body: new FormData(form)
+                                        });
+
+                                const result = await response.json();
+
+                                if (!response.ok || !result.success) {
+
+                                    throw new Error(
+                                        result.message
+                                        ?? 'No se pudo restablecer la contraseña.');
+                                }
+
+                                bootstrap.Modal
+                                    .getInstance(document.getElementById('resetPasswordModal'))
+                                    ?.hide();
+
+                                mostrarAlerta(result.message, 'success');
+                            }
+                            catch (err) {
+
+                                error.textContent = err.message;
+
+                                error.classList.remove('d-none');
+                            }
+                            finally {
+                                boton.disabled = false;
+                            }
+                        });
+
+
+        });
+    
+        //Mostrar alerta de éxito o error
+        function mostrarAlerta(mensaje, tipo) {
+
+            const container = document.getElementById('usuarioAlertContainer');
+
+            container.innerHTML = `
+                    <div class="alert alert-${tipo}
+                                alert-dismissible fade show"
+                         role="alert">
+
+                        ${mensaje}
+
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert"
+                                aria-label="Cerrar">
+                        </button>
+
+                    </div>`;
+        }
+
+    </script>
 }
