@@ -118,32 +118,21 @@ public class UsuarioController : Controller
         return Json(unidades);
     }
 
-    //[Authorize(Policy = PermisosSistema.Seguridad.UsuariosCambiarEstado)]
+    [Authorize(Policy = PermisosSistema.Seguridad.UsuariosCambiarEstado)]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CambiarEstado(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> CambiarEstado(
+    Guid id,
+    CancellationToken cancellationToken)
     {
-        /*try
-        {
-            await _usuarioService.CambiarEstadoAsync(
-                id,
-                cancellationToken);
+        // =========================================================
+        // USUARIO QUE EJECUTA LA OPERACIÓN
+        // =========================================================
 
-            TempData["SuccessMessage"] =
-                "Estado del usuario actualizado correctamente.";
-        }
-        catch (Exception ex)
-        {
-            TempData["ErrorMessage"] =
-                ex.Message;
-        }
-
-
-        return RedirectToAction(
-            nameof(Index));*/
         string? currentUserId =
-        User.FindFirstValue(
-            ClaimTypes.NameIdentifier);
+            User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
 
         if (!Guid.TryParse(
             currentUserId,
@@ -152,12 +141,13 @@ public class UsuarioController : Controller
             return Unauthorized();
         }
 
+
         try
         {
             bool activo =
                 await _usuarioService.CambiarEstadoAsync(
                     id,
-                    //usuarioActualId,
+                    usuarioActualId,
                     cancellationToken);
 
 

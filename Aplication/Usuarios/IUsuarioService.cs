@@ -37,9 +37,13 @@ public interface IUsuarioService
     /*Task CambiarEstadoAsync(
         Guid id,
         CancellationToken cancellationToken = default);*/
-    Task<bool> CambiarEstadoAsync(
+    /*Task<bool> CambiarEstadoAsync(
     Guid id,
     //Guid usuarioActualId,
+    CancellationToken cancellationToken = default);*/
+    Task<bool> CambiarEstadoAsync(
+    Guid id,
+    Guid usuarioActualId,
     CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<SelectListItem>>

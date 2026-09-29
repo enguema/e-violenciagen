@@ -67,14 +67,290 @@ public static class CatalogoSeeder
                 cancellationToken);
         }
 
-        if (!await dbContext.Instituciones.AnyAsync(cancellationToken))
+        /*if (!await dbContext.Instituciones.AnyAsync(cancellationToken))
         {
             await CrearInstitucionesAsync(dbContext);
-        }
+        }*/
+
+        await CrearInstitucionesAsync(dbContext, cancellationToken);
+
+        await CrearUnidadesOrganizativasAsync(dbContext, cancellationToken);
     }
 
 
+    private static async Task CrearUnidadesOrganizativasAsync(AppDbContext dbContext, CancellationToken cancellationToken)
+    {
+        // =========================================================
+        // RECUPERAR INSTITUCIONES
+        // =========================================================
 
+        /*
+         * Utilizamos Codigo para resolver las FK
+         * sin depender de Guid hardcodeados.
+         */
+        var instituciones =
+            await dbContext.Instituciones
+                .ToDictionaryAsync(
+                    i => i.Codigo,
+                    cancellationToken);
+
+
+        // =========================================================
+        // VALIDAR INSTITUCIONES NECESARIAS
+        // =========================================================
+
+        string[] institucionesRequeridas =
+        {
+        "MASIG",
+        "POLICIA",
+        "GENDARMERIA",
+        "FISCALIA_GENERAL",
+        "PODER_JUDICIAL",
+        "MIN_SANIDAD"
+    };
+
+
+        foreach (string codigo in institucionesRequeridas)
+        {
+            if (!instituciones.ContainsKey(codigo))
+            {
+                throw new InvalidOperationException(
+                    $"No existe la institución "
+                    + $"con código '{codigo}'.");
+            }
+        }
+
+
+        // =========================================================
+        // CREAR UNIDADES ORGANIZATIVAS
+        // =========================================================
+
+        var unidades = new[]
+        {
+        // -----------------------------------------------------
+        // MASIG
+        // -----------------------------------------------------
+
+        new UnidadOrganizativa
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "MASIG_DG_IGUALDAD",
+
+            Nombre =
+                "Dirección General de Igualdad de Género",
+
+            InstitucionId =
+                instituciones["MASIG"].Id
+        },
+
+
+        new UnidadOrganizativa
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "MASIG_SERVICIO_ATENCION",
+
+            Nombre =
+                "Servicio de Atención y Seguimiento",
+
+            InstitucionId =
+                instituciones["MASIG"].Id
+        },
+
+
+        // -----------------------------------------------------
+        // POLICÍA
+        // -----------------------------------------------------
+
+        new UnidadOrganizativa
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "POLICIA_MALABO",
+
+            Nombre =
+                "Comisaría de Policía de Malabo",
+
+            InstitucionId =
+                instituciones["POLICIA"].Id
+        },
+
+
+        new UnidadOrganizativa
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "POLICIA_BATA",
+
+            Nombre =
+                "Comisaría de Policía de Bata",
+
+            InstitucionId =
+                instituciones["POLICIA"].Id
+        },
+
+
+        // -----------------------------------------------------
+        // GENDARMERÍA
+        // -----------------------------------------------------
+
+        new UnidadOrganizativa
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "GENDARMERIA_MALABO",
+
+            Nombre =
+                "Unidad de Gendarmería de Malabo",
+
+            InstitucionId =
+                instituciones["GENDARMERIA"].Id
+        },
+
+
+        new UnidadOrganizativa
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "GENDARMERIA_BATA",
+
+            Nombre =
+                "Unidad de Gendarmería de Bata",
+
+            InstitucionId =
+                instituciones["GENDARMERIA"].Id
+        },
+
+
+        // -----------------------------------------------------
+        // FISCALÍA
+        // -----------------------------------------------------
+
+        new UnidadOrganizativa
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "FISCALIA_MALABO",
+
+            Nombre =
+                "Fiscalía de Malabo",
+
+            InstitucionId =
+                instituciones["FISCALIA_GENERAL"].Id
+        },
+
+
+        new UnidadOrganizativa
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "FISCALIA_BATA",
+
+            Nombre =
+                "Fiscalía de Bata",
+
+            InstitucionId =
+                instituciones["FISCALIA_GENERAL"].Id
+        },
+
+
+        // -----------------------------------------------------
+        // PODER JUDICIAL
+        // -----------------------------------------------------
+
+        new UnidadOrganizativa
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "JUZGADOS_MALABO",
+
+            Nombre =
+                "Juzgados de Malabo",
+
+            InstitucionId =
+                instituciones["PODER_JUDICIAL"].Id
+        },
+
+
+        new UnidadOrganizativa
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "JUZGADOS_BATA",
+
+            Nombre =
+                "Juzgados de Bata",
+
+            InstitucionId =
+                instituciones["PODER_JUDICIAL"].Id
+        },
+
+
+        // -----------------------------------------------------
+        // SANIDAD
+        // -----------------------------------------------------
+
+        new UnidadOrganizativa
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "SANIDAD_MALABO",
+
+            Nombre =
+                "Servicios Sanitarios de Malabo",
+
+            InstitucionId =
+                instituciones["MIN_SANIDAD"].Id
+        },
+
+
+        new UnidadOrganizativa
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "SANIDAD_BATA",
+
+            Nombre =
+                "Servicios Sanitarios de Bata",
+
+            InstitucionId =
+                instituciones["MIN_SANIDAD"].Id
+        }
+    };
+
+
+        // =========================================================
+        // UNIDADES YA EXISTENTES
+        // =========================================================
+
+        HashSet<string> codigosExistentes =
+            await dbContext.UnidadesOrganizativas
+                .Select(u => u.Codigo)
+                .ToHashSetAsync(
+                    cancellationToken);
+
+
+        // =========================================================
+        // AGREGAR SOLO LAS QUE FALTAN
+        // =========================================================
+
+        foreach (UnidadOrganizativa unidad in unidades)
+        {
+            if (codigosExistentes.Contains(
+                unidad.Codigo))
+            {
+                continue;
+            }
+
+            dbContext.UnidadesOrganizativas.Add(
+                unidad);
+        }
+
+
+        await dbContext.SaveChangesAsync(
+            cancellationToken);
+    }
     private static async Task CrearProvinciasAsync(AppDbContext dbContext, CancellationToken cancellationToken)
     {
         /*
@@ -715,66 +991,180 @@ public static class CatalogoSeeder
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private static async Task CrearInstitucionesAsync(AppDbContext context)
+    private static async Task CrearInstitucionesAsync(AppDbContext dbContext, CancellationToken cancellationToken)
     {
-        /*
-         * Antes de crear una institución necesitamos
-         * localizar su TipoInstitucion.
-         *
-         * No hardcodeamos el Guid porque puede cambiar
-         * entre bases de datos.
-         */
-        var tipoMinisterio = await context.TiposInstitucion
-            .FirstOrDefaultAsync(t =>
-                t.Nombre == "Ministerio");
+        // =========================================================
+        // RECUPERAR TIPOS DE INSTITUCIÓN
+        // =========================================================
 
-        if (tipoMinisterio is null)
+        /*
+         * Utilizamos Codigo porque es un identificador
+         * funcional estable.
+         *
+         * El Nombre puede cambiar por motivos de presentación.
+         */
+        var tipos =
+            await dbContext.TiposInstitucion
+                .ToDictionaryAsync(
+                    x => x.Codigo,
+                    cancellationToken);
+
+
+        // =========================================================
+        // VALIDAR TIPOS NECESARIOS
+        // =========================================================
+
+        string[] tiposRequeridos =
         {
-            throw new InvalidOperationException(
-                "No existe el TipoInstitucion 'Ministerio'. " +
-                "Debe ejecutarse primero CrearTiposInstitucionAsync().");
+        "MINISTERIO",
+        "SEGURIDAD",
+        "FISCALIA",
+        "JUDICIAL",
+        "SANIDAD"
+    };
+
+
+        foreach (string codigo in tiposRequeridos)
+        {
+            if (!tipos.ContainsKey(codigo))
+            {
+                throw new InvalidOperationException(
+                    $"No existe el TipoInstitucion "
+                    + $"con código '{codigo}'.");
+            }
         }
 
 
-        /*
-         * Utilizamos un código estable para identificar
-         * la institución.
-         *
-         * Esto permite ejecutar el Seeder varias veces
-         * sin generar registros duplicados.
-         */
-        const string codigoInstitucion = "MASIG";
+        // =========================================================
+        // DEFINICIONES INSTITUCIONALES
+        // =========================================================
 
-        bool existe = await context.Instituciones
-            .AnyAsync(i =>
-                i.Codigo == codigoInstitucion);
-
-        if (existe)
+        var instituciones = new[]
         {
-            return;
-        }
-
-
-        var institucion = new Institucion
+        new Institucion
         {
             Id = Guid.NewGuid(),
+
+            Codigo = "MASIG",
 
             Nombre =
                 "Ministerio de Asuntos Sociales e Igualdad de Género",
 
-            Codigo = codigoInstitucion,
-
-            TipoInstitucionId = tipoMinisterio.Id,
+            TipoInstitucionId =
+                tipos["MINISTERIO"].Id,
 
             Activo = true
-        };
+        },
 
 
-        context.Instituciones.Add(institucion);
+        new Institucion
+        {
+            Id = Guid.NewGuid(),
 
-        await context.SaveChangesAsync();
+            Codigo = "POLICIA",
+
+            Nombre = "Policía Nacional",
+
+            TipoInstitucionId =
+                tipos["SEGURIDAD"].Id,
+
+            Activo = true
+        },
+
+
+        new Institucion
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "GENDARMERIA",
+
+            Nombre = "Gendarmería Nacional",
+
+            TipoInstitucionId =
+                tipos["SEGURIDAD"].Id,
+
+            Activo = true
+        },
+
+
+        new Institucion
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "FISCALIA_GENERAL",
+
+            Nombre = "Fiscalía General",
+
+            TipoInstitucionId =
+                tipos["FISCALIA"].Id,
+
+            Activo = true
+        },
+
+
+        new Institucion
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "PODER_JUDICIAL",
+
+            Nombre = "Poder Judicial",
+
+            TipoInstitucionId =
+                tipos["JUDICIAL"].Id,
+
+            Activo = true
+        },
+
+
+        new Institucion
+        {
+            Id = Guid.NewGuid(),
+
+            Codigo = "MIN_SANIDAD",
+
+            Nombre = "Ministerio de Sanidad",
+
+            TipoInstitucionId =
+                tipos["SANIDAD"].Id,
+
+            Activo = true
+        }
+    };
+
+
+        // =========================================================
+        // OBTENER LOS QUE YA EXISTEN
+        // =========================================================
+
+        HashSet<string> codigosExistentes =
+            await dbContext.Instituciones
+                .Select(i => i.Codigo)
+                .ToHashSetAsync(
+                    cancellationToken);
+
+
+        // =========================================================
+        // INSERTAR SOLO LOS QUE FALTAN
+        // =========================================================
+
+        foreach (Institucion institucion in instituciones)
+        {
+            if (codigosExistentes.Contains(
+                institucion.Codigo))
+            {
+                continue;
+            }
+
+            dbContext.Instituciones.Add(
+                institucion);
+        }
+
+
+        await dbContext.SaveChangesAsync(
+            cancellationToken);
     }
-    
+
     private static async Task CrearTiposDocumentoIdentidadAsync(AppDbContext dbContext, CancellationToken cancellationToken)
     {
         var tipos = new[]

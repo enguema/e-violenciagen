@@ -206,6 +206,7 @@ app.MapControllerRoute(//Ruta MVC Predeterminada
  */
 
 await IdentitySeeder.SeedAsync(app.Services);
+await PermissionSeeder.SeedAsync(app.Services);
 
 
 app.Run();

@@ -214,14 +214,18 @@ public class UsuarioService : IUsuarioService
 
     public async Task<bool> CambiarEstadoAsync(
     Guid id,
-    //Guid usuarioActualId,
+    Guid usuarioActualId,
     CancellationToken cancellationToken = default)
     {
-        ApplicationUser? usuario = await _userManager.FindByIdAsync(id.ToString());
+        ApplicationUser? usuario =
+            await _userManager.FindByIdAsync(
+                id.ToString());
+
 
         if (usuario is null)
         {
-            throw new KeyNotFoundException("El usuario no existe.");
+            throw new KeyNotFoundException(
+                "El usuario no existe.");
         }
 
 
@@ -229,15 +233,22 @@ public class UsuarioService : IUsuarioService
         // EVITAR AUTO-DESACTIVACIÓN
         // =========================================================
 
-        /*if (usuario.Id == usuarioActualId
+        /*
+         * id:
+         * usuario cuyo estado queremos cambiar.
+         *
+         * usuarioActualId:
+         * usuario que está ejecutando la operación.
+         *
+         * Solo impedimos la operación cuando ambos
+         * representan al mismo usuario Y estamos intentando
+         * desactivarlo.
+         */
+        if (usuario.Id == usuarioActualId
             && usuario.Activo)
         {
             throw new InvalidOperationException(
                 "No puede desactivar su propia cuenta.");
-        }*/
-        if (usuario.Id == id && usuario.Activo)
-        {
-            throw new InvalidOperationException("No puede desactivar su propia cuenta.");
         }
 
 
@@ -245,9 +256,17 @@ public class UsuarioService : IUsuarioService
         // PROTEGER AL ÚLTIMO ADMINISTRADOR
         // =========================================================
 
+        /*
+         * Esta validación solo es necesaria cuando vamos
+         * a desactivar una cuenta actualmente activa.
+         */
         if (usuario.Activo)
         {
-            bool esAdministrador = await _userManager.IsInRoleAsync(usuario, RolesSistema.Administrador);
+            bool esAdministrador =
+                await _userManager.IsInRoleAsync(
+                    usuario,
+                    RolesSistema.Administrador);
+
 
             if (esAdministrador)
             {
@@ -262,18 +281,21 @@ public class UsuarioService : IUsuarioService
         // CAMBIAR ESTADO
         // =========================================================
 
-        usuario.Activo = !usuario.Activo;
+        usuario.Activo =
+            !usuario.Activo;
 
 
-        /*
-         * Si desactivamos la cuenta, cambiamos el SecurityStamp
-         * para invalidar las sesiones de Identity.
-         */
+        // =========================================================
+        // INVALIDAR SESIONES AL DESACTIVAR
+        // =========================================================
+
         if (!usuario.Activo)
         {
             IdentityResult stampResultado =
-                await _userManager.UpdateSecurityStampAsync(
-                    usuario);
+                await _userManager
+                    .UpdateSecurityStampAsync(
+                        usuario);
+
 
             ValidarIdentityResult(
                 stampResultado,
@@ -281,8 +303,14 @@ public class UsuarioService : IUsuarioService
         }
 
 
+        // =========================================================
+        // GUARDAR
+        // =========================================================
+
         IdentityResult resultado =
-            await _userManager.UpdateAsync(usuario);
+            await _userManager
+                .UpdateAsync(usuario);
+
 
         ValidarIdentityResult(
             resultado,
@@ -290,10 +318,8 @@ public class UsuarioService : IUsuarioService
 
 
         /*
-         * Devolvemos el nuevo estado.
-         *
-         * true  = Activo
-         * false = Inactivo
+         * true  = quedó activo
+         * false = quedó inactivo
          */
         return usuario.Activo;
     }
