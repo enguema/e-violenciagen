@@ -41,6 +41,11 @@ public class PersonaConfiguration
             .HasForeignKey(x => x.BarrioId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(p => p.DistritoProcedencia)
+            .WithMany()
+            .HasForeignKey(p => p.DistritoProcedenciaId)
+            .OnDelete(DeleteBehavior.Restrict);
+
 
         // =====================================================
         // ÍNDICES
@@ -52,13 +57,14 @@ public class PersonaConfiguration
          *
          * Creamos por tanto un índice compuesto único.
          */
+        builder.HasIndex(p => p.DistritoProcedenciaId);
         builder.HasIndex(p => p.Nombres);
 
         builder.HasIndex(p => p.Apellidos);
 
         builder.HasIndex(p => p.NumeroDocumento);
 
-        
+
         builder.HasIndex(x => new
         {
             x.TipoDocumentoIdentidadId,

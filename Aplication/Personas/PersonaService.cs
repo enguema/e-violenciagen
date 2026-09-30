@@ -50,14 +50,12 @@ public class PersonaService : IPersonaService
     /// fotografías de personas.
     /// </summary>
     private static readonly IReadOnlyDictionary<string, string>
-        AllowedPhotoTypes =
-            new Dictionary<string, string>(
-                StringComparer.OrdinalIgnoreCase)
-            {
-                ["image/jpeg"] = ".jpg",
-                ["image/png"] = ".png",
-                ["image/webp"] = ".webp"
-            };
+        AllowedPhotoTypes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["image/jpeg"] = ".jpg",
+            ["image/png"] = ".png",
+            ["image/webp"] = ".webp"
+        };
 
 
     // =========================================================
@@ -438,6 +436,11 @@ public class PersonaService : IPersonaService
                     p.Barrio.Distrito.Provincia != null
                         ? p.Barrio.Distrito.Provincia.Nombre
                         : null,
+                
+                DistritoProcedencia =
+                    p.DistritoProcedencia != null
+                        ? p.DistritoProcedencia.Nombre
+                        : null,
 
 
                 // =============================================
@@ -499,6 +502,14 @@ public class PersonaService : IPersonaService
 
                 BarrioId =
                     p.BarrioId,
+                
+                DistritoProcedenciaId =
+                    p.DistritoProcedenciaId,
+                
+                DistritoResidenciaId =
+                    p.Barrio != null
+                        ? p.Barrio.DistritoId
+                        : null,
 
                 /*
                  * No intentamos convertir RutaFoto en IFormFile.
@@ -520,11 +531,8 @@ public class PersonaService : IPersonaService
     public async Task<Guid> CreateAsync(PersonaFormViewModel model, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(model);
-
         Normalizar(model);
-
         await ValidarReferenciasAsync(model, cancellationToken);
-
         string? nuevaRutaFoto = null;
 
         try
@@ -571,7 +579,10 @@ public class PersonaService : IPersonaService
                     model.BarrioId,
 
                 RutaFoto =
-                    nuevaRutaFoto
+                    nuevaRutaFoto,
+
+                DistritoProcedenciaId =
+                    model.DistritoProcedenciaId,
             };
 
             _dbContext.Personas.Add(persona);
@@ -597,6 +608,20 @@ public class PersonaService : IPersonaService
         }
     }
 
+    public async Task<IReadOnlyList<SelectListItem>> GetBarriosByDistritoAsync(Guid distritoId, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext
+            .Set<Barrio>()
+            .AsNoTracking()
+            .Where(b => b.DistritoId == distritoId)
+            .OrderBy(b => b.Nombre)
+            .Select(b => new SelectListItem
+            {
+                Value = b.Id.ToString(),
+                Text = b.Nombre
+            })
+            .ToListAsync(cancellationToken);
+    }
 
     // =========================================================
     // ACTUALIZAR PERSONA
@@ -698,6 +723,9 @@ public class PersonaService : IPersonaService
 
             persona.BarrioId =
                 model.BarrioId;
+
+            persona.DistritoProcedenciaId =
+                model.DistritoProcedenciaId;
 
 
             await _dbContext.SaveChangesAsync(
@@ -886,6 +914,45 @@ public class PersonaService : IPersonaService
             if (!existeBarrio)
             {
                 throw new InvalidOperationException("El barrio seleccionado no existe.");
+            }
+        }
+
+        if (model.DistritoProcedenciaId.HasValue)
+        {
+            bool existeDistritoProcedencia =
+                await _dbContext.Set<Distrito>()
+                    .AsNoTracking()
+                    .AnyAsync(
+                        d => d.Id ==
+                             model.DistritoProcedenciaId.Value,
+                        cancellationToken);
+
+            if (!existeDistritoProcedencia)
+            {
+                throw new InvalidOperationException(
+                    "El distrito de procedencia seleccionado no existe.");
+            }
+        }
+
+        if (model.BarrioId.HasValue)
+        {
+            bool barrioValido =
+                await _dbContext.Set<Barrio>()
+                    .AsNoTracking()
+                    .AnyAsync(
+                        b =>
+                            b.Id == model.BarrioId.Value &&
+                            (
+                                !model.DistritoResidenciaId.HasValue ||
+                                b.DistritoId ==
+                                    model.DistritoResidenciaId.Value
+                            ),
+                        cancellationToken);
+
+            if (!barrioValido)
+            {
+                throw new InvalidOperationException(
+                    "El barrio seleccionado no pertenece al distrito indicado.");
             }
         }
     }
@@ -1154,14 +1221,24 @@ public class PersonaService : IPersonaService
             })
             .ToListAsync(cancellationToken);
 
+        var distritos = await _dbContext
+            .Set<Distrito>()
+            .AsNoTracking()
+            .OrderBy(d => d.Nombre)
+            .Select(d => new SelectListItem
+            {
+                Value = d.Id.ToString(),
+                Text = d.Nombre
+            })
+            .ToListAsync(cancellationToken);
+
 
         return new PersonaCreateViewModel
         {
             Persona = new PersonaFormViewModel(),
-
             TiposDocumento = tiposDocumento,
-
-            Barrios = barrios
+            Barrios = barrios,
+            Distritos = distritos
         };
     }
 
@@ -1169,7 +1246,7 @@ public class PersonaService : IPersonaService
     // BUSCADOR REUTILIZABLE DE PERSONAS
     // =========================================================
 
-    public async Task<IReadOnlyList<PersonaSearchResultDto>>SearchAsync(string term, int limit = 10, bool includeInactive = false, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<PersonaSearchResultDto>> SearchAsync(string term, int limit = 10, bool includeInactive = false, CancellationToken cancellationToken = default)
     {
         // =====================================================
         // VALIDACIÓN DEL TEXTO

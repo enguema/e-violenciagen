@@ -20,4 +20,10 @@ public class PersonaCreateViewModel
 
     public IReadOnlyList<SelectListItem> Barrios { get; set; }
         = Array.Empty<SelectListItem>();
+
+    public IReadOnlyList<SelectListItem> Distritos { get; set; }
+        = Array.Empty<SelectListItem>();
+
+    /*public IReadOnlyList<SelectListItem> Barrios { get; set; }
+        = Array.Empty<SelectListItem>();*/
 }

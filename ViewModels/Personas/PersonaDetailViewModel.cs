@@ -64,6 +64,7 @@ public class PersonaDetailViewModel
     public string? Provincia { get; set; }
 
     public int? Edad { get; set; }
+    public string? DistritoProcedencia { get; set; }
 
 
     // =========================================================

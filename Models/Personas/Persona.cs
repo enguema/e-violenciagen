@@ -79,6 +79,20 @@ public class Persona : BaseEntity
 
     public Barrio? Barrio { get; set; }
 
+    // =========================================================
+    // PROCEDENCIA
+    // =========================================================
+
+    /// <summary>
+    /// Distrito del que procede originalmente la persona.
+    ///
+    /// Es independiente del distrito de residencia actual,
+    /// que se obtiene a través de Barrio.
+    /// </summary>
+    public Guid? DistritoProcedenciaId { get; set; }
+
+    public Distrito? DistritoProcedencia { get; set; }
+
 
     // =========================================================
     // VINCULACIONES INSTITUCIONALES

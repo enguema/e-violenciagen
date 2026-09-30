@@ -119,7 +119,20 @@ public class PersonaFormViewModel
         ErrorMessage = "La dirección no puede superar los 500 caracteres.")]
     public string? Direccion { get; set; }
 
+    [Display(Name = "Distrito")]
+    public Guid? DistritoResidenciaId { get; set; }
 
     [Display(Name = "Barrio")]
     public Guid? BarrioId { get; set; }
+
+    // =========================================================
+    // PROCEDENCIA
+    // =========================================================
+
+    /// <summary>
+    /// Distrito de procedencia de la persona.
+    /// Este valor sí se persiste en Persona.
+    /// </summary>
+    [Display(Name = "Procedencia")]
+    public Guid? DistritoProcedenciaId { get; set; }
 }

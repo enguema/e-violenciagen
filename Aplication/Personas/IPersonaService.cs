@@ -3,6 +3,7 @@ using e_violenciagen.Dtos.Personas;
 using e_violenciagen.Models.Personas;
 using e_violenciagen.ViewModels.Common;
 using e_violenciagen.ViewModels.Personas;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace e_violenciagen.Aplication.Personas;
 
@@ -60,7 +61,7 @@ public interface IPersonaService
     /// </summary>
     Task<PersonaFormViewModel?> GetForEditAsync(Guid id, CancellationToken cancellationToken = default);
 
-
+    Task<IReadOnlyList<SelectListItem>> GetBarriosByDistritoAsync(Guid distritoId, CancellationToken cancellationToken = default);
     // =========================================================
     // CREACIÓN
     // =========================================================

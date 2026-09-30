@@ -5,6 +5,7 @@ using e_violenciagen.ViewModels.Personas;
 using e_violenciagen.Dtos.Personas;
 using e_violenciagen.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace e_violenciagen.Controllers;
 
@@ -153,6 +154,9 @@ public class PersonaController : Controller
 
             NumeroCasosComoVictima =
                 persona.NumeroCasosComoVictima,
+            
+            DistritoProcedencia =
+                persona.DistritoProcedencia,
 
             NumeroCasosComoPresuntoAgresor =
                 persona.NumeroCasosComoPresuntoAgresor,
@@ -179,7 +183,7 @@ public class PersonaController : Controller
     [HttpGet]
     public async Task<IActionResult> Create(CancellationToken cancellationToken)
     {
-        await GetFormCatalogsAsync(cancellationToken);
+        await GetFormCatalogsAsync(null, cancellationToken);
         //var model = new PersonaFormViewModel();
         //var model = await _personaService.GetCreateViewModelAsync(cancellationToken);
         return View(new PersonaFormViewModel());
@@ -262,7 +266,7 @@ public class PersonaController : Controller
         {
             return NotFound();
         }
-        await GetFormCatalogsAsync(cancellationToken);
+        await GetFormCatalogsAsync(model.DistritoResidenciaId, cancellationToken);
         return View(model);
     }
 
@@ -473,7 +477,19 @@ public class PersonaController : Controller
 
         return Json(personas);
     }
-    
+
+    [HttpGet]
+    public async Task<IActionResult> GetBarriosByDistrito(Guid distritoId, CancellationToken cancellationToken)
+    {
+        if (distritoId == Guid.Empty)
+        {
+            return Json(Array.Empty<object>());
+        }
+
+        var barrios = await _personaService.GetBarriosByDistritoAsync(distritoId, cancellationToken);
+        return Json(barrios);
+    }
+
     // =========================================================
     // MÉTODOS PRIVADOS
     // =========================================================
@@ -508,7 +524,7 @@ public class PersonaController : Controller
                     .ToArray());
     }
 
-    private async Task GetFormCatalogsAsync(CancellationToken cancellationToken)
+    private async Task GetFormCatalogsAsync(Guid? distritoId, CancellationToken cancellationToken)
     {
         var model = await _personaService
             .GetCreateViewModelAsync(cancellationToken);
@@ -516,7 +532,24 @@ public class PersonaController : Controller
         ViewBag.TiposDocumento =
             model.TiposDocumento;
 
+        ViewBag.Distritos =
+    model.Distritos;
+
         ViewBag.Barrios =
             model.Barrios;
+
+        if (distritoId.HasValue)
+        {
+            ViewBag.Barrios =
+                await _personaService
+                    .GetBarriosByDistritoAsync(
+                        distritoId.Value,
+                        cancellationToken);
+        }
+        else
+        {
+            ViewBag.Barrios =
+                Array.Empty<SelectListItem>();
+        }
     }
 }

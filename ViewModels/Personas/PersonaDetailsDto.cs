@@ -62,6 +62,7 @@ public class PersonaDetailsDto
     public string? Distrito { get; set; }
 
     public string? Provincia { get; set; }
+    public string? DistritoProcedencia { get; set; }
 
 
     // =========================================================
