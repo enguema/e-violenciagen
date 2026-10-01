@@ -31,7 +31,7 @@ public class CasoDetailsViewModel
 
     public string? RelatoInicial { get; set; }
 
-    public string? LugarDescripcion { get; set; }
+
 
 
     // =====================================================
@@ -43,7 +43,7 @@ public class CasoDetailsViewModel
     public string? Distrito { get; set; }
 
     public string? Barrio { get; set; }
-
+    public string? LugarDescripcion { get; set; }
 
     // =====================================================
     // CLASIFICACIÓN
