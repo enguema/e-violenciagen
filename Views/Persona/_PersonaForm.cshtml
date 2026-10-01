@@ -255,8 +255,15 @@
                 <label asp-for="BarrioId" class="form-label">
                 </label>
 
-                <select asp-for="BarrioId" asp-items="ViewBag.Barrios" id="barrioSelect" class="form-select"
+                @*<select asp-for="BarrioId" asp-items="ViewBag.Barrios" id="barrioSelect" class="form-select"
                         disabled="@(!Model.DistritoResidenciaId.HasValue)">
+
+                    <option value="">
+                        Seleccione primero un distrito...
+                    </option>
+
+                </select>*@
+                <select asp-for="BarrioId" asp-items="ViewBag.Barrios" id="barrioSelect" class="form-select">
 
                     <option value="">
                         Seleccione primero un distrito...
@@ -391,10 +398,10 @@
 
                 // Limpiamos los barrios anteriores.
                 barrioSelect.innerHTML = `
-                <option value="">
-                    Seleccione un barrio...
-                </option>
-            `;
+                    <option value="">
+                        Seleccione un barrio...
+                    </option>
+                `;
 
 
                 if (!distritoId) {
@@ -402,10 +409,10 @@
                     barrioSelect.disabled = true;
 
                     barrioSelect.innerHTML = `
-                    <option value="">
-                        Seleccione primero un distrito...
-                    </option>
-                `;
+                        <option value="">
+                            Seleccione primero un distrito...
+                        </option>
+                    `;
 
                     return;
                 }
@@ -414,18 +421,18 @@
                 barrioSelect.disabled = true;
 
                 barrioSelect.innerHTML = `
-                <option value="">
-                    Cargando barrios...
-                </option>
-            `;
+                    <option value="">
+                        Cargando barrios...
+                    </option>
+                `;
 
 
                 try {
 
                     const url =
                         '@Url.Action(
-                                            "GetBarriosByDistrito",
-                                            "Persona")'
+                                                                                            "GetBarriosByDistrito",
+                                                                                            "Persona")'
                         + "?distritoId="
                         + encodeURIComponent(distritoId);
 
@@ -446,10 +453,10 @@
 
 
                     barrioSelect.innerHTML = `
-                    <option value="">
-                        Seleccione un barrio...
-                    </option>
-                `;
+                        <option value="">
+                            Seleccione un barrio...
+                        </option>
+                    `;
 
 
                     barrios.forEach(
@@ -483,10 +490,10 @@
 
 
                     barrioSelect.innerHTML = `
-                    <option value="">
-                        No se pudieron cargar los barrios
-                    </option>
-                `;
+                        <option value="">
+                            No se pudieron cargar los barrios
+                        </option>
+                    `;
 
                 }
 

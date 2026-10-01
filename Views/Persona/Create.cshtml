@@ -525,6 +525,125 @@
                 }
 
             });
+        // =============================================
+        // DIRECCION: BARIO, PRIVADO, MUNICIPIO, ESTADO, PAIS
+        // =============================================
+        const distritoSelect =
+            document.getElementById("distritoResidenciaSelect");
+
+        const barrioSelect =
+            document.getElementById("barrioSelect");
+
+
+        distritoSelect.addEventListener(
+            "change",
+            async function () {
+
+                const distritoId = this.value;
+
+
+                // Limpiamos los barrios anteriores.
+                barrioSelect.innerHTML = `
+                    <option value="">
+                        Seleccione un barrio...
+                    </option>
+                `;
+
+
+                if (!distritoId) {
+
+                    barrioSelect.disabled = true;
+
+                    barrioSelect.innerHTML = `
+                        <option value="">
+                            Seleccione primero un distrito...
+                        </option>
+                    `;
+
+                    return;
+                }
+
+
+                barrioSelect.disabled = true;
+
+                barrioSelect.innerHTML = `
+                    <option value="">
+                        Cargando barrios...
+                    </option>
+                `;
+
+
+                try {
+
+                    const url =
+                        '@Url.Action(
+                                                                                            "GetBarriosByDistrito",
+                                                                                            "Persona")'
+                        + "?distritoId="
+                        + encodeURIComponent(distritoId);
+
+
+                    const response =
+                        await fetch(url);
+
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP ${response.status}`
+                        );
+                    }
+
+
+                    const barrios =
+                        await response.json();
+
+
+                    barrioSelect.innerHTML = `
+                        <option value="">
+                            Seleccione un barrio...
+                        </option>
+                    `;
+
+
+                    barrios.forEach(
+                        barrio => {
+
+                            const option =
+                                document.createElement("option");
+
+                            option.value =
+                                barrio.value;
+
+                            option.textContent =
+                                barrio.text;
+
+                            barrioSelect.appendChild(
+                                option
+                            );
+
+                        });
+
+
+                    barrioSelect.disabled = false;
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Error cargando barrios:",
+                        error
+                    );
+
+
+                    barrioSelect.innerHTML = `
+                        <option value="">
+                            No se pudieron cargar los barrios
+                        </option>
+                    `;
+
+                }
+
+            });
 
     </script>
 }
