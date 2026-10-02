@@ -121,7 +121,110 @@ public class CasoController : Controller
         }
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AgregarVictima(
+    AgregarVictimaViewModel model,
+    CancellationToken cancellationToken)
+    {
+        /*
+         * Necesitamos siempre el CasoId para poder regresar
+         * al expediente aunque haya un error.
+         */
+        if (!ModelState.IsValid)
+        {
+            TempData["Error"] =
+                "Debe seleccionar una persona.";
 
+            return RedirectToAction(
+                nameof(Details),
+                new { id = model.CasoId });
+        }
+
+        try
+        {
+            await _casoService.AgregarVictimaAsync(
+                model.CasoId,
+                model.PersonaId!.Value,
+                cancellationToken);
+
+            TempData["Success"] =
+                "La víctima fue agregada correctamente al expediente.";
+        }
+        catch (KeyNotFoundException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error al agregar una víctima al caso {CasoId}.",
+                model.CasoId);
+
+            TempData["Error"] =
+                "Se produjo un error al agregar la víctima.";
+        }
+
+        return RedirectToAction(
+            nameof(Details),
+            new { id = model.CasoId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AgregarPresuntoAgresor(
+    AgregarPresuntoAgresorViewModel model,
+    CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            TempData["Error"] =
+                "Debe seleccionar una persona.";
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id = model.CasoId });
+        }
+
+        try
+        {
+            await _casoService.AgregarPresuntoAgresorAsync(
+                model.CasoId,
+                model.PersonaId!.Value,
+                cancellationToken);
+
+            TempData["Success"] =
+                "El presunto agresor fue agregado correctamente al expediente.";
+        }
+        catch (KeyNotFoundException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error al agregar un presunto agresor al caso {CasoId}.",
+                model.CasoId);
+
+            TempData["Error"] =
+                "Se produjo un error al agregar el presunto agresor.";
+        }
+
+        return RedirectToAction(
+            nameof(Details),
+            new { id = model.CasoId });
+    }
+    
     // =========================================================
     // EXPEDIENTE
     // =========================================================

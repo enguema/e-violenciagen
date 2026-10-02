@@ -22,6 +22,149 @@ public class CasoService : ICasoService
         _dbContext = dbContext;
     }
 
+    //agregar victimas
+    public async Task AgregarVictimaAsync(
+    Guid casoId,
+    Guid personaId,
+    CancellationToken cancellationToken = default)
+    {
+        /*
+         * 1. Comprobamos que el caso realmente exista.
+         */
+        bool existeCaso = await _dbContext.Casos
+            .AnyAsync(
+                c => c.Id == casoId,
+                cancellationToken);
+
+        if (!existeCaso)
+        {
+            throw new KeyNotFoundException(
+                "El caso indicado no existe.");
+        }
+
+        /*
+         * 2. Comprobamos que la persona seleccionada exista.
+         *
+         * IMPORTANTE:
+         * No creamos una Persona nueva.
+         * Estamos vinculando una Persona que ya existe
+         * en el sistema.
+         */
+        bool existePersona = await _dbContext.Personas
+            .AnyAsync(
+                p => p.Id == personaId,
+                cancellationToken);
+
+        if (!existePersona)
+        {
+            throw new InvalidOperationException(
+                "La persona seleccionada no existe.");
+        }
+
+        /*
+         * 3. Impedimos que la misma persona se agregue
+         * varias veces como víctima del mismo caso.
+         * y QUE NO PUEDE SER VICTIMA Y PRESUNTO AGRESOR AL MISMO TIEMPO
+         */
+        bool yaEsVictima = await _dbContext.CasosVictimas
+            .AnyAsync(
+                cv =>
+                    cv.CasoId == casoId &&
+                    cv.PersonaId == personaId,
+                cancellationToken);
+
+        if (yaEsVictima)
+        {
+            throw new InvalidOperationException(
+                "La persona seleccionada ya está registrada como víctima de este caso.");
+        }
+
+        /*
+         * 4. Creamos únicamente la relación.
+         *
+         * La Persona ya existe y no debe duplicarse.
+         */
+        var casoVictima = new CasoVictima
+        {
+            CasoId = casoId,
+            PersonaId = personaId
+        };
+
+        _dbContext.CasosVictimas.Add(casoVictima);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    //Agregar presunto agresor
+    public async Task AgregarPresuntoAgresorAsync(
+    Guid casoId,
+    Guid personaId,
+    CancellationToken cancellationToken = default)
+    {
+        /*
+         * 1. Verificamos que el expediente exista.
+         */
+        bool existeCaso = await _dbContext.Casos
+            .AnyAsync(
+                c => c.Id == casoId,
+                cancellationToken);
+
+        if (!existeCaso)
+        {
+            throw new KeyNotFoundException(
+                "El caso indicado no existe.");
+        }
+
+        /*
+         * 2. Verificamos que la persona exista.
+         *
+         * No creamos una Persona nueva.
+         * Solo vinculamos una persona existente al expediente.
+         */
+        bool existePersona = await _dbContext.Personas
+            .AnyAsync(
+                p => p.Id == personaId,
+                cancellationToken);
+
+        if (!existePersona)
+        {
+            throw new InvalidOperationException(
+                "La persona seleccionada no existe.");
+        }
+
+        /*
+         * 3. Evitamos duplicados.
+         *
+         * Una persona no debe aparecer dos veces como
+         * presunto agresor dentro del mismo expediente.
+         */
+        bool yaEsPresuntoAgresor =
+            await _dbContext.CasosPresuntosAgresores
+                .AnyAsync(
+                    x =>
+                        x.CasoId == casoId &&
+                        x.PersonaId == personaId,
+                    cancellationToken);
+
+        if (yaEsPresuntoAgresor)
+        {
+            throw new InvalidOperationException(
+                "La persona seleccionada ya está registrada como presunto agresor de este caso.");
+        }
+
+        /*
+         * 4. Creamos únicamente la relación.
+         */
+        var relacion = new CasoPresuntoAgresor
+        {
+            CasoId = casoId,
+            PersonaId = personaId
+        };
+
+        _dbContext.CasosPresuntosAgresores.Add(relacion);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 
     // =========================================================
     // LISTADO GENERAL

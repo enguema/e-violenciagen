@@ -1,9 +1,34 @@
 @using Microsoft.AspNetCore.Authorization
+@using e_violenciagen.ViewModels.Personas
 @inject IAuthorizationService AuthorizationService
 @model e_violenciagen.ViewModels.Casos.CasoDetailsViewModel
 
 @{
     ViewData["Title"] = $"Expediente {Model.CodigoCaso}";
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+
+        @TempData["Success"]
+
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar">
+        </button>
+
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+
+        @TempData["Error"]
+
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar">
+        </button>
+
+    </div>
 }
 
 @{
@@ -253,6 +278,155 @@
 
 </div>
 
+<!-- =====================================================
+     MODAL: AGREGAR VÍCTIMA
+     ===================================================== -->
+
+<div class="modal fade" id="modalAgregarVictima" tabindex="-1" aria-labelledby="modalAgregarVictimaLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <form asp-controller="Caso" asp-action="AgregarVictima" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <!-- Identificador del expediente -->
+                <input type="hidden" name="CasoId" value="@Model.Id" />
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title" id="modalAgregarVictimaLabel">
+
+                        Agregar víctima al expediente
+
+                    </h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="alert alert-light border mb-3">
+
+                        Busque y seleccione una persona
+                        previamente registrada en el sistema.
+
+                    </div>
+
+                    @await Html.PartialAsync(
+                        "_PersonaSelector",
+                        new PersonaSelectorViewModel
+                        {
+                            Label = "Víctima",
+                            FieldName = "PersonaId",
+                            SelectedPersonaId = null
+                        })
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+
+                        Cancelar
+
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+
+                        Agregar víctima
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     MODAL: AGREGAR PRESUNTO AGRESOR
+     ===================================================== -->
+
+<div class="modal fade" id="modalAgregarPresuntoAgresor" tabindex="-1"
+     aria-labelledby="modalAgregarPresuntoAgresorLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <form asp-controller="Caso" asp-action="AgregarPresuntoAgresor" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <!-- Expediente sobre el que estamos trabajando -->
+                <input type="hidden" name="CasoId" value="@Model.Id" />
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title" id="modalAgregarPresuntoAgresorLabel">
+
+                        Agregar presunto agresor
+
+                    </h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="alert alert-light border mb-3">
+
+                        Busque y seleccione una persona
+                        previamente registrada en el sistema.
+
+                    </div>
+
+                    @await Html.PartialAsync(
+                        "_PersonaSelector",
+                        new PersonaSelectorViewModel
+                        {
+                            Label = "Presunto agresor",
+                            FieldName = "PersonaId",
+                            SelectedPersonaId = null
+                        })
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+
+                        Cancelar
+
+                    </button>
+
+                    <button type="submit" class="btn btn-danger">
+
+                        Agregar presunto agresor
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
 
 @section Styles {
     <link rel="stylesheet" href="~/css/casos.css" asp-append-version="true" />
@@ -265,4 +439,5 @@
     </script>
 
     <script src="~/js/casos/details.js" asp-append-version="true"></script>
+    <script src="~/js/persona-selector.js" asp-append-version="true"></script>
 }

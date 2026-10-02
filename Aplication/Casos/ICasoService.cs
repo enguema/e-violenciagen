@@ -66,4 +66,16 @@ public interface ICasoService
     Task<IReadOnlyList<OpcionCatalogoViewModel>> GetBarriosAsync(
         Guid distritoId,
         CancellationToken cancellationToken = default);
+
+    //AGREGAR VICTIMAS
+    Task AgregarVictimaAsync(
+    Guid casoId,
+    Guid personaId,
+    CancellationToken cancellationToken = default);
+
+    //AGREGAR PRESUNTO AGRESOR
+    Task AgregarPresuntoAgresorAsync(
+    Guid casoId,
+    Guid personaId,
+    CancellationToken cancellationToken = default);
 }
