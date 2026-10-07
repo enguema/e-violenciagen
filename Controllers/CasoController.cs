@@ -224,7 +224,7 @@ public class CasoController : Controller
             nameof(Details),
             new { id = model.CasoId });
     }
-    
+
     // =========================================================
     // EXPEDIENTE
     // =========================================================
@@ -293,7 +293,6 @@ public class CasoController : Controller
         return Json(distritos);
     }
 
-
     [HttpGet]
     public async Task<IActionResult> Barrios(Guid distritoId, CancellationToken cancellationToken)
     {
@@ -304,4 +303,108 @@ public class CasoController : Controller
 
         return Json(barrios);
     }
+
+    // Vincular y desvincular personas a un caso
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DesvincularVictima(
+    DesvincularVictimaViewModel model,
+    CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            TempData["Error"] =
+                "No se pudo identificar correctamente la víctima.";
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id = model.CasoId });
+        }
+
+        try
+        {
+            await _casoService.DesvincularVictimaAsync(
+                model.CasoId,
+                model.PersonaId,
+                cancellationToken);
+
+            TempData["Success"] =
+                "La víctima fue desvinculada correctamente del expediente.";
+        }
+        catch (KeyNotFoundException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error al desvincular la víctima {PersonaId} del caso {CasoId}.",
+                model.PersonaId,
+                model.CasoId);
+
+            TempData["Error"] =
+                "Se produjo un error al desvincular la víctima.";
+        }
+
+        return RedirectToAction(
+            nameof(Details),
+            new { id = model.CasoId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DesvincularPresuntoAgresor(
+    DesvincularPresuntoAgresorViewModel model,
+    CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            TempData["Error"] =
+                "No se pudo identificar correctamente al presunto agresor.";
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id = model.CasoId });
+        }
+
+        try
+        {
+            await _casoService.DesvincularPresuntoAgresorAsync(
+                model.CasoId,
+                model.PersonaId,
+                cancellationToken);
+
+            TempData["Success"] =
+                "El presunto agresor fue desvinculado correctamente del expediente.";
+        }
+        catch (KeyNotFoundException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error al desvincular el presunto agresor {PersonaId} del caso {CasoId}.",
+                model.PersonaId,
+                model.CasoId);
+
+            TempData["Error"] =
+                "Se produjo un error al desvincular al presunto agresor.";
+        }
+
+        return RedirectToAction(
+            nameof(Details),
+            new { id = model.CasoId });
+    }
+
 }

@@ -90,6 +90,84 @@
 
                                 </div>
 
+                                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#desvincularVictima_@persona.PersonaId">
+
+                                    Desvincular
+
+                                </button>
+
+                                @*Modal - Desvincular Víctima *@
+                                <div class="modal fade" id="desvincularVictima_@persona.PersonaId" tabindex="-1"
+                                     aria-hidden="true">
+
+                                    <div class="modal-dialog modal-dialog-centered">
+
+                                        <div class="modal-content">
+
+                                            <form asp-controller="Caso" asp-action="DesvincularVictima" method="post">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden" name="CasoId" value="@Model.Id" />
+
+                                                <input type="hidden" name="PersonaId" value="@persona.PersonaId" />
+
+                                                <div class="modal-header">
+
+                                                    <h5 class="modal-title">
+                                                        Desvincular víctima
+                                                    </h5>
+
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Cerrar">
+                                                    </button>
+
+                                                </div>
+
+                                                <div class="modal-body">
+
+                                                    <p>
+                                                        ¿Desea desvincular a
+                                                        <strong>@persona.NombreCompleto</strong>
+                                                        de este expediente?
+                                                    </p>
+
+                                                    <div class="alert alert-warning mb-0">
+
+                                                        Esta operación no eliminará a la persona
+                                                        del sistema. Únicamente dejará de figurar
+                                                        como víctima de este caso.
+
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="modal-footer">
+
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+
+                                                        Cancelar
+
+                                                    </button>
+
+                                                    <button type="submit" class="btn btn-danger">
+
+                                                        Sí, desvincular
+
+                                                    </button>
+
+                                                </div>
+
+                                            </form>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
                             </div>
 
                         </div>
@@ -146,20 +224,98 @@
                 {
                     foreach (var persona in Model.PresuntosAgresores)
                     {
-                        <div class="border rounded-3 p-3 mb-3">
+                        <div class="d-flex justify-content-between gap-3">
+                            <div class="border rounded-3 p-3 mb-3">
+                                <h6 class="fw-bold mb-1">
+                                    @persona.NombreCompleto
+                                </h6>
 
-                            <h6 class="fw-bold mb-1">
-                                @persona.NombreCompleto
-                            </h6>
+                                @if (!string.IsNullOrWhiteSpace(
+                                    persona.RelacionConVictima))
+                                {
+                                    <div class="small text-muted">
+                                        Relación:
+                                        @persona.RelacionConVictima
+                                    </div>
+                                }
+                            </div>
+                            
 
-                            @if (!string.IsNullOrWhiteSpace(
-                                persona.RelacionConVictima))
-                            {
-                                <div class="small text-muted">
-                                    Relación:
-                                    @persona.RelacionConVictima
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#desvincularAgresor_@persona.PersonaId">
+
+                                Desvincular
+
+                            </button>
+
+                        </div>
+                        
+
+                        @*modal desvincular agresor*@
+                        <div class="modal fade" id="desvincularAgresor_@persona.PersonaId" tabindex="-1" aria-hidden="true">
+
+                            <div class="modal-dialog modal-dialog-centered">
+
+                                <div class="modal-content">
+
+                                    <form asp-controller="Caso" asp-action="DesvincularPresuntoAgresor" method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden" name="CasoId" value="@Model.Id" />
+
+                                        <input type="hidden" name="PersonaId" value="@persona.PersonaId" />
+
+                                        <div class="modal-header">
+
+                                            <h5 class="modal-title">
+                                                Desvincular presunto agresor
+                                            </h5>
+
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                                            </button>
+
+                                        </div>
+
+                                        <div class="modal-body">
+
+                                            <p>
+                                                ¿Desea desvincular a
+                                                <strong>@persona.NombreCompleto</strong>
+                                                de este expediente?
+                                            </p>
+
+                                            <div class="alert alert-warning mb-0">
+
+                                                La persona permanecerá registrada en el
+                                                sistema. Solo se eliminará su relación como
+                                                presunto agresor de este caso.
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="modal-footer">
+
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+
+                                                Cancelar
+
+                                            </button>
+
+                                            <button type="submit" class="btn btn-danger">
+
+                                                Sí, desvincular
+
+                                            </button>
+
+                                        </div>
+
+                                    </form>
+
                                 </div>
-                            }
+
+                            </div>
 
                         </div>
                     }

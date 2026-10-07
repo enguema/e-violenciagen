@@ -38,8 +38,7 @@ public class CasoService : ICasoService
 
         if (!existeCaso)
         {
-            throw new KeyNotFoundException(
-                "El caso indicado no existe.");
+            throw new KeyNotFoundException("El caso indicado no existe.");
         }
 
         /*
@@ -59,6 +58,24 @@ public class CasoService : ICasoService
         {
             throw new InvalidOperationException(
                 "La persona seleccionada no existe.");
+        }
+
+        /*
+        * NUEVA REGLA:
+        * La misma persona no puede ser víctima y presunto agresor
+        * en el mismo caso.
+        */
+        await ValidarQueNoExistaConflictoDeRolesAsync(casoId, personaId, seAgregaComoVictima: true, cancellationToken);
+
+        bool yaEsPresuntoAgresor = await _dbContext.CasosPresuntosAgresores
+            .AnyAsync(
+                x => x.CasoId == casoId && x.PersonaId == personaId,
+                cancellationToken);
+
+        if (yaEsPresuntoAgresor)
+        {
+            throw new InvalidOperationException(
+                "La persona seleccionada ya figura como presunto agresor en este caso y no puede registrarse también como víctima.");
         }
 
         /*
@@ -131,6 +148,13 @@ public class CasoService : ICasoService
             throw new InvalidOperationException(
                 "La persona seleccionada no existe.");
         }
+
+        /*
+        * NUEVA REGLA:
+        * La misma persona no puede ser víctima y presunto agresor
+        * en el mismo caso.
+        */
+        await ValidarQueNoExistaConflictoDeRolesAsync(casoId, personaId, seAgregaComoVictima: false, cancellationToken);
 
         /*
          * 3. Evitamos duplicados.
@@ -596,9 +620,7 @@ public class CasoService : ICasoService
 
 
     public async Task<IReadOnlyList<OpcionCatalogoViewModel>>
-        GetBarriosAsync(
-            Guid distritoId,
-            CancellationToken cancellationToken = default)
+        GetBarriosAsync(Guid distritoId, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Barrios
             .AsNoTracking()
@@ -655,6 +677,18 @@ public class CasoService : ICasoService
             }
         }
 
+        /*
+         * Validamos que la víctima principal y el presunto agresor
+         * no sean la misma persona.
+         */
+
+        if (model.VictimaPersonaId.HasValue &&
+            model.PresuntoAgresorPersonaId.HasValue &&
+            model.VictimaPersonaId.Value == model.PresuntoAgresorPersonaId.Value)
+        {
+            throw new InvalidOperationException(
+                "La misma persona no puede registrarse como víctima y como presunto agresor dentro del mismo caso.");
+        }
 
         /*
          * Al tener habilitada una estrategia de reintentos en Npgsql,
@@ -1053,9 +1087,154 @@ public class CasoService : ICasoService
         });
     }
 
+    //====== Vincular - Desvincular personas a un caso ======
+    public async Task DesvincularVictimaAsync(
+        Guid casoId,
+        Guid personaId,
+        CancellationToken cancellationToken = default)
+    {
+        /*
+         * 1. Comprobamos que el caso exista.
+         */
+        bool existeCaso = await _dbContext.Casos
+            .AnyAsync(
+                c => c.Id == casoId,
+                cancellationToken);
 
+        if (!existeCaso)
+        {
+            throw new KeyNotFoundException(
+                "El caso indicado no existe.");
+        }
+
+        /*
+         * 2. Buscamos específicamente la relación
+         * entre el caso y la víctima.
+         *
+         * IMPORTANTE:
+         * No buscamos la Persona para eliminarla.
+         */
+        var relacion = await _dbContext.CasosVictimas
+            .FirstOrDefaultAsync(
+                x =>
+                    x.CasoId == casoId &&
+                    x.PersonaId == personaId,
+                cancellationToken);
+
+        if (relacion is null)
+        {
+            throw new InvalidOperationException(
+                "La persona indicada no está registrada como víctima de este caso.");
+        }
+
+        /*
+         * 3. El expediente debe conservar al menos
+         * una víctima.
+         */
+        int numeroVictimas = await _dbContext.CasosVictimas
+            .CountAsync(
+                x => x.CasoId == casoId,
+                cancellationToken);
+
+        if (numeroVictimas <= 1)
+        {
+            throw new InvalidOperationException(
+                "No se puede desvincular esta víctima porque el caso debe conservar al menos una víctima asociada.");
+        }
+
+        /*
+         * 4. Eliminamos únicamente la relación.
+         *
+         * La Persona permanece intacta en el sistema
+         * y puede seguir vinculada a otros casos.
+         */
+        _dbContext.CasosVictimas.Remove(relacion);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DesvincularPresuntoAgresorAsync(
+    Guid casoId,
+    Guid personaId,
+    CancellationToken cancellationToken = default)
+    {
+        /*
+         * 1. Comprobamos que el caso exista.
+         */
+        bool existeCaso = await _dbContext.Casos
+            .AnyAsync(
+                c => c.Id == casoId,
+                cancellationToken);
+
+        if (!existeCaso)
+        {
+            throw new KeyNotFoundException(
+                "El caso indicado no existe.");
+        }
+
+        /*
+         * 2. Buscamos exclusivamente la relación.
+         */
+        var relacion = await _dbContext.CasosPresuntosAgresores
+            .FirstOrDefaultAsync(
+                x =>
+                    x.CasoId == casoId &&
+                    x.PersonaId == personaId,
+                cancellationToken);
+
+        if (relacion is null)
+        {
+            throw new InvalidOperationException(
+                "La persona indicada no está registrada como presunto agresor de este caso.");
+        }
+
+        /*
+         * 3. Eliminamos la vinculación.
+         *
+         * La Persona NO se elimina.
+         */
+        _dbContext.CasosPresuntosAgresores.Remove(relacion);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 
     //========== Métodos privados ==========
+
+    // Evita que una misma persona pueda figurar simultáneamente
+    // como víctima y presunto agresor en un mismo caso.
+    private async Task ValidarQueNoExistaConflictoDeRolesAsync(
+    Guid casoId,
+    Guid personaId,
+    bool seAgregaComoVictima,
+    CancellationToken cancellationToken = default)
+    {
+        if (seAgregaComoVictima)
+        {
+            bool yaEsPresuntoAgresor = await _dbContext.CasosPresuntosAgresores
+                .AnyAsync(
+                    x => x.CasoId == casoId && x.PersonaId == personaId,
+                    cancellationToken);
+
+            if (yaEsPresuntoAgresor)
+            {
+                throw new InvalidOperationException(
+                    "La persona seleccionada ya figura como presunto agresor en este caso y no puede registrarse también como víctima.");
+            }
+        }
+        else
+        {
+            bool yaEsVictima = await _dbContext.CasosVictimas
+                .AnyAsync(
+                    x => x.CasoId == casoId && x.PersonaId == personaId,
+                    cancellationToken);
+
+            if (yaEsVictima)
+            {
+                throw new InvalidOperationException(
+                    "La persona seleccionada ya figura como víctima en este caso y no puede registrarse también como presunto agresor.");
+            }
+        }
+    }
     private async Task<string> GenerarCodigoCasoAsync(CancellationToken cancellationToken)
     {
         /*

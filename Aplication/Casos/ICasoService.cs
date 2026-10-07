@@ -78,4 +78,15 @@ public interface ICasoService
     Guid casoId,
     Guid personaId,
     CancellationToken cancellationToken = default);
+
+    //Vincular - Desvincular
+    Task DesvincularVictimaAsync(
+    Guid casoId,
+    Guid personaId,
+    CancellationToken cancellationToken = default);
+
+    Task DesvincularPresuntoAgresorAsync(
+        Guid casoId,
+        Guid personaId,
+        CancellationToken cancellationToken = default);
 }
