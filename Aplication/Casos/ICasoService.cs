@@ -1,5 +1,6 @@
 using e_violenciagen.ViewModels;
 using e_violenciagen.ViewModels.Casos;
+using OpcionCatalogoViewModel = e_violenciagen.ViewModels.Casos.OpcionCatalogoViewModel;
 
 namespace e_violenciagen.Aplication.Casos;
 /// <summary>
@@ -8,6 +9,10 @@ namespace e_violenciagen.Aplication.Casos;
 /// </summary>
 public interface ICasoService
 {
+    
+    Task<Guid> RegistrarActuacionAsync(
+    RegistrarActuacionViewModel model,
+    CancellationToken cancellationToken = default);
     /// <summary>
     /// Obtiene el listado resumido de expedientes.
     /// </summary>

@@ -261,6 +261,56 @@ public class CasoController : Controller
             actuaciones);
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = "Casos.Editar")]
+    public async Task<IActionResult> RegistrarActuacion(
+    RegistrarActuacionViewModel model,
+    CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            TempData["Error"] =
+                "Revise los datos introducidos para la actuación.";
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id = model.CasoId });
+        }
+
+        try
+        {
+            await _casoService.RegistrarActuacionAsync(
+                model,
+                cancellationToken);
+
+            TempData["Success"] =
+                "La actuación institucional fue registrada correctamente.";
+        }
+        catch (KeyNotFoundException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error al registrar una actuación para el caso {CasoId}.",
+                model.CasoId);
+
+            TempData["Error"] =
+                "Se produjo un error al registrar la actuación.";
+        }
+
+        return RedirectToAction(
+            nameof(Details),
+            new { id = model.CasoId });
+    }
+
 
     // =========================================================
     // PARTIAL: DOCUMENTOS

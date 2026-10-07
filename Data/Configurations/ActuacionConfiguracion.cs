@@ -28,6 +28,10 @@ public class ActuacionConfiguration
 
         builder.Property(x => x.Resultado)
             .HasMaxLength(2000);
+        
+        // =====================================================
+        // Por ahora omitimos configurar las propiedades obligatorias
+        // =====================================================
 
 
         // =====================================================

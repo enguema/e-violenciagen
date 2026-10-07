@@ -5,6 +5,7 @@ using e_violenciagen.ViewModels;
 using e_violenciagen.ViewModels.Casos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using OpcionCatalogoViewModel = e_violenciagen.ViewModels.Casos.OpcionCatalogoViewModel;
 
 namespace e_violenciagen.Aplication.Casos;
 // <summary>
@@ -507,13 +508,178 @@ public class CasoService : ICasoService
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<Guid> RegistrarActuacionAsync(
+    RegistrarActuacionViewModel model,
+    CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+
+        // =====================================================
+        // 1. VALIDAR CASO
+        // =====================================================
+
+        bool existeCaso = await _dbContext.Casos
+            .AnyAsync(
+                c => c.Id == model.CasoId,
+                cancellationToken);
+
+        if (!existeCaso)
+        {
+            throw new KeyNotFoundException(
+                "El caso indicado no existe.");
+        }
+
+
+        // =====================================================
+        // 2. VALIDAR TIPO DE ACTUACIÓN
+        // =====================================================
+
+        bool existeTipoActuacion =
+            await _dbContext.TiposActuacion
+                .AnyAsync(
+                    x => x.Id == model.TipoActuacionId!.Value,
+                    cancellationToken);
+
+        if (!existeTipoActuacion)
+        {
+            throw new InvalidOperationException(
+                "El tipo de actuación seleccionado no existe.");
+        }
+
+
+        // =====================================================
+        // 3. VALIDAR INSTITUCIÓN
+        // =====================================================
+
+        bool existeInstitucion =
+            await _dbContext.Instituciones
+                .AnyAsync(
+                    x => x.Id == model.InstitucionId!.Value,
+                    cancellationToken);
+
+        if (!existeInstitucion)
+        {
+            throw new InvalidOperationException(
+                "La institución seleccionada no existe.");
+        }
+
+
+        // =====================================================
+        // 4. VALIDAR UNIDAD ORGANIZATIVA
+        // =====================================================
+
+        if (model.UnidadOrganizativaId.HasValue)
+        {
+            /*
+             * No basta con verificar que exista la unidad.
+             *
+             * También tiene que pertenecer a la institución
+             * seleccionada.
+             */
+            bool unidadValida =
+                await _dbContext.UnidadesOrganizativas
+                    .AnyAsync(
+                        u =>
+                            u.Id == model.UnidadOrganizativaId.Value &&
+                            u.InstitucionId == model.InstitucionId.Value,
+                        cancellationToken);
+
+            if (!unidadValida)
+            {
+                throw new InvalidOperationException(
+                    "La unidad organizativa seleccionada no pertenece a la institución indicada.");
+            }
+        }
+
+
+        // =====================================================
+        // 5. VALIDAR FECHA
+        // =====================================================
+
+        DateTime fechaUtc =
+            ConvertirFechaActuacionAUtc(
+                model.FechaActuacion);
+
+        /*
+         * Una actuación representa algo que ya ocurrió.
+         *
+         * Permitimos un pequeño margen por diferencias
+         * entre relojes de equipos.
+         */
+        if (fechaUtc > DateTime.UtcNow.AddMinutes(5))
+        {
+            throw new InvalidOperationException(
+                "La fecha de la actuación no puede estar en el futuro.");
+        }
+
+
+        // =====================================================
+        // 6. NORMALIZAR TEXTO
+        // =====================================================
+
+        string titulo = model.Titulo.Trim();
+
+        if (string.IsNullOrWhiteSpace(titulo))
+        {
+            throw new InvalidOperationException(
+                "Debe indicar un título para la actuación.");
+        }
+
+        string? descripcion =
+            string.IsNullOrWhiteSpace(model.Descripcion)
+                ? null
+                : model.Descripcion.Trim();
+
+        string? resultado =
+            string.IsNullOrWhiteSpace(model.Resultado)
+                ? null
+                : model.Resultado.Trim();
+
+
+        // =====================================================
+        // 7. CREAR ACTUACIÓN
+        // =====================================================
+
+        var actuacion = new Actuacion
+        {
+            CasoId = model.CasoId,
+
+            TipoActuacionId =
+                model.TipoActuacionId.Value,
+
+            InstitucionId =
+                model.InstitucionId.Value,
+
+            UnidadOrganizativaId =
+                model.UnidadOrganizativaId,
+
+            FechaActuacion = fechaUtc,
+
+            Titulo = titulo,
+
+            Descripcion = descripcion,
+
+            Resultado = resultado
+        };
+
+
+        // =====================================================
+        // 8. PERSISTIR
+        // =====================================================
+
+        _dbContext.Actuaciones.Add(actuacion);
+
+        await _dbContext.SaveChangesAsync(
+            cancellationToken);
+
+        return actuacion.Id;
+    }
 
     // =========================================================
     // DOCUMENTOS
     // =========================================================
 
-    public async Task<IReadOnlyList<CasoDocumentoViewModel>>
-        GetDocumentosAsync(
+    public async Task<IReadOnlyList<CasoDocumentoViewModel>>GetDocumentosAsync(
             Guid casoId,
             CancellationToken cancellationToken = default)
     {
@@ -619,8 +785,7 @@ public class CasoService : ICasoService
     }
 
 
-    public async Task<IReadOnlyList<OpcionCatalogoViewModel>>
-        GetBarriosAsync(Guid distritoId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<OpcionCatalogoViewModel>>GetBarriosAsync(Guid distritoId, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Barrios
             .AsNoTracking()
@@ -1365,5 +1530,27 @@ public class CasoService : ICasoService
         return persona;
     }
 
+    private static DateTime ConvertirFechaActuacionAUtc(
+    DateTime fechaLocal)
+    {
+        /*
+         * datetime-local del navegador no incluye zona horaria.
+         *
+         * Por eso tratamos el valor como hora local de
+         * Guinea Ecuatorial y lo convertimos explícitamente
+         * a UTC antes de persistirlo.
+         */
+        DateTime fechaSinZona =
+            DateTime.SpecifyKind(
+                fechaLocal,
+                DateTimeKind.Unspecified);
 
+        TimeZoneInfo zonaHoraria =
+            TimeZoneInfo.FindSystemTimeZoneById(
+                "Africa/Malabo");
+
+        return TimeZoneInfo.ConvertTimeToUtc(
+            fechaSinZona,
+            zonaHoraria);
+    }
 }
