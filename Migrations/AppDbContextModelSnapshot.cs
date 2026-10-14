@@ -186,7 +186,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasIndex("UnidadOrganizativaId1");
 
-                    b.ToTable("PersonasInstituciones");
+                    b.ToTable("PersonasInstituciones", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.Actuacion", b =>
@@ -244,7 +244,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasIndex("CasoId", "FechaActuacion");
 
-                    b.ToTable("Actuaciones");
+                    b.ToTable("Actuaciones", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.ActuacionParticipante", b =>
@@ -266,7 +266,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasIndex("PersonaInstitucionId");
 
-                    b.ToTable("ActuacionesParticipantes");
+                    b.ToTable("ActuacionesParticipantes", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.ApplicationRole", b =>
@@ -433,7 +433,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasIndex("DistritoId");
 
-                    b.ToTable("Barrios");
+                    b.ToTable("Barrios", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.Caso", b =>
@@ -493,7 +493,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasIndex("FechaRegistro");
 
-                    b.ToTable("Casos");
+                    b.ToTable("Casos", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.CasoPresuntoAgresor", b =>
@@ -519,7 +519,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasIndex("PersonaId");
 
-                    b.ToTable("CasosPresuntosAgresores");
+                    b.ToTable("CasosPresuntosAgresores", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.CasoTipoViolencia", b =>
@@ -534,7 +534,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasIndex("TipoViolenciaId");
 
-                    b.ToTable("CasosTiposViolencia");
+                    b.ToTable("CasosTiposViolencia", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.CasoVictima", b =>
@@ -562,7 +562,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasIndex("PersonaId");
 
-                    b.ToTable("CasosVictimas");
+                    b.ToTable("CasosVictimas", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.Distrito", b =>
@@ -598,7 +598,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasIndex("ProvinciaId");
 
-                    b.ToTable("Distritos");
+                    b.ToTable("Distritos", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.DocumentoExpediente", b =>
@@ -685,7 +685,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasIndex("TipoDocumentoExpedienteId");
 
-                    b.ToTable("DocumentosExpediente");
+                    b.ToTable("DocumentosExpediente", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.EstadoCaso", b =>
@@ -722,7 +722,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EstadosCaso");
+                    b.ToTable("EstadosCaso", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.Institucion", b =>
@@ -764,7 +764,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasIndex("TipoInstitucionId");
 
-                    b.ToTable("Instituciones");
+                    b.ToTable("Instituciones", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.Permiso", b =>
@@ -800,7 +800,7 @@ namespace e_violenciagen.Migrations
                     b.HasIndex("Codigo")
                         .IsUnique();
 
-                    b.ToTable("Permisos");
+                    b.ToTable("Permisos", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.Persona", b =>
@@ -874,7 +874,7 @@ namespace e_violenciagen.Migrations
                     b.HasIndex("TipoDocumentoIdentidadId", "NumeroDocumento")
                         .IsUnique();
 
-                    b.ToTable("Personas");
+                    b.ToTable("Personas", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.Provincia", b =>
@@ -905,7 +905,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Provincias");
+                    b.ToTable("Provincias", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.RolPermiso", b =>
@@ -920,7 +920,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasIndex("PermisoId");
 
-                    b.ToTable("RolPermisos");
+                    b.ToTable("RolPermisos", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.TipoActuacion", b =>
@@ -954,7 +954,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TiposActuacion");
+                    b.ToTable("TiposActuacion", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.TipoDocumentoExpediente", b =>
@@ -988,7 +988,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TiposDocumentoExpediente");
+                    b.ToTable("TiposDocumentoExpediente", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.TipoDocumentoIdentidad", b =>
@@ -1022,7 +1022,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TiposDocumentoIdentidad");
+                    b.ToTable("TiposDocumentoIdentidad", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.TipoInstitucion", b =>
@@ -1056,7 +1056,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TiposInstitucion");
+                    b.ToTable("TiposInstitucion", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.TipoViolencia", b =>
@@ -1090,7 +1090,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TiposViolencia");
+                    b.ToTable("TiposViolencia", (string)null);
                 });
 
             modelBuilder.Entity("e_violenciagen.Models.UnidadOrganizativa", b =>
@@ -1133,7 +1133,7 @@ namespace e_violenciagen.Migrations
 
                     b.HasIndex("UnidadPadreId");
 
-                    b.ToTable("UnidadesOrganizativas");
+                    b.ToTable("UnidadesOrganizativas", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

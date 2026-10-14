@@ -259,6 +259,109 @@
 
                 <partial name="_Actuaciones" model="Model.Actuaciones" />
 
+                <div class="card shadow-sm mb-4">
+
+                    <div class="card-header d-flex
+                        justify-content-between
+                        align-items-center">
+
+                        <div>
+                            <h5 class="mb-0">
+                                Actuaciones institucionales
+                            </h5>
+
+                            <small class="text-muted">
+                                Intervenciones realizadas por las instituciones
+                                participantes en el expediente.
+                            </small>
+                        </div>
+
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#modalRegistrarActuacion">
+
+                            Registrar actuación
+
+                        </button>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        @if (Model.Actuaciones != null &&
+                             Model.Actuaciones.Any())
+                        {
+                            foreach (var actuacion in Model.Actuaciones)
+                            {
+                                <div class="border rounded p-3 mb-3">
+
+                                    <div class="d-flex
+                                        justify-content-between
+                                        align-items-start">
+
+                                        <div>
+                                            <strong>
+                                                @actuacion.Titulo
+                                            </strong>
+
+                                            <div class="text-muted small">
+                                                @actuacion.TipoActuacion
+                                            </div>
+                                        </div>
+
+                                        <span class="badge text-bg-light">
+                                            @actuacion.FechaActuacion
+                                        </span>
+
+                                    </div>
+
+                                    <div class="mt-2">
+                                        <strong>Institución:</strong>
+                                        @actuacion.Institucion
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        actuacion.UnidadOrganizativa))
+                                    {
+                                        <div>
+                                            <strong>Unidad:</strong>
+                                            @actuacion.UnidadOrganizativa
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        actuacion.Descripcion))
+                                    {
+                                        <p class="mt-2 mb-1">
+                                            @actuacion.Descripcion
+                                        </p>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        actuacion.Resultado))
+                                    {
+                                        <div class="mt-2">
+                                            <strong>Resultado:</strong>
+                                            @actuacion.Resultado
+                                        </div>
+                                    }
+
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-muted text-center py-4">
+
+                                Todavía no se han registrado actuaciones
+                                institucionales en este expediente.
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
             </div>
 
         </div>
@@ -428,6 +531,193 @@
 
 </div>
 
+<!-- =====================================================
+     MODAL: REGISTRAR ACTUACIÓN
+     ===================================================== -->
+<div class="modal fade" id="modalRegistrarActuacion" tabindex="-1" aria-labelledby="modalRegistrarActuacionLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog
+        modal-lg
+        modal-dialog-centered
+        modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <form asp-controller="Caso" asp-action="RegistrarActuacion" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="CasoId" value="@Model.Id" />
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title" id="modalRegistrarActuacionLabel">
+
+                        Registrar actuación institucional
+
+                    </h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row g-3">
+
+                        <!-- Tipo de actuación -->
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Tipo de actuación
+                            </label>
+
+                            <select name="TipoActuacionId" class="form-select" required>
+
+                                <option value="">
+                                    Seleccione...
+                                </option>
+
+                                @foreach (
+                                    var tipo in Model.TiposActuacion)
+                                {
+                                    <option value="@tipo.Id">
+                                        @tipo.Nombre
+                                    </option>
+                                }
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Fecha -->
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Fecha y hora
+                            </label>
+
+                            <input type="datetime-local" name="FechaActuacion" class="form-control" required />
+
+                        </div>
+
+
+                        <!-- Institución -->
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Institución
+                            </label>
+
+                            <select id="institucionActuacion" name="InstitucionId" class="form-select" required>
+
+                                <option value="">
+                                    Seleccione...
+                                </option>
+
+                                @foreach (var institucion in Model.Instituciones)
+                                {
+                                    <option value="@institucion.Id">
+                                        @institucion.Nombre
+                                    </option>
+                                }
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Unidad -->
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Unidad organizativa
+                            </label>
+
+                            <select id="unidadActuacion" name="UnidadOrganizativaId" class="form-select" disabled>
+
+                                <option value="">
+                                    Seleccione primero una institución
+                                </option>
+
+                            </select>
+
+                            <div class="form-text">
+                                Opcional.
+                            </div>
+
+                        </div>
+
+
+                        <!-- Título -->
+                        <div class="col-12">
+
+                            <label class="form-label">
+                                Título
+                            </label>
+
+                            <input type="text" name="Titulo" class="form-control" maxlength="200" required />
+
+                        </div>
+
+
+                        <!-- Descripción -->
+                        <div class="col-12">
+
+                            <label class="form-label">
+                                Descripción
+                            </label>
+
+                            <textarea name="Descripcion" class="form-control" rows="4" maxlength="4000">
+                            </textarea>
+
+                        </div>
+
+
+                        <!-- Resultado -->
+                        <div class="col-12">
+
+                            <label class="form-label">
+                                Resultado
+                            </label>
+
+                            <textarea name="Resultado" class="form-control" rows="3" maxlength="2000">
+                            </textarea>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+
+                        Cancelar
+
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+
+                        Registrar actuación
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 @section Styles {
     <link rel="stylesheet" href="~/css/casos.css" asp-append-version="true" />
 }
@@ -440,4 +730,104 @@
 
     <script src="~/js/casos/details.js" asp-append-version="true"></script>
     <script src="~/js/persona-selector.js" asp-append-version="true"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const institucionSelect =
+                document.getElementById("institucionActuacion");
+
+            const unidadSelect =
+                document.getElementById("unidadActuacion");
+
+            console.log("institucionSelect:", institucionSelect);
+            console.log("unidadSelect:", unidadSelect);
+
+            if (!institucionSelect || !unidadSelect) {
+                console.error("No se encontraron los select de institución/unidad.");
+                return;
+            }
+
+            institucionSelect.addEventListener("change", async function () {
+
+                const institucionId = institucionSelect.value;
+
+                console.log("Institución seleccionada:", institucionId);
+
+                // Reiniciamos siempre el select dependiente.
+                unidadSelect.innerHTML = "";
+                unidadSelect.disabled = true;
+
+                if (!institucionId) {
+                    unidadSelect.innerHTML =
+                        '<option value="">Seleccione primero una institución</option>';
+
+                    return;
+                }
+
+                unidadSelect.innerHTML =
+                    '<option value="">Cargando unidades...</option>';
+
+                try {
+
+                    const url =
+                        '@Url.Action("UnidadesPorInstitucion", "Caso")'
+                        + '?institucionId='
+                        + encodeURIComponent(institucionId);
+
+                    console.log("URL Fetch:", url);
+
+                    const response = await fetch(url);
+
+                    console.log("Status:", response.status);
+
+                    if (!response.ok) {
+                        throw new Error(
+                            "HTTP " + response.status);
+                    }
+
+                    const unidades = await response.json();
+
+                    console.log("Unidades recibidas:", unidades);
+
+                    unidadSelect.innerHTML = "";
+
+                    // La unidad es opcional.
+                    const opcionVacia =
+                        document.createElement("option");
+
+                    opcionVacia.value = "";
+                    opcionVacia.textContent = "Sin especificar";
+
+                    unidadSelect.appendChild(opcionVacia);
+
+                    unidades.forEach(function (unidad) {
+
+                        const option =
+                            document.createElement("option");
+
+                        option.value = unidad.id;
+                        option.textContent = unidad.nombre;
+
+                        unidadSelect.appendChild(option);
+                    });
+
+                    // IMPORTANTE:
+                    // se habilita después de obtener la respuesta.
+                    unidadSelect.disabled = false;
+
+                } catch (error) {
+
+                    console.error(
+                        "Error cargando unidades:",
+                        error);
+
+                    unidadSelect.innerHTML =
+                        '<option value="">No se pudieron cargar las unidades</option>';
+
+                    unidadSelect.disabled = true;
+                }
+            });
+        });
+    </script>
 }

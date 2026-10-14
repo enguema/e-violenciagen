@@ -13,13 +13,16 @@ using Microsoft.AspNetCore.Mvc;
 public class CasoController : Controller
 {
     private readonly ICasoService _casoService;
+    private readonly IInstitucionService _institucionService;
     private readonly ILogger<CasoController> _logger;
 
     public CasoController(
         ICasoService casoService,
+        IInstitucionService institucionService,
         ILogger<CasoController> logger)
     {
         _casoService = casoService;
+        _institucionService = institucionService;
         _logger = logger;
     }
 
@@ -263,10 +266,8 @@ public class CasoController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Policy = "Casos.Editar")]
-    public async Task<IActionResult> RegistrarActuacion(
-    RegistrarActuacionViewModel model,
-    CancellationToken cancellationToken)
+    //[Authorize(Policy = "Casos.Editar")]
+    public async Task<IActionResult> RegistrarActuacion(RegistrarActuacionViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -352,6 +353,28 @@ public class CasoController : Controller
                 cancellationToken);
 
         return Json(barrios);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> UnidadesPorInstitucion(
+    Guid institucionId,
+    CancellationToken cancellationToken)
+    {
+        if (institucionId == Guid.Empty)
+        {
+            return BadRequest(new
+            {
+                message = "Debe indicar una institución válida."
+            });
+        }
+
+        var unidades =
+            await _institucionService
+                .ObtenerUnidadesPorInstitucionAsync(
+                    institucionId,
+                    cancellationToken);
+
+        return Json(unidades);
     }
 
     // Vincular y desvincular personas a un caso

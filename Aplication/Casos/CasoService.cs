@@ -243,7 +243,301 @@ public class CasoService : ICasoService
     // EXPEDIENTE COMPLETO
     // =========================================================
 
-    public async Task<CasoDetailsViewModel?> GetDetailsAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<CasoDetailsViewModel?> GetDetailsAsync(
+    Guid id,
+    CancellationToken cancellationToken = default)
+    {
+        /*
+         * Primero obtenemos los datos propios del expediente.
+         *
+         * Seguimos utilizando proyección para evitar una gran
+         * cantidad de Include().
+         */
+        var model = await _dbContext.Casos
+            .AsNoTracking()
+            .Where(c => c.Id == id)
+            .Select(c => new CasoDetailsViewModel
+            {
+                Id = c.Id,
+                CodigoCaso = c.CodigoCaso,
+
+                Estado = c.EstadoCaso.Nombre,
+                CodigoEstado = c.EstadoCaso.Codigo,
+
+                FechaRegistro = c.FechaRegistro,
+                FechaHecho = c.FechaHecho,
+
+                Resumen = c.Resumen,
+                RelatoInicial = c.RelatoInicial,
+                LugarDescripcion = c.LugarDescripcion,
+
+                Barrio = c.BarrioHecho != null
+                    ? c.BarrioHecho.Nombre
+                    : null,
+
+                Distrito = c.BarrioHecho != null
+                    ? c.BarrioHecho.Distrito.Nombre
+                    : null,
+
+                Provincia = c.BarrioHecho != null
+                    ? c.BarrioHecho.Distrito.Provincia.Nombre
+                    : null,
+
+
+                // =================================================
+                // TIPOS DE VIOLENCIA
+                // =================================================
+
+                TiposViolencia = c.TiposViolencia
+                    .Where(x => x.TipoViolencia.Activo)
+                    .Select(x => x.TipoViolencia.Nombre)
+                    .OrderBy(x => x)
+                    .ToList(),
+
+
+                // =================================================
+                // VÍCTIMAS
+                // =================================================
+
+                Victimas = c.Victimas
+                    .Select(v => new CasoPersonaViewModel
+                    {
+                        PersonaId = v.PersonaId,
+
+                        NombreCompleto =
+                            v.Persona.Nombres + " " +
+                            v.Persona.Apellidos,
+
+                        TipoDocumento =
+                            v.Persona.TipoDocumentoIdentidad != null
+                                ? v.Persona.TipoDocumentoIdentidad.Nombre
+                                : null,
+
+                        NumeroDocumento =
+                            v.Persona.NumeroDocumento,
+
+                        FechaNacimiento =
+                            v.Persona.FechaNacimiento,
+
+                        Telefono =
+                            v.Persona.Telefono,
+
+                        EsPrincipal =
+                            v.EsVictimaPrincipal,
+
+                        RequiereProteccion =
+                            v.RequiereProteccion,
+
+                        Observaciones =
+                            v.Observaciones
+                    })
+                    .OrderByDescending(v => v.EsPrincipal)
+                    .ThenBy(v => v.NombreCompleto)
+                    .ToList(),
+
+
+                // =================================================
+                // PRESUNTOS AGRESORES
+                // =================================================
+
+                PresuntosAgresores = c.PresuntosAgresores
+                    .Select(a => new CasoPersonaViewModel
+                    {
+                        PersonaId = a.PersonaId,
+
+                        NombreCompleto =
+                            a.Persona.Nombres + " " +
+                            a.Persona.Apellidos,
+
+                        TipoDocumento =
+                            a.Persona.TipoDocumentoIdentidad != null
+                                ? a.Persona.TipoDocumentoIdentidad.Nombre
+                                : null,
+
+                        NumeroDocumento =
+                            a.Persona.NumeroDocumento,
+
+                        FechaNacimiento =
+                            a.Persona.FechaNacimiento,
+
+                        Telefono =
+                            a.Persona.Telefono,
+
+                        RelacionConVictima =
+                            a.RelacionConVictima,
+
+                        Observaciones =
+                            a.Observaciones
+                    })
+                    .OrderBy(a => a.NombreCompleto)
+                    .ToList(),
+
+
+                // =================================================
+                // ACTUACIONES
+                // =================================================
+
+                Actuaciones = c.Actuaciones
+                    .Where(a => a.Activo)
+                    .OrderByDescending(a => a.FechaActuacion)
+                    .Select(a => new CasoActuacionViewModel
+                    {
+                        Id = a.Id,
+
+                        FechaActuacion =
+                            a.FechaActuacion,
+
+                        TipoActuacion =
+                            a.TipoActuacion.Nombre,
+
+                        Titulo =
+                            a.Titulo,
+
+                        Descripcion =
+                            a.Descripcion,
+
+                        Resultado =
+                            a.Resultado,
+
+                        Institucion =
+                            a.Institucion.Nombre,
+
+                        UnidadOrganizativa =
+                            a.UnidadOrganizativa != null
+                                ? a.UnidadOrganizativa.Nombre
+                                : null,
+
+                        NumeroParticipantes =
+                            a.Participantes.Count(),
+
+                        NumeroDocumentos =
+                            a.Documentos.Count(d => d.Activo)
+                    })
+                    .ToList(),
+
+
+                // =================================================
+                // DOCUMENTOS
+                // =================================================
+
+                Documentos = c.Documentos
+                    .Where(d => d.Activo)
+                    .OrderByDescending(d => d.FechaIncorporacion)
+                    .Select(d => new CasoDocumentoViewModel
+                    {
+                        Id = d.Id,
+
+                        NombreOriginal =
+                            d.NombreOriginal,
+
+                        TipoDocumento =
+                            d.TipoDocumentoExpediente.Nombre,
+
+                        FechaDocumento =
+                            d.FechaDocumento,
+
+                        FechaIncorporacion =
+                            d.FechaIncorporacion,
+
+                        Titulo =
+                            d.Titulo,
+
+                        TipoMime =
+                            d.TipoMime,
+
+                        TamanoBytes =
+                            d.TamanoBytes,
+
+                        EsConfidencial =
+                            d.EsConfidencial,
+
+                        ActuacionId =
+                            d.ActuacionId,
+
+                        ActuacionTitulo =
+                            d.Actuacion != null
+                                ? d.Actuacion.Titulo
+                                : null
+                    })
+                    .ToList()
+            })
+            .SingleOrDefaultAsync(cancellationToken);
+
+
+        /*
+         * Si el caso no existe, terminamos aquí.
+         */
+        if (model is null)
+        {
+            return null;
+        }
+
+
+        // =========================================================
+        // CATÁLOGO: TIPOS DE ACTUACIÓN
+        // =========================================================
+
+        model.TiposActuacion = await _dbContext.TiposActuacion
+            .AsNoTracking()
+
+            // Si TipoActuacion tiene Activo, mantenemos solo activos.
+            .Where(x => x.Activo)
+
+            .OrderBy(x => x.Nombre)
+
+            .Select(x => new OpcionCatalogoViewModel
+            {
+                Id = x.Id,
+                Nombre = x.Nombre
+            })
+            .ToListAsync(cancellationToken);
+
+
+        // =========================================================
+        // CATÁLOGO: INSTITUCIONES
+        // =========================================================
+
+        model.Instituciones = await _dbContext.Instituciones
+            .AsNoTracking()
+
+            // Si Institucion hereda Activo desde BaseEntity.
+            .Where(x => x.Activo)
+
+            .OrderBy(x => x.Nombre)
+
+            .Select(x => new OpcionCatalogoViewModel
+            {
+                Id = x.Id,
+                Nombre = x.Nombre
+            })
+            .ToListAsync(cancellationToken);
+
+
+        // =========================================================
+        // CATÁLOGO: UNIDADES ORGANIZATIVAS
+        // =========================================================
+
+        /*model.UnidadesOrganizativas =
+            await _dbContext.UnidadesOrganizativas
+                .AsNoTracking()
+
+                .Where(x => x.Activo)
+
+                .OrderBy(x => x.Nombre)
+
+                .Select(x => new UnidadOrganizativaOpcionViewModel
+                {
+                    Id = x.Id,
+                    InstitucionId = x.InstitucionId,
+
+                    Nombre = x.Nombre
+                })
+                .ToListAsync(cancellationToken);*/
+
+
+        return model;
+    }
+    public async Task<CasoDetailsViewModel?> GetDetailsAsyncBORRAR(Guid id, CancellationToken cancellationToken = default)
     {
         /*
          * Utilizamos proyección en lugar de una enorme cadena
@@ -675,11 +969,178 @@ public class CasoService : ICasoService
         return actuacion.Id;
     }
 
+    public async Task<Guid> RegistrarActuacionAsyncBORRAR(
+    RegistrarActuacionViewModel model,
+    CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+
+        // =====================================================
+        // 1. VALIDAR CASO
+        // =====================================================
+
+        bool existeCaso = await _dbContext.Casos
+            .AnyAsync(
+                c => c.Id == model.CasoId,
+                cancellationToken);
+
+        if (!existeCaso)
+        {
+            throw new KeyNotFoundException(
+                "El caso indicado no existe.");
+        }
+
+
+        // =====================================================
+        // 2. VALIDAR TIPO DE ACTUACIÓN
+        // =====================================================
+
+        bool existeTipoActuacion =
+            await _dbContext.TiposActuacion
+                .AnyAsync(
+                    x => x.Id == model.TipoActuacionId!.Value,
+                    cancellationToken);
+
+        if (!existeTipoActuacion)
+        {
+            throw new InvalidOperationException(
+                "El tipo de actuación seleccionado no existe.");
+        }
+
+
+        // =====================================================
+        // 3. VALIDAR INSTITUCIÓN
+        // =====================================================
+
+        bool existeInstitucion =
+            await _dbContext.Instituciones
+                .AnyAsync(
+                    x => x.Id == model.InstitucionId!.Value,
+                    cancellationToken);
+
+        if (!existeInstitucion)
+        {
+            throw new InvalidOperationException(
+                "La institución seleccionada no existe.");
+        }
+
+
+        // =====================================================
+        // 4. VALIDAR UNIDAD ORGANIZATIVA
+        // =====================================================
+
+        if (model.UnidadOrganizativaId.HasValue)
+        {
+            /*
+             * No basta con verificar que exista la unidad.
+             *
+             * También tiene que pertenecer a la institución
+             * seleccionada.
+             */
+            bool unidadValida =
+                await _dbContext.UnidadesOrganizativas
+                    .AnyAsync(
+                        u =>
+                            u.Id == model.UnidadOrganizativaId.Value &&
+                            u.InstitucionId == model.InstitucionId.Value,
+                        cancellationToken);
+
+            if (!unidadValida)
+            {
+                throw new InvalidOperationException(
+                    "La unidad organizativa seleccionada no pertenece a la institución indicada.");
+            }
+        }
+
+
+        // =====================================================
+        // 5. VALIDAR FECHA
+        // =====================================================
+
+        DateTime fechaUtc =
+            ConvertirFechaActuacionAUtc(
+                model.FechaActuacion);
+
+        /*
+         * Una actuación representa algo que ya ocurrió.
+         *
+         * Permitimos un pequeño margen por diferencias
+         * entre relojes de equipos.
+         */
+        if (fechaUtc > DateTime.UtcNow.AddMinutes(5))
+        {
+            throw new InvalidOperationException(
+                "La fecha de la actuación no puede estar en el futuro.");
+        }
+
+
+        // =====================================================
+        // 6. NORMALIZAR TEXTO
+        // =====================================================
+
+        string titulo = model.Titulo.Trim();
+
+        if (string.IsNullOrWhiteSpace(titulo))
+        {
+            throw new InvalidOperationException(
+                "Debe indicar un título para la actuación.");
+        }
+
+        string? descripcion =
+            string.IsNullOrWhiteSpace(model.Descripcion)
+                ? null
+                : model.Descripcion.Trim();
+
+        string? resultado =
+            string.IsNullOrWhiteSpace(model.Resultado)
+                ? null
+                : model.Resultado.Trim();
+
+
+        // =====================================================
+        // 7. CREAR ACTUACIÓN
+        // =====================================================
+
+        var actuacion = new Actuacion
+        {
+            CasoId = model.CasoId,
+
+            TipoActuacionId =
+                model.TipoActuacionId.Value,
+
+            InstitucionId =
+                model.InstitucionId.Value,
+
+            UnidadOrganizativaId =
+                model.UnidadOrganizativaId,
+
+            FechaActuacion = fechaUtc,
+
+            Titulo = titulo,
+
+            Descripcion = descripcion,
+
+            Resultado = resultado
+        };
+
+
+        // =====================================================
+        // 8. PERSISTIR
+        // =====================================================
+
+        _dbContext.Actuaciones.Add(actuacion);
+
+        await _dbContext.SaveChangesAsync(
+            cancellationToken);
+
+        return actuacion.Id;
+    }
+
     // =========================================================
     // DOCUMENTOS
     // =========================================================
 
-    public async Task<IReadOnlyList<CasoDocumentoViewModel>>GetDocumentosAsync(
+    public async Task<IReadOnlyList<CasoDocumentoViewModel>> GetDocumentosAsync(
             Guid casoId,
             CancellationToken cancellationToken = default)
     {
@@ -785,7 +1246,7 @@ public class CasoService : ICasoService
     }
 
 
-    public async Task<IReadOnlyList<OpcionCatalogoViewModel>>GetBarriosAsync(Guid distritoId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<OpcionCatalogoViewModel>> GetBarriosAsync(Guid distritoId, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Barrios
             .AsNoTracking()

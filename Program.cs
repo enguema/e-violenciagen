@@ -30,6 +30,7 @@ builder.Services.AddScoped<ICasoService, CasoService>();
 builder.Services.AddScoped<IPersonaService, PersonaService>();
 builder.Services.AddScoped<IAuthorizationHandler, PermisoAuthorizationHandler>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IInstitucionService, InstitucionService>();
 
 // =========================================================
 // IDENTITY

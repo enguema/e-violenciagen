@@ -29,6 +29,9 @@ public class ActuacionConfiguration
         builder.Property(x => x.Resultado)
             .HasMaxLength(2000);
         
+        builder.Property(x => x.FechaActuacion)
+                .IsRequired();
+        
         // =====================================================
         // Por ahora omitimos configurar las propiedades obligatorias
         // =====================================================

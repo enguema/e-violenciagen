@@ -80,6 +80,5 @@ public class CasoDetailsViewModel
     public List<OpcionCatalogoViewModel> Instituciones { get; set; }
         = [];
 
-    public List<UnidadOrganizativaOpcionViewModel> UnidadesOrganizativas
-        { get; set; } = [];
+    //public List<UnidadOrganizativaOpcionViewModel> UnidadesOrganizativas { get; set; } = [];
 }
