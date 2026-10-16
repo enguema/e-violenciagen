@@ -14,7 +14,7 @@ public class ActuacionParticipanteConfiguration
         EntityTypeBuilder<ActuacionParticipante> builder)
     {
         // =====================================================
-        // CLAVE PRIMARIA COMPUESTA
+        // CLAVE PRIMARIA COMPUESTA: EVITAR DUPLICADOS
         // =====================================================
 
         builder.HasKey(x => new

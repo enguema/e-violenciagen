@@ -480,4 +480,107 @@ public class CasoController : Controller
             new { id = model.CasoId });
     }
 
+    //Agrear participante a una actuación
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = "Casos.Editar")]
+    public async Task<IActionResult> AgregarParticipanteActuacion(
+    AgregarParticipanteActuacionViewModel model,
+    CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            TempData["Error"] =
+                "Debe seleccionar un participante válido.";
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id = model.CasoId });
+        }
+
+        try
+        {
+            await _casoService.AgregarParticipanteActuacionAsync(
+                model.ActuacionId,
+                model.UsuarioId,
+                cancellationToken);
+
+            TempData["Success"] =
+                "El participante fue agregado correctamente a la actuación.";
+        }
+        catch (KeyNotFoundException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error al agregar el usuario {UsuarioId} a la actuación {ActuacionId}.",
+                model.UsuarioId,
+                model.ActuacionId);
+
+            TempData["Error"] =
+                "Se produjo un error al agregar el participante.";
+        }
+
+        return RedirectToAction(
+            nameof(Details),
+            new { id = model.CasoId });
+    }
+
+    //Quitar participante de una actuación
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = "Casos.Editar")]
+    public async Task<IActionResult> QuitarParticipanteActuacion(
+    QuitarParticipanteActuacionViewModel model,
+    CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            TempData["Error"] =
+                "No se pudo identificar correctamente al participante.";
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id = model.CasoId });
+        }
+
+        try
+        {
+            await _casoService.QuitarParticipanteActuacionAsync(
+                model.ActuacionId,
+                model.UsuarioId,
+                cancellationToken);
+
+            TempData["Success"] =
+                "El participante fue retirado correctamente de la actuación.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["Error"] = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error al retirar el usuario {UsuarioId} de la actuación {ActuacionId}.",
+                model.UsuarioId,
+                model.ActuacionId);
+
+            TempData["Error"] =
+                "Se produjo un error al retirar el participante.";
+        }
+
+        return RedirectToAction(
+            nameof(Details),
+            new { id = model.CasoId });
+    }
+
+    
 }

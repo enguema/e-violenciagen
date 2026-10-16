@@ -24,4 +24,8 @@ public class CasoActuacionViewModel
     public int NumeroParticipantes { get; set; }
 
     public int NumeroDocumentos { get; set; }
+    /// <summary>
+    /// Obtiene o establece la lista de participantes en la actuación.
+    /// </summary>
+    public List<ActuacionParticipanteViewModel> Participantes { get; set; } = [];
 }

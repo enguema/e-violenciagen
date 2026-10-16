@@ -9,7 +9,7 @@ namespace e_violenciagen.Aplication.Casos;
 /// </summary>
 public interface ICasoService
 {
-    
+
     Task<Guid> RegistrarActuacionAsync(
     RegistrarActuacionViewModel model,
     CancellationToken cancellationToken = default);
@@ -93,5 +93,15 @@ public interface ICasoService
     Task DesvincularPresuntoAgresorAsync(
         Guid casoId,
         Guid personaId,
+        CancellationToken cancellationToken = default);
+
+    Task AgregarParticipanteActuacionAsync(
+    Guid actuacionId,
+    Guid usuarioId,
+    CancellationToken cancellationToken = default);
+
+    Task QuitarParticipanteActuacionAsync(
+        Guid actuacionId,
+        Guid usuarioId,
         CancellationToken cancellationToken = default);
 }

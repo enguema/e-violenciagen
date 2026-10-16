@@ -415,7 +415,6 @@ public class CasoService : ICasoService
                     })
                     .ToList(),
 
-
                 // =================================================
                 // DOCUMENTOS
                 // =================================================
@@ -537,6 +536,7 @@ public class CasoService : ICasoService
 
         return model;
     }
+
     public async Task<CasoDetailsViewModel?> GetDetailsAsyncBORRAR(Guid id, CancellationToken cancellationToken = default)
     {
         /*
@@ -1822,6 +1822,147 @@ public class CasoService : ICasoService
         _dbContext.CasosPresuntosAgresores.Remove(relacion);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task AgregarParticipanteActuacionAsync(
+    Guid actuacionId,
+    Guid usuarioId,
+    CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(usuarioId.ToString()))
+        {
+            throw new InvalidOperationException(
+                "Debe seleccionar un participante.");
+        }
+
+
+        // =====================================================
+        // 1. OBTENER LA ACTUACIÓN
+        // =====================================================
+
+        var actuacion = await _dbContext.Actuaciones
+            .AsNoTracking()
+            .FirstOrDefaultAsync(
+                x => x.Id == actuacionId,
+                cancellationToken);
+
+        if (actuacion is null)
+        {
+            throw new KeyNotFoundException(
+                "La actuación indicada no existe.");
+        }
+
+
+        // =====================================================
+        // 2. OBTENER EL USUARIO
+        // =====================================================
+
+        var usuario = await _dbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(
+                x => x.Id == usuarioId,
+                cancellationToken);
+
+        if (usuario is null)
+        {
+            throw new InvalidOperationException(
+                "El usuario seleccionado no existe.");
+        }
+
+
+        // =====================================================
+        // 3. VALIDAR QUE EL USUARIO ESTÉ ACTIVO
+        // =====================================================
+
+        /*
+         * Utiliza aquí el nombre real de la propiedad
+         * de estado que tenga ApplicationUser.
+         */
+        if (!usuario.Activo)
+        {
+            throw new InvalidOperationException(
+                "No puede añadirse un usuario inactivo como participante.");
+        }
+
+
+        // =====================================================
+        // 4. VALIDAR INSTITUCIÓN
+        // =====================================================
+
+        if (usuario.InstitucionId != Guid.Empty || usuario.InstitucionId != actuacion.InstitucionId)
+        {
+            throw new InvalidOperationException(
+                "El usuario seleccionado no pertenece a la institución responsable de esta actuación.");
+        }
+
+        // =====================================================
+        // 5. EVITAR DUPLICADOS
+        // =====================================================
+
+        bool yaParticipa =
+            await _dbContext.ActuacionesParticipantes
+                .AnyAsync(
+                    x =>
+                        x.ActuacionId == actuacionId &&
+                        x.PersonaInstitucionId == usuarioId,
+                    cancellationToken);
+
+        if (yaParticipa)
+        {
+            throw new InvalidOperationException(
+                "El usuario seleccionado ya participa en esta actuación.");
+        }
+
+
+        // =====================================================
+        // 6. CREAR LA RELACIÓN
+        // =====================================================
+
+        var participante = new ActuacionParticipante
+        {
+            ActuacionId = actuacionId,
+            PersonaInstitucionId = usuarioId
+        };
+
+        _dbContext.ActuacionesParticipantes.Add(participante);
+
+        await _dbContext.SaveChangesAsync(
+            cancellationToken);
+    }
+
+    public async Task QuitarParticipanteActuacionAsync(
+    Guid actuacionId,
+    Guid usuarioId,
+    CancellationToken cancellationToken = default)
+    {
+        /*
+         * Buscamos la relación exacta.
+         *
+         * No eliminamos al usuario.
+         */
+        var participante =
+            await _dbContext.ActuacionesParticipantes
+                .FirstOrDefaultAsync(
+                    x =>
+                        x.ActuacionId == actuacionId &&
+                        x.PersonaInstitucionId == usuarioId,
+                    cancellationToken);
+
+        if (participante is null)
+        {
+            throw new InvalidOperationException(
+                "El usuario indicado no participa en esta actuación.");
+        }
+
+        /*
+         * Eliminamos únicamente la relación
+         * actuación ↔ profesional.
+         */
+        _dbContext.ActuacionesParticipantes.Remove(
+            participante);
+
+        await _dbContext.SaveChangesAsync(
+            cancellationToken);
     }
 
     //========== Métodos privados ==========

@@ -74,11 +74,11 @@ public class CasoDetailsViewModel
 
     public List<CasoDocumentoViewModel> Documentos { get; set; } = [];
 
-    public List<OpcionCatalogoViewModel> TiposActuacion { get; set; }
-        = [];
+    public List<OpcionCatalogoViewModel> TiposActuacion { get; set; }  = [];
 
-    public List<OpcionCatalogoViewModel> Instituciones { get; set; }
-        = [];
+    public List<OpcionCatalogoViewModel> Instituciones { get; set; } = [];
+
+    //public List<ActuacionParticipanteViewModel> Participantes { get; set; }= [];
 
     //public List<UnidadOrganizativaOpcionViewModel> UnidadesOrganizativas { get; set; } = [];
 }
