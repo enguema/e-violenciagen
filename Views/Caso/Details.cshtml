@@ -717,6 +717,97 @@
 
 </div>
 
+@*Modal para agregar participante*@
+<div class="modal fade"
+     id="modalAgregarParticipante"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <form asp-controller="Caso"
+                  asp-action="AgregarParticipanteActuacion"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="CasoId"
+                       value="@Model.Id" />
+
+                <input type="hidden"
+                       id="participanteActuacionId"
+                       name="ActuacionId" />
+
+                <div class="modal-header">
+
+                    <div>
+                        <h5 class="modal-title">
+                            Agregar participante
+                        </h5>
+
+                        <small class="text-muted"
+                               id="participanteActuacionTitulo">
+                        </small>
+                    </div>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <label class="form-label">
+                        Profesional institucional
+                    </label>
+
+                    <select id="participanteUsuarioId"
+                            name="UsuarioId"
+                            class="form-select"
+                            required
+                            disabled>
+
+                        <option value="">
+                            Seleccione una actuación
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Cancelar
+
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Agregar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 
 @section Styles {
     <link rel="stylesheet" href="~/css/casos.css" asp-append-version="true" />
@@ -828,6 +919,175 @@
                     unidadSelect.disabled = true;
                 }
             });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const modal =
+                document.getElementById("modalAgregarParticipante");
+
+            const actuacionIdInput =
+                document.getElementById("participanteActuacionId");
+
+            const titulo =
+                document.getElementById("participanteActuacionTitulo");
+
+            const usuarioSelect =
+                document.getElementById("participanteUsuarioId");
+
+            if (!modal ||
+                !actuacionIdInput ||
+                !usuarioSelect) {
+                return;
+            }
+
+
+            modal.addEventListener(
+                "show.bs.modal",
+                async function (event) {
+
+                    /*
+                     * Botón que provocó la apertura del modal.
+                     */
+                    const button = event.relatedTarget;
+
+                    if (!button) {
+                        return;
+                    }
+
+                    const actuacionId =
+                        button.getAttribute("data-actuacion-id");
+
+                    const actuacionTitulo =
+                        button.getAttribute("data-actuacion-titulo");
+
+
+                    // ==========================================
+                    // ESTABLECER ACTUACIÓN
+                    // ==========================================
+
+                    actuacionIdInput.value =
+                        actuacionId ?? "";
+
+                    if (titulo) {
+                        titulo.textContent =
+                            actuacionTitulo ?? "";
+                    }
+
+
+                    // ==========================================
+                    // ESTADO CARGANDO
+                    // ==========================================
+
+                    usuarioSelect.disabled = true;
+
+                    usuarioSelect.innerHTML =
+                        '<option value="">Cargando participantes...</option>';
+
+
+                    if (!actuacionId) {
+                        return;
+                    }
+
+
+                    try {
+
+                        const url =
+                            '@Url.Action(
+                                                    "ParticipantesDisponibles",
+                                                    "Caso")'
+                            + '?actuacionId='
+                            + encodeURIComponent(actuacionId);
+
+                        const response =
+                            await fetch(url);
+
+
+                        if (!response.ok) {
+                            throw new Error(
+                                "No se pudieron cargar los participantes.");
+                        }
+
+
+                        const usuarios =
+                            await response.json();
+
+
+                        usuarioSelect.innerHTML = "";
+
+
+                        // ======================================
+                        // SIN USUARIOS
+                        // ======================================
+
+                        if (usuarios.length === 0) {
+
+                            const option =
+                                document.createElement("option");
+
+                            option.value = "";
+                            option.textContent =
+                                "No hay profesionales disponibles";
+
+                            usuarioSelect.appendChild(option);
+
+                            usuarioSelect.disabled = true;
+
+                            return;
+                        }
+
+
+                        // ======================================
+                        // OPCIÓN INICIAL
+                        // ======================================
+
+                        const inicial =
+                            document.createElement("option");
+
+                        inicial.value = "";
+                        inicial.textContent =
+                            "Seleccione...";
+
+                        usuarioSelect.appendChild(inicial);
+
+
+                        // ======================================
+                        // USUARIOS
+                        // ======================================
+
+                        usuarios.forEach(usuario => {
+
+                            const option =
+                                document.createElement("option");
+
+                            option.value = usuario.id;
+
+                            option.textContent =
+                                usuario.unidadOrganizativa
+                                    ? usuario.nombreCompleto +
+                                    " — " +
+                                    usuario.unidadOrganizativa
+                                    : usuario.nombreCompleto;
+
+                            usuarioSelect.appendChild(option);
+                        });
+
+
+                        usuarioSelect.disabled = false;
+
+                    }
+                    catch (error) {
+
+                        console.error(error);
+
+                        usuarioSelect.innerHTML =
+                            '<option value="">Error al cargar profesionales</option>';
+
+                        usuarioSelect.disabled = true;
+                    }
+                });
         });
     </script>
 }

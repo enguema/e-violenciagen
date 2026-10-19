@@ -582,5 +582,33 @@ public class CasoController : Controller
             new { id = model.CasoId });
     }
 
-    
+    [HttpGet]
+    //[Authorize(Policy = "Casos.Editar")]
+    public async Task<IActionResult> ParticipantesDisponibles(
+    Guid actuacionId,
+    CancellationToken cancellationToken)
+    {
+        if (actuacionId == Guid.Empty)
+        {
+            return BadRequest();
+        }
+
+        try
+        {
+            var participantes =
+                await _casoService
+                    .ObtenerParticipantesDisponiblesAsync(
+                        actuacionId,
+                        cancellationToken);
+
+            return Ok(participantes);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new
+            {
+                message = ex.Message
+            });
+        }
+    }
 }

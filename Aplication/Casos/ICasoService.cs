@@ -104,4 +104,9 @@ public interface ICasoService
         Guid actuacionId,
         Guid usuarioId,
         CancellationToken cancellationToken = default);
+
+    Task<List<ParticipanteOpcionViewModel>>
+    ObtenerParticipantesDisponiblesAsync(
+        Guid actuacionId,
+        CancellationToken cancellationToken = default);
 }

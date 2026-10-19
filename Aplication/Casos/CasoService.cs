@@ -243,9 +243,7 @@ public class CasoService : ICasoService
     // EXPEDIENTE COMPLETO
     // =========================================================
 
-    public async Task<CasoDetailsViewModel?> GetDetailsAsync(
-    Guid id,
-    CancellationToken cancellationToken = default)
+    public async Task<CasoDetailsViewModel?> GetDetailsAsync(Guid id, CancellationToken cancellationToken = default)
     {
         /*
          * Primero obtenemos los datos propios del expediente.
@@ -1963,6 +1961,78 @@ public class CasoService : ICasoService
 
         await _dbContext.SaveChangesAsync(
             cancellationToken);
+    }
+
+    public async Task<List<ParticipanteOpcionViewModel>>
+    ObtenerParticipantesDisponiblesAsync(
+        Guid actuacionId,
+        CancellationToken cancellationToken = default)
+    {
+        // =====================================================
+        // 1. OBTENER ACTUACIÓN
+        // =====================================================
+
+        var actuacion =
+            await _dbContext.Actuaciones
+                .AsNoTracking()
+                .Where(x => x.Id == actuacionId)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.InstitucionId
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+
+        if (actuacion is null)
+        {
+            throw new KeyNotFoundException(
+                "La actuación indicada no existe.");
+        }
+
+
+        // =====================================================
+        // 2. OBTENER LOS USUARIOS QUE YA PARTICIPAN
+        // =====================================================
+
+        var participantesActuales =
+            _dbContext.ActuacionesParticipantes
+                .Where(x => x.ActuacionId == actuacionId)
+                .Select(x => x.PersonaInstitucionId);
+
+
+        // =====================================================
+        // 3. CANDIDATOS
+        // =====================================================
+
+        return await _dbContext.Users
+            .AsNoTracking()
+
+            /*
+             * Solo usuarios activos de la institución
+             * responsable de la actuación.
+             */
+            .Where(u =>
+                u.Activo &&
+                u.InstitucionId == actuacion.InstitucionId &&
+                !participantesActuales.Contains(u.Id))
+
+            .OrderBy(u => u.Nombre)
+            .ThenBy(u => u.Apellidos)
+
+            .Select(u => new ParticipanteOpcionViewModel
+            {
+                Id = u.Id,
+
+                NombreCompleto =
+                    u.Nombre + " " + u.Apellidos,
+
+                UnidadOrganizativa =
+                    u.UnidadOrganizativa != null
+                        ? u.UnidadOrganizativa.Nombre
+                        : null
+            })
+
+            .ToListAsync(cancellationToken);
     }
 
     //========== Métodos privados ==========
