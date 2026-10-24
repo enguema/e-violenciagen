@@ -257,7 +257,7 @@
             <div id="actuacionesContainer">
 
                 @*<partial name="_Actuaciones" model="Model.Actuaciones" />*@
-                
+
                 @await Html.PartialAsync(
                 "_Actuaciones",
                 new e_violenciagen.ViewModels.Casos.ActuacionesSeccionViewModel
@@ -913,6 +913,202 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
+            const modal = document.getElementById("modalAgregarParticipante");
+            const actuacionIdInput = document.getElementById("participanteActuacionId");
+            const titulo = document.getElementById("participanteActuacionTitulo");
+            const usuarioSelect = document.getElementById("participanteUsuarioId");
+
+            console.log("Modal participante:", modal);
+            console.log("Input actuación:", actuacionIdInput);
+            console.log("Select usuario:", usuarioSelect);
+
+            if (!modal || !actuacionIdInput || !usuarioSelect) {
+                console.error(
+                    "No se encontraron los elementos necesarios del modal de participantes."
+                );
+                return;
+            }
+
+            modal.addEventListener("show.bs.modal", async function (event) {
+
+                console.log("Abriendo modal de participante...");
+
+                const button = event.relatedTarget;
+
+                console.log("Botón origen:", button);
+
+                if (!button) {
+                    console.error(
+                        "No se pudo identificar el botón que abrió el modal."
+                    );
+                    return;
+                }
+
+                const actuacionId =
+                    button.getAttribute("data-actuacion-id");
+
+                const actuacionTitulo =
+                    button.getAttribute("data-actuacion-titulo");
+
+                console.log("ActuacionId:", actuacionId);
+                console.log("Título:", actuacionTitulo);
+
+                actuacionIdInput.value = actuacionId || "";
+
+                if (titulo) {
+                    titulo.textContent = actuacionTitulo || "";
+                }
+
+                // Estado inicial
+                usuarioSelect.disabled = true;
+                usuarioSelect.innerHTML =
+                    '<option value="">Cargando profesionales...</option>';
+
+                if (!actuacionId) {
+                    console.error(
+                        "El botón no contiene data-actuacion-id."
+                    );
+
+                    usuarioSelect.innerHTML =
+                        '<option value="">Actuación no válida</option>';
+
+                    return;
+                }
+
+                try {
+
+                    const url =
+                        '@Url.Action("ParticipantesDisponibles", "Caso")'
+                        + '?actuacionId='
+                        + encodeURIComponent(actuacionId);
+
+                    console.log("URL participantes:", url);
+
+                    const response = await fetch(url);
+
+                    console.log(
+                        "Estado HTTP participantes:",
+                        response.status
+                    );
+
+                    if (!response.ok) {
+
+                        const texto = await response.text();
+
+                        console.error(
+                            "Respuesta del servidor:",
+                            texto
+                        );
+
+                        throw new Error(
+                            "HTTP " + response.status
+                        );
+                    }
+
+                    const usuarios = await response.json();
+
+                    console.log(
+                        "Usuarios recibidos:",
+                        usuarios
+                    );
+
+                    usuarioSelect.innerHTML = "";
+
+                    // ==========================================
+                    // NO HAY PROFESIONALES DISPONIBLES
+                    // ==========================================
+
+                    if (!usuarios || usuarios.length === 0) {
+
+                        const option =
+                            document.createElement("option");
+
+                        option.value = "";
+                        option.textContent =
+                            "No hay profesionales disponibles";
+
+                        usuarioSelect.appendChild(option);
+
+                        /*
+                         * Lo dejamos habilitado temporalmente
+                         * para que sea evidente que la consulta
+                         * funcionó pero no encontró candidatos.
+                         */
+                        usuarioSelect.disabled = false;
+
+                        console.warn(
+                            "El endpoint respondió correctamente, pero no encontró profesionales."
+                        );
+
+                        return;
+                    }
+
+                    // ==========================================
+                    // OPCIÓN INICIAL
+                    // ==========================================
+
+                    const inicial =
+                        document.createElement("option");
+
+                    inicial.value = "";
+                    inicial.textContent = "Seleccione...";
+
+                    usuarioSelect.appendChild(inicial);
+
+                    // ==========================================
+                    // CARGAR PROFESIONALES
+                    // ==========================================
+
+                    usuarios.forEach(function (usuario) {
+
+                        const option =
+                            document.createElement("option");
+
+                        option.value = usuario.id;
+
+                        if (usuario.unidadOrganizativa) {
+
+                            option.textContent =
+                                usuario.nombreCompleto
+                                + " — "
+                                + usuario.unidadOrganizativa;
+
+                        } else {
+
+                            option.textContent =
+                                usuario.nombreCompleto;
+                        }
+
+                        usuarioSelect.appendChild(option);
+                    });
+
+                    usuarioSelect.disabled = false;
+
+                    console.log(
+                        "Select habilitado. Profesionales:",
+                        usuarios.length
+                    );
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Error cargando participantes:",
+                        error
+                    );
+
+                    usuarioSelect.innerHTML =
+                        '<option value="">Error al cargar profesionales</option>';
+
+                    usuarioSelect.disabled = true;
+                }
+            });
+        });
+    </script>
+
+    @*<script>
+        document.addEventListener("DOMContentLoaded", function () {
+
             const modal =
                 document.getElementById("modalAgregarParticipante");
 
@@ -1077,5 +1273,5 @@
                     }
                 });
         });
-    </script>
+    </script>*@
 }
