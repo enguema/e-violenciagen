@@ -146,7 +146,6 @@
             </div>
         </div>
 
-
         <div class="col-sm-6 col-xl-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
@@ -257,7 +256,15 @@
 
             <div id="actuacionesContainer">
 
-                <partial name="_Actuaciones" model="Model.Actuaciones" />
+                @*<partial name="_Actuaciones" model="Model.Actuaciones" />*@
+                
+                @await Html.PartialAsync(
+                "_Actuaciones",
+                new e_violenciagen.ViewModels.Casos.ActuacionesSeccionViewModel
+                {
+                    CasoId = Model.Id,
+                    Actuaciones = Model.Actuaciones
+                })
 
                 <div class="card shadow-sm mb-4">
 
@@ -718,28 +725,19 @@
 </div>
 
 @*Modal para agregar participante*@
-<div class="modal fade"
-     id="modalAgregarParticipante"
-     tabindex="-1"
-     aria-hidden="true">
+<div class="modal fade" id="modalAgregarParticipante" tabindex="-1" aria-hidden="true">
 
     <div class="modal-dialog modal-dialog-centered">
 
         <div class="modal-content">
 
-            <form asp-controller="Caso"
-                  asp-action="AgregarParticipanteActuacion"
-                  method="post">
+            <form asp-controller="Caso" asp-action="AgregarParticipanteActuacion" method="post">
 
                 @Html.AntiForgeryToken()
 
-                <input type="hidden"
-                       name="CasoId"
-                       value="@Model.Id" />
+                <input type="hidden" name="CasoId" value="@Model.Id" />
 
-                <input type="hidden"
-                       id="participanteActuacionId"
-                       name="ActuacionId" />
+                <input type="hidden" id="participanteActuacionId" name="ActuacionId" />
 
                 <div class="modal-header">
 
@@ -748,14 +746,11 @@
                             Agregar participante
                         </h5>
 
-                        <small class="text-muted"
-                               id="participanteActuacionTitulo">
+                        <small class="text-muted" id="participanteActuacionTitulo">
                         </small>
                     </div>
 
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal">
                     </button>
 
                 </div>
@@ -766,11 +761,7 @@
                         Profesional institucional
                     </label>
 
-                    <select id="participanteUsuarioId"
-                            name="UsuarioId"
-                            class="form-select"
-                            required
-                            disabled>
+                    <select id="participanteUsuarioId" name="UsuarioId" class="form-select" required disabled>
 
                         <option value="">
                             Seleccione una actuación
@@ -782,16 +773,13 @@
 
                 <div class="modal-footer">
 
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
 
                         Cancelar
 
                     </button>
 
-                    <button type="submit"
-                            class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary">
 
                         Agregar
 
@@ -996,8 +984,8 @@
 
                         const url =
                             '@Url.Action(
-                                                    "ParticipantesDisponibles",
-                                                    "Caso")'
+                                                                                                            "ParticipantesDisponibles",
+                                                                                                            "Caso")'
                             + '?actuacionId='
                             + encodeURIComponent(actuacionId);
 

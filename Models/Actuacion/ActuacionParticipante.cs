@@ -22,7 +22,8 @@ public class ActuacionParticipante
     // PERSONA / INSTITUCIÓN
     // =========================================================
 
-    public Guid PersonaInstitucionId { get; set; }
+    public Guid UsuarioId { get; set; }
+    public ApplicationUser Usuario { get; set; } = null!;
 
     public PersonaInstitucion PersonaInstitucion { get; set; } = null!;
 

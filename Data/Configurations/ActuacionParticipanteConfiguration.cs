@@ -20,7 +20,7 @@ public class ActuacionParticipanteConfiguration
         builder.HasKey(x => new
         {
             x.ActuacionId,
-            x.PersonaInstitucionId
+            x.UsuarioId
         });
 
 
@@ -40,7 +40,7 @@ public class ActuacionParticipanteConfiguration
 
         builder.HasOne(x => x.PersonaInstitucion)
             .WithMany(x => x.ParticipacionesActuaciones)
-            .HasForeignKey(x => x.PersonaInstitucionId)
+            .HasForeignKey(x => x.UsuarioId)
             .OnDelete(DeleteBehavior.Restrict);
 
 
@@ -52,6 +52,6 @@ public class ActuacionParticipanteConfiguration
          * Facilita localizar todas las actuaciones
          * en las que participó un profesional concreto.
          */
-        builder.HasIndex(x => x.PersonaInstitucionId);
+        builder.HasIndex(x => x.UsuarioId);
     }
 }

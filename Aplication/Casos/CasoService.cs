@@ -409,7 +409,31 @@ public class CasoService : ICasoService
                             a.Participantes.Count(),
 
                         NumeroDocumentos =
-                            a.Documentos.Count(d => d.Activo)
+                            a.Documentos.Count(d => d.Activo),
+
+                        // =============================================
+                        // PARTICIPANTES DE ESTA ACTUACIÓN
+                        // =============================================
+
+                        Participantes = a.Participantes
+                    .OrderBy(p => p.Usuario.Nombre)
+                    .ThenBy(p => p.Usuario.Apellidos)
+                    .Select(p => new ActuacionParticipanteViewModel
+                    {
+                        //Id = p.Id,
+
+                        //UsuarioId = p.UsuarioId,
+
+                        NombreCompleto =
+                            p.Usuario.Nombre + " " +
+                            p.Usuario.Apellidos,
+
+                        UnidadOrganizativa =
+                            p.Usuario.UnidadOrganizativa != null
+                                ? p.Usuario.UnidadOrganizativa.Nombre
+                                : null
+                    })
+                    .ToList()
                     })
                     .ToList(),
 
@@ -1902,7 +1926,7 @@ public class CasoService : ICasoService
                 .AnyAsync(
                     x =>
                         x.ActuacionId == actuacionId &&
-                        x.PersonaInstitucionId == usuarioId,
+                        x.UsuarioId == usuarioId,
                     cancellationToken);
 
         if (yaParticipa)
@@ -1919,7 +1943,7 @@ public class CasoService : ICasoService
         var participante = new ActuacionParticipante
         {
             ActuacionId = actuacionId,
-            PersonaInstitucionId = usuarioId
+            UsuarioId = usuarioId
         };
 
         _dbContext.ActuacionesParticipantes.Add(participante);
@@ -1943,7 +1967,7 @@ public class CasoService : ICasoService
                 .FirstOrDefaultAsync(
                     x =>
                         x.ActuacionId == actuacionId &&
-                        x.PersonaInstitucionId == usuarioId,
+                        x.UsuarioId == usuarioId,
                     cancellationToken);
 
         if (participante is null)
@@ -1997,7 +2021,7 @@ public class CasoService : ICasoService
         var participantesActuales =
             _dbContext.ActuacionesParticipantes
                 .Where(x => x.ActuacionId == actuacionId)
-                .Select(x => x.PersonaInstitucionId);
+                .Select(x => x.UsuarioId);
 
 
         // =====================================================
