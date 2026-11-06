@@ -913,6 +913,356 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
+            const actuacionIdInput =
+                document.getElementById("participanteActuacionId");
+
+            const tituloActuacion =
+                document.getElementById("participanteActuacionTitulo");
+
+            const usuarioSelect =
+                document.getElementById("participanteUsuarioId");
+
+
+            console.log(
+                "Inicializando gestión de participantes..."
+            );
+
+            console.log(
+                "actuacionIdInput:",
+                actuacionIdInput
+            );
+
+            console.log(
+                "usuarioSelect:",
+                usuarioSelect
+            );
+
+
+            if (!actuacionIdInput ||
+                !usuarioSelect) {
+
+                console.error(
+                    "No se encontraron los controles del modal de participantes."
+                );
+
+                return;
+            }
+
+
+            /*
+             * =====================================================
+             * DELEGACIÓN DE EVENTOS
+             * =====================================================
+             *
+             * Escuchamos los clicks desde document.
+             *
+             * Esto permite que funcione incluso si los botones
+             * .btn-agregar-participante son creados posteriormente
+             * mediante AJAX, partials o details.js.
+             */
+            document.addEventListener(
+                "click",
+                async function (event) {
+
+                    /*
+                     * event.target puede ser:
+                     *
+                     * - el propio botón
+                     * - un <i> dentro del botón
+                     * - un <span>
+                     *
+                     * closest() encuentra el botón correcto.
+                     */
+                    const boton =
+                        event.target.closest(
+                            ".btn-agregar-participante"
+                        );
+
+
+                    /*
+                     * Si el click no pertenece a uno de nuestros
+                     * botones, ignoramos el evento.
+                     */
+                    if (!boton) {
+                        return;
+                    }
+
+
+                    console.log(
+                        "CLICK detectado en Agregar participante"
+                    );
+
+
+                    // =================================================
+                    // DATOS DE LA ACTUACIÓN
+                    // =================================================
+
+                    const actuacionId =
+                        boton.dataset.actuacionId;
+
+                    const actuacionTitulo =
+                        boton.dataset.actuacionTitulo;
+
+
+                    console.log(
+                        "ActuacionId:",
+                        actuacionId
+                    );
+
+                    console.log(
+                        "ActuacionTitulo:",
+                        actuacionTitulo
+                    );
+
+
+                    // =================================================
+                    // VALIDACIÓN
+                    // =================================================
+
+                    if (!actuacionId) {
+
+                        console.error(
+                            "El botón no contiene data-actuacion-id."
+                        );
+
+                        usuarioSelect.disabled = true;
+
+                        usuarioSelect.innerHTML =
+                            '<option value="">Actuación no válida</option>';
+
+                        return;
+                    }
+
+
+                    // =================================================
+                    // PREPARAR FORMULARIO
+                    // =================================================
+
+                    actuacionIdInput.value =
+                        actuacionId;
+
+
+                    if (tituloActuacion) {
+
+                        tituloActuacion.textContent =
+                            actuacionTitulo ?? "";
+                    }
+
+
+                    usuarioSelect.disabled = true;
+
+                    usuarioSelect.innerHTML =
+                        '<option value="">Cargando profesionales...</option>';
+
+
+                    try {
+
+                        // =============================================
+                        // CONSTRUIR URL
+                        // =============================================
+
+                        const url =
+                            '@Url.Action("ParticipantesDisponibles", "Caso")'
+                            + '?actuacionId='
+                            + encodeURIComponent(
+                                actuacionId
+                            );
+
+
+                        console.log(
+                            "FETCH:",
+                            url
+                        );
+
+
+                        // =============================================
+                        // PETICIÓN
+                        // =============================================
+
+                        const response =
+                            await fetch(
+                                url,
+                                {
+                                    method: "GET",
+                                    headers: {
+                                        "Accept": "application/json"
+                                    }
+                                }
+                            );
+
+
+                        console.log(
+                            "HTTP STATUS:",
+                            response.status
+                        );
+
+
+                        if (!response.ok) {
+
+                            const texto =
+                                await response.text();
+
+                            console.error(
+                                "Respuesta del servidor:",
+                                texto
+                            );
+
+                            throw new Error(
+                                "HTTP "
+                                + response.status
+                            );
+                        }
+
+
+                        // =============================================
+                        // RESPUESTA JSON
+                        // =============================================
+
+                        const usuarios =
+                            await response.json();
+
+
+                        console.log(
+                            "Usuarios recibidos:",
+                            usuarios
+                        );
+
+
+                        usuarioSelect.innerHTML = "";
+
+
+                        // =============================================
+                        // SIN PROFESIONALES
+                        // =============================================
+
+                        if (!Array.isArray(usuarios) ||
+                            usuarios.length === 0) {
+
+                            const option =
+                                document.createElement(
+                                    "option"
+                                );
+
+                            option.value = "";
+
+                            option.textContent =
+                                "No hay profesionales disponibles";
+
+
+                            usuarioSelect.appendChild(
+                                option
+                            );
+
+
+                            /*
+                             * Lo dejamos habilitado para que quede
+                             * claro que la consulta sí se realizó.
+                             */
+                            usuarioSelect.disabled =
+                                false;
+
+
+                            console.warn(
+                                "La consulta funcionó, pero no devolvió profesionales."
+                            );
+
+                            return;
+                        }
+
+
+                        // =============================================
+                        // OPCIÓN INICIAL
+                        // =============================================
+
+                        const inicial =
+                            document.createElement(
+                                "option"
+                            );
+
+                        inicial.value = "";
+
+                        inicial.textContent =
+                            "Seleccione...";
+
+
+                        usuarioSelect.appendChild(
+                            inicial
+                        );
+
+
+                        // =============================================
+                        // PROFESIONALES
+                        // =============================================
+
+                        usuarios.forEach(
+                            function (usuario) {
+
+                                const option =
+                                    document.createElement(
+                                        "option"
+                                    );
+
+
+                                option.value =
+                                    usuario.id;
+
+
+                                if (
+                                    usuario.unidadOrganizativa
+                                ) {
+
+                                    option.textContent =
+                                        usuario.nombreCompleto
+                                        + " — "
+                                        + usuario.unidadOrganizativa;
+
+                                } else {
+
+                                    option.textContent =
+                                        usuario.nombreCompleto;
+                                }
+
+
+                                usuarioSelect.appendChild(
+                                    option
+                                );
+                            }
+                        );
+
+
+                        usuarioSelect.disabled =
+                            false;
+
+
+                        console.log(
+                            "Profesionales cargados correctamente:",
+                            usuarios.length
+                        );
+
+                    }
+                    catch (error) {
+
+                        console.error(
+                            "ERROR cargando participantes:",
+                            error
+                        );
+
+
+                        usuarioSelect.innerHTML =
+                            '<option value="">Error al cargar profesionales</option>';
+
+
+                        usuarioSelect.disabled =
+                            true;
+                    }
+                }
+            );
+        });
+    </script>
+
+    @*<script>
+        document.addEventListener("DOMContentLoaded", function () {
+
             const modal = document.getElementById("modalAgregarParticipante");
             const actuacionIdInput = document.getElementById("participanteActuacionId");
             const titulo = document.getElementById("participanteActuacionTitulo");
@@ -1103,175 +1453,6 @@
                     usuarioSelect.disabled = true;
                 }
             });
-        });
-    </script>
-
-    @*<script>
-        document.addEventListener("DOMContentLoaded", function () {
-
-            const modal =
-                document.getElementById("modalAgregarParticipante");
-
-            const actuacionIdInput =
-                document.getElementById("participanteActuacionId");
-
-            const titulo =
-                document.getElementById("participanteActuacionTitulo");
-
-            const usuarioSelect =
-                document.getElementById("participanteUsuarioId");
-
-            if (!modal ||
-                !actuacionIdInput ||
-                !usuarioSelect) {
-                return;
-            }
-
-
-            modal.addEventListener(
-                "show.bs.modal",
-                async function (event) {
-
-                    /*
-                     * Botón que provocó la apertura del modal.
-                     */
-                    const button = event.relatedTarget;
-
-                    if (!button) {
-                        return;
-                    }
-
-                    const actuacionId =
-                        button.getAttribute("data-actuacion-id");
-
-                    const actuacionTitulo =
-                        button.getAttribute("data-actuacion-titulo");
-
-
-                    // ==========================================
-                    // ESTABLECER ACTUACIÓN
-                    // ==========================================
-
-                    actuacionIdInput.value =
-                        actuacionId ?? "";
-
-                    if (titulo) {
-                        titulo.textContent =
-                            actuacionTitulo ?? "";
-                    }
-
-
-                    // ==========================================
-                    // ESTADO CARGANDO
-                    // ==========================================
-
-                    usuarioSelect.disabled = true;
-
-                    usuarioSelect.innerHTML =
-                        '<option value="">Cargando participantes...</option>';
-
-
-                    if (!actuacionId) {
-                        return;
-                    }
-
-
-                    try {
-
-                        const url =
-                            '@Url.Action(
-                                                                                                            "ParticipantesDisponibles",
-                                                                                                            "Caso")'
-                            + '?actuacionId='
-                            + encodeURIComponent(actuacionId);
-
-                        const response =
-                            await fetch(url);
-
-
-                        if (!response.ok) {
-                            throw new Error(
-                                "No se pudieron cargar los participantes.");
-                        }
-
-
-                        const usuarios =
-                            await response.json();
-
-
-                        usuarioSelect.innerHTML = "";
-
-
-                        // ======================================
-                        // SIN USUARIOS
-                        // ======================================
-
-                        if (usuarios.length === 0) {
-
-                            const option =
-                                document.createElement("option");
-
-                            option.value = "";
-                            option.textContent =
-                                "No hay profesionales disponibles";
-
-                            usuarioSelect.appendChild(option);
-
-                            usuarioSelect.disabled = true;
-
-                            return;
-                        }
-
-
-                        // ======================================
-                        // OPCIÓN INICIAL
-                        // ======================================
-
-                        const inicial =
-                            document.createElement("option");
-
-                        inicial.value = "";
-                        inicial.textContent =
-                            "Seleccione...";
-
-                        usuarioSelect.appendChild(inicial);
-
-
-                        // ======================================
-                        // USUARIOS
-                        // ======================================
-
-                        usuarios.forEach(usuario => {
-
-                            const option =
-                                document.createElement("option");
-
-                            option.value = usuario.id;
-
-                            option.textContent =
-                                usuario.unidadOrganizativa
-                                    ? usuario.nombreCompleto +
-                                    " — " +
-                                    usuario.unidadOrganizativa
-                                    : usuario.nombreCompleto;
-
-                            usuarioSelect.appendChild(option);
-                        });
-
-
-                        usuarioSelect.disabled = false;
-
-                    }
-                    catch (error) {
-
-                        console.error(error);
-
-                        usuarioSelect.innerHTML =
-                            '<option value="">Error al cargar profesionales</option>';
-
-                        usuarioSelect.disabled = true;
-                    }
-                });
         });
     </script>*@
 }

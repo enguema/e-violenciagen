@@ -126,9 +126,7 @@ public class CasoController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AgregarVictima(
-    AgregarVictimaViewModel model,
-    CancellationToken cancellationToken)
+    public async Task<IActionResult> AgregarVictima(AgregarVictimaViewModel model, CancellationToken cancellationToken)
     {
         /*
          * Necesitamos siempre el CasoId para poder regresar
@@ -180,9 +178,7 @@ public class CasoController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AgregarPresuntoAgresor(
-    AgregarPresuntoAgresorViewModel model,
-    CancellationToken cancellationToken)
+    public async Task<IActionResult> AgregarPresuntoAgresor(AgregarPresuntoAgresorViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -356,9 +352,7 @@ public class CasoController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> UnidadesPorInstitucion(
-    Guid institucionId,
-    CancellationToken cancellationToken)
+    public async Task<IActionResult> UnidadesPorInstitucion(Guid institucionId, CancellationToken cancellationToken)
     {
         if (institucionId == Guid.Empty)
         {
@@ -380,9 +374,7 @@ public class CasoController : Controller
     // Vincular y desvincular personas a un caso
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DesvincularVictima(
-    DesvincularVictimaViewModel model,
-    CancellationToken cancellationToken)
+    public async Task<IActionResult> DesvincularVictima(DesvincularVictimaViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -431,9 +423,7 @@ public class CasoController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DesvincularPresuntoAgresor(
-    DesvincularPresuntoAgresorViewModel model,
-    CancellationToken cancellationToken)
+    public async Task<IActionResult> DesvincularPresuntoAgresor(DesvincularPresuntoAgresorViewModel model, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
@@ -483,7 +473,7 @@ public class CasoController : Controller
     //Agrear participante a una actuación
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Policy = "Casos.Editar")]
+    //[Authorize(Policy = "Casos.Editar")]
     public async Task<IActionResult> AgregarParticipanteActuacion(
     AgregarParticipanteActuacionViewModel model,
     CancellationToken cancellationToken)

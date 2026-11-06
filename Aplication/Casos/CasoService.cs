@@ -787,10 +787,7 @@ public class CasoService : ICasoService
     // ACTUACIONES
     // =========================================================
 
-    public async Task<IReadOnlyList<CasoActuacionViewModel>>
-        GetActuacionesAsync(
-            Guid casoId,
-            CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<CasoActuacionViewModel>>GetActuacionesAsync(Guid casoId, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Actuaciones
             .AsNoTracking()
@@ -824,9 +821,7 @@ public class CasoService : ICasoService
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Guid> RegistrarActuacionAsync(
-    RegistrarActuacionViewModel model,
-    CancellationToken cancellationToken = default)
+    public async Task<Guid> RegistrarActuacionAsync(RegistrarActuacionViewModel model, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(model);
 
@@ -991,9 +986,7 @@ public class CasoService : ICasoService
         return actuacion.Id;
     }
 
-    public async Task<Guid> RegistrarActuacionAsyncBORRAR(
-    RegistrarActuacionViewModel model,
-    CancellationToken cancellationToken = default)
+    public async Task<Guid> RegistrarActuacionAsyncBORRAR(RegistrarActuacionViewModel model, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(model);
 
@@ -1162,9 +1155,7 @@ public class CasoService : ICasoService
     // DOCUMENTOS
     // =========================================================
 
-    public async Task<IReadOnlyList<CasoDocumentoViewModel>> GetDocumentosAsync(
-            Guid casoId,
-            CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<CasoDocumentoViewModel>> GetDocumentosAsync(Guid casoId, CancellationToken cancellationToken = default)
     {
         return await _dbContext.DocumentosExpediente
             .AsNoTracking()
@@ -1266,8 +1257,6 @@ public class CasoService : ICasoService
             })
             .ToListAsync(cancellationToken);
     }
-
-
     public async Task<IReadOnlyList<OpcionCatalogoViewModel>> GetBarriosAsync(Guid distritoId, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Barrios
@@ -1736,10 +1725,7 @@ public class CasoService : ICasoService
     }
 
     //====== Vincular - Desvincular personas a un caso ======
-    public async Task DesvincularVictimaAsync(
-        Guid casoId,
-        Guid personaId,
-        CancellationToken cancellationToken = default)
+    public async Task DesvincularVictimaAsync(Guid casoId, Guid personaId, CancellationToken cancellationToken = default)
     {
         /*
          * 1. Comprobamos que el caso exista.
@@ -1801,10 +1787,7 @@ public class CasoService : ICasoService
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DesvincularPresuntoAgresorAsync(
-    Guid casoId,
-    Guid personaId,
-    CancellationToken cancellationToken = default)
+    public async Task DesvincularPresuntoAgresorAsync(Guid casoId, Guid personaId, CancellationToken cancellationToken = default)
     {
         /*
          * 1. Comprobamos que el caso exista.
@@ -1846,10 +1829,7 @@ public class CasoService : ICasoService
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task AgregarParticipanteActuacionAsync(
-    Guid actuacionId,
-    Guid usuarioId,
-    CancellationToken cancellationToken = default)
+    public async Task AgregarParticipanteActuacionAsync(Guid actuacionId, Guid usuarioId, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(usuarioId.ToString()))
         {
@@ -1952,10 +1932,7 @@ public class CasoService : ICasoService
             cancellationToken);
     }
 
-    public async Task QuitarParticipanteActuacionAsync(
-    Guid actuacionId,
-    Guid usuarioId,
-    CancellationToken cancellationToken = default)
+    public async Task QuitarParticipanteActuacionAsync(Guid actuacionId, Guid usuarioId, CancellationToken cancellationToken = default)
     {
         /*
          * Buscamos la relación exacta.
